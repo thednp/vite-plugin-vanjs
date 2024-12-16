@@ -51,7 +51,9 @@ declare module "vanjs/ssr" {
 Update your `tsconfig.json` file:
 ```json
 {
-  // "compilerOptions": { ... },
+  "compilerOptions": {
+    // ...{} your compiler options
+  },
   "include": ["global.d.ts"], /* link the file here*/
 }
 ```
