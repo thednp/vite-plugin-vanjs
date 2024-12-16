@@ -1,6 +1,4 @@
-import { Plugin } from 'vite';
-
-export default function vanjsPlugin(): Plugin {
+export default function vanjsPlugin() {
   return {
     name: 'vanjs',
     enforce: 'pre',
