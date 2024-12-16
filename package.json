@@ -20,8 +20,11 @@
     "spa"
   ],
   "peerDependencies": {
-    "vite": "^6.0.3",
     "vanjs-core": "^1.5.2",
     "mini-van-plate": "^0.6.1"
+  },
+  "devDependencies": {
+    "vite": "^6.0.3",
+    "typescript": "~5.7.2"
   }
 }
