@@ -7,3 +7,5 @@ export default vanjsPlugin;
 declare module 'vanjs/ssr' {
     export = Van;
 }
+
+export { };
