@@ -49,7 +49,7 @@ declare module "vanjs/ssr" {
 ```
 
 Update your `tsconfig.json` file:
-```json
+```ts
 {
   "compilerOptions": {
     // ...{} your compiler options
