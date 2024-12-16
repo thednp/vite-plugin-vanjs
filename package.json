@@ -4,21 +4,13 @@
   "author": "thednp",
   "license": "MIT",
   "description": "A Vite plugin for VanJS to simplify SSR and SSG aplication development.",
-  "main": "dist/index.js",
-  "module": "index.js",
+  "main": "index.mjs",
+  "module": "index.mjs",
   "types": "index.d.ts",
   "files": [
-    "dist/index.mjs",
-    "dist/index.cjs",
-    "dist/index.d.ts"
+    "index.mjs",
+    "index.d.ts"
   ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.mjs"
-    }
-  },
   "keywords": [
     "vite",
     "plugin",
@@ -44,8 +36,7 @@
   "devDependencies": {
     "@types/node": "^22.10.2",
     "typescript": "~5.7.2",
-    "vite": "^6.0.3",
-    "vite-plugin-dts": "^4.3.0"
+    "vite": "^6.0.3"
   },
   "packageManager": "pnpm@9.10.0",
   "engines": {

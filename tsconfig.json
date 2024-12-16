@@ -25,6 +25,6 @@
     "checkJs": true,
     "skipLibCheck": true // allows dts-bundle-generator to import from package.json
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "experiments", "coverage", "dist"],
+  "include": ["src", "index.d.ts"],
+  "exclude": ["node_modules", "experiments", "coverage"],
 }

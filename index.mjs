@@ -1,12 +1,16 @@
-function n() {
+export default function VitePluginVanJS() {
   return {
     name: "vanjs",
     enforce: "pre",
-    resolveId(e) {
-      return e === "vanjs/ssr" ? "\0vanjs/ssr" : null;
+    resolveId(id) {
+      if (id === "vanjs/ssr") {
+        return "\0vanjs/ssr";
+      }
+      return null;
     },
-    load(e) {
-      return e === "\0vanjs/ssr" ? `// vite-plugin-vanjs
+    load(id) {
+      if (id === "\0vanjs/ssr") {
+        return `// vite-plugin-vanjs
 import vanPlate from "mini-van-plate/van-plate";
 import vanCore from "vanjs-core";
 
@@ -20,11 +24,9 @@ const getVanJS = () => {
 };
 
 export default getVanJS();
-` : null;
-    }
+`;
+      }
+      return null;
+    },
   };
 }
-export {
-  n as default
-};
-//# sourceMappingURL=index.mjs.map
