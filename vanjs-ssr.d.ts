@@ -4,4 +4,4 @@ declare module 'vanjs/ssr' {
     export = Van;
 }
 
-export default 'vanjs-core';
+export default 'vanjs/ssr';

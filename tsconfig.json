@@ -23,8 +23,11 @@
     "allowSyntheticDefaultImports": true,
     "noEmit": true,
     "checkJs": true,
-    "skipLibCheck": true // allows dts-bundle-generator to import from package.json
+    "paths": {
+      // "vanjs/ssr": ["./src/types/vanjs.d.ts"]
+      "vanjs/ssr": ["vanjs-ssr.d.ts"]
+    }
   },
-  "include": ["src", "index.d.ts"],
+  "include": ["src", "index.d.ts", "vanjs-ssr.d.ts"],
   "exclude": ["node_modules", "experiments", "coverage"],
 }

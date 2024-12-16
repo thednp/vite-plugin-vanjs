@@ -1,7 +1,11 @@
-import van from 'vanjs-core';
-import vanPlate from 'mini-van-plate/van-plate';
+import { Plugin } from 'vite';
+import * as Van from 'vanjs-core';
 
-export { vanCore as van, vanPlate };
+declare function vanjsPlugin(): Plugin;
+export default vanjsPlugin;
 
-declare const _default: typeof vanPlate | typeof van;
-export default _default;
+declare module 'vanjs/ssr' {
+    export = Van;
+}
+
+export * from 'vanjs-core';

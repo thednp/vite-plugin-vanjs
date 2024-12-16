@@ -20,6 +20,9 @@
     "ssg",
     "spa"
   ],
+  "exports": {
+    "./vanjs/ssr": "./vanjs-ssr.d.ts"
+  },
   "scripts": {
     "prepublishOnly": "pnpm up && pnpm lint && pnpm format && pnpm build && pnpm badges",
     "badges": "npx -p dependency-version-badge update-badge vanjs-core mini-van-plate typescript vite",
