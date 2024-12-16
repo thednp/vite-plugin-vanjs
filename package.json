@@ -4,13 +4,21 @@
   "author": "thednp",
   "license": "MIT",
   "description": "A Vite plugin for VanJS to simplify SSR and SSG aplication development.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "module": "index.js",
   "types": "index.d.ts",
   "files": [
-    "index.js",
-    "index.d.ts"
+    "dist/index.mjs",
+    "dist/index.cjs",
+    "dist/index.d.ts"
   ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
+    }
+  },
   "keywords": [
     "vite",
     "plugin",
@@ -19,12 +27,24 @@
     "ssg",
     "spa"
   ],
+  "scripts": {
+    "prepublishOnly": "pnpm up && pnpm lint && pnpm format && pnpm build && pnpm badges",
+    "badges": "npx -p dependency-version-badge update-badge typescript vite",
+    "format": "deno fmt src",
+    "lint": "pnpm lint:ts && pnpm check:ts",
+    "lint:ts": "deno lint src",
+    "fix:ts": "deno lint src --fix",
+    "check:ts": "tsc -noEmit",
+    "build": "vite build"
+  },
   "peerDependencies": {
-    "vanjs-core": "^1.5.2",
-    "mini-van-plate": "^0.6.1"
+    "mini-van-plate": "^0.6.1",
+    "vanjs-core": "^1.5.2"
   },
   "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "~5.7.2",
     "vite": "^6.0.3",
-    "typescript": "~5.7.2"
+    "vite-plugin-dts": "^4.3.0"
   }
 }

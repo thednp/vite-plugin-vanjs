@@ -1,15 +1,18 @@
-export default function vanjsPlugin() {
+import { type Plugin } from "vite";
+
+export default function VitePluginVanJS(): Plugin {
   return {
-    name: 'vanjs',
-    enforce: 'pre',
+    name: "vanjs",
+    enforce: "pre",
     resolveId(id) {
-      if (id === 'vanjs/ssr') {
-        return '\0vanjs/ssr';
+      if (id === "vanjs/ssr") {
+        return "\0vanjs/ssr";
       }
+      return null;
     },
     load(id) {
-      if (id === '\0vanjs/ssr') {
-return `// vite-plugin-vanjs
+      if (id === "\0vanjs/ssr") {
+        return `// vite-plugin-vanjs
 import vanPlate from "mini-van-plate/van-plate";
 import vanCore from "vanjs-core";
 
@@ -25,6 +28,7 @@ const getVanJS = () => {
 export default getVanJS();
 `;
       }
+      return null;
     },
   };
 }

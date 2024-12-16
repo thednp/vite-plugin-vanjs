@@ -1,5 +1,11 @@
 # vite-plugin-vanjs
 
+[![ci](https://github.com/thednp/vite-plugin-vanjs/actions/workflows/ci.yml/badge.svg)](https://github.com/thednp/vite-plugin-vanjs/actions/workflows/ci.yml)
+[![NPM Version](https://img.shields.io/npm/v/vite-plugin-vanjs.svg)](https://www.npmjs.com/package/vite-plugin-vanjs)
+[![NPM Downloads](https://img.shields.io/npm/dm/vite-plugin-vanjs.svg)](http://npm-stat.com/charts.html?package=vite-plugin-vanjs)
+[![typescript version](https://img.shields.io/badge/typescript-5.7.2-brightgreen)](https://www.typescriptlang.org/)
+[![vite version](https://img.shields.io/badge/vite-6.0.3-brightgreen)](https://github.com/vitejs)
+
 A Vite plugin for VanJS to simplify SSR and SSG application development.
 
 This plugin provides a virtual `vanjs/ssr` import that resolves to the correct Van object for either server or client environments.
