@@ -21,7 +21,7 @@
     "spa"
   ],
   "exports": {
-    "./vanjs/ssr": "./vanjs-ssr.d.ts"
+    "vanjs/ssr": "./vanjs-ssr.d.ts"
   },
   "scripts": {
     "prepublishOnly": "pnpm up && pnpm lint && pnpm format && pnpm build && pnpm badges",

@@ -1,7 +1,8 @@
-import * as Van from 'vanjs-core';
+// import * as Van from 'vanjs-core';
 
 declare module 'vanjs/ssr' {
-    export = Van;
+    // export default Van;
+    import Van from 'vanjs-core';
+    export default Van;
+    
 }
-
-export default 'vanjs/ssr';

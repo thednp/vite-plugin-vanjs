@@ -28,6 +28,6 @@
       "vanjs/ssr": ["vanjs-ssr.d.ts"]
     }
   },
-  "include": ["src", "index.d.ts", "vanjs-ssr.d.ts"],
+  "include": ["index.d.ts", "vanjs-ssr.d.ts"],
   "exclude": ["node_modules", "experiments", "coverage"],
 }
