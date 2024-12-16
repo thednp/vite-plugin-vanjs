@@ -12,10 +12,6 @@
     "index.d.ts",
     "vanjs-ssr.d.ts"
   ],
-  "exports": {
-    ".": "./index.mjs",
-    "./vanjs/ssr": "./vanjs-ssr.d.ts"
-  },
   "keywords": [
     "vite",
     "plugin",
