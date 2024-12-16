@@ -29,7 +29,7 @@
   ],
   "scripts": {
     "prepublishOnly": "pnpm up && pnpm lint && pnpm format && pnpm build && pnpm badges",
-    "badges": "npx -p dependency-version-badge update-badge typescript vite",
+    "badges": "npx -p dependency-version-badge update-badge vanjs-core mini-van-plate typescript vite",
     "format": "deno fmt src",
     "lint": "pnpm lint:ts && pnpm check:ts",
     "lint:ts": "deno lint src",
@@ -37,7 +37,7 @@
     "check:ts": "tsc -noEmit",
     "build": "vite build"
   },
-  "peerDependencies": {
+  "dependencies": {
     "mini-van-plate": "^0.6.1",
     "vanjs-core": "^1.5.2"
   },

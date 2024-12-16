@@ -20,7 +20,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Update version badges 🏷
-        run: npx -p dependency-version-badge update-badge typescript vite
+        run: npx -p dependency-version-badge update-badge vanjs-core mini-van-plate typescript vite
 
       - name: Commit any changed files 💾
         uses: stefanzweifel/git-auto-commit-action@v4
