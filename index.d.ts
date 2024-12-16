@@ -8,4 +8,4 @@ declare module 'vanjs/ssr' {
     export = Van;
 }
 
-export { };
+export * from 'vanjs-core';
