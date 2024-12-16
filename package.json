@@ -4,11 +4,11 @@
   "author": "thednp",
   "license": "MIT",
   "description": "A Vite plugin for VanJS to simplify SSR and SSG aplication development.",
-  "main": "index.ts",
-  "module": "index.ts",
+  "main": "index.mts",
+  "module": "index.mts",
   "types": "index.d.ts",
   "files": [
-    "index.ts",
+    "index.mts",
     "index.d.ts"
   ],
   "keywords": [

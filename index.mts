@@ -3,6 +3,7 @@ import { Plugin } from 'vite';
 export default function vanjsPlugin(): Plugin {
   return {
     name: 'vanjs',
+    enforce: 'pre',
     resolveId(id) {
       if (id === 'vanjs/ssr') {
         return '\0vanjs/ssr';
