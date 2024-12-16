@@ -1,0 +1,27 @@
+{
+  "name": "vite-plugin-vanjs",
+  "version": "0.0.1",
+  "author": "thednp",
+  "license": "MIT",
+  "description": "A Vite plugin for VanJS to simplify SSR and SSG aplication development.",
+  "main": "index.ts",
+  "module": "index.ts",
+  "types": "index.d.ts",
+  "files": [
+    "index.ts",
+    "index.d.ts"
+  ],
+  "keywords": [
+    "vite",
+    "plugin",
+    "vanjs",
+    "ssr",
+    "ssg",
+    "spa"
+  ],
+  "peerDependencies": {
+    "vite": "^6.0.3",
+    "vanjs-core": "^1.5.2",
+    "mini-van-plate": "^0.6.1"
+  }
+}
