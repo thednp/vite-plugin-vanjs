@@ -10,7 +10,8 @@
   "files": [
     "src/index.mjs",
     "src/index.d.ts",
-    "src/vanjs-ssr.d.ts"
+    "src/vanjs-ssr.d.ts",
+    "src/transform.mjs"
   ],
   "keywords": [
     "vite",
