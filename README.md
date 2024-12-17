@@ -8,9 +8,13 @@
 [![mini-van-plate version](https://img.shields.io/badge/mini--van--plate-0.6.1-brightgreen)](https://github.com/vanjs-org/mini-van-plate)
 [![vite version](https://img.shields.io/badge/vite-6.0.3-brightgreen)](https://github.com/vitejs)
 
-A Vite plugin for VanJS to simplify SSR and SSG application development.
+A Vite plugin for VanJS to simplify enable JSX transformation and SSR and SSG application development.
 
-This plugin provides a virtual `vanjs/ssr` import that resolves to the correct Van object for either server or client environments.
+This plugin uses and requires the `mini-van-plate` package in order to register the Van and VanX objects in an isomorphic server/client enviroment. If you're planning to do SSR apps, the `van-ext` is also required.
+
+The recommended template for you to use is the [vite-starter-vanjs-ssr](https://github.com/thednp/vite-starter-vanjs-ssr) which already features this plugin.
+
+If you don't need an SSR/SSG, you simply make use of the JSX transformation capability.
 
 ## Usage
 
@@ -20,43 +24,44 @@ import { defineConfig } from 'vite';
 import vanjs from 'vite-plugin-vanjs';
 
 export default defineConfig({
-  plugins: [vanjs()],
+  plugins: [vanjs(
+    jsx: false,
+  )],
 });
 ```
 
+For SSR applications, you need to import the shared `env` object, vite-plugin-vanjs makes sure to load it where needed.
 ```ts
 // my-component.ts
-import van from 'vanjs/ssr';
+import { env } from 'mini-van-plate/shared';
 
 // use van as usual
 const MyComponent = () => {
-  return van.div("Hello from VanJS!");
+  return env.van.div("Hello from VanJS!");
 };
 ```
 
 
-### Typescript
+### JSX Transformation
 
-Create a `global.d.ts` file in the root of your project:
-```ts
-// global.d.ts
-/// <reference types="vite/client" />
+```tsx
+// App.tsx
+import { env } from 'mini-van-shared';
 
-declare module "vanjs/ssr" {
-    import van from "vanjs-core";
-    export default van;
+const { van } = env;
+
+const App = () => {
+  const count = env.van.state(0);
+
+  return (
+    <button onClick={() => count++}>{count.val}</button>
+  );
 }
+
+van.add(document.getElementById("app")!, <App />);
+
 ```
 
-Update your `tsconfig.json` file:
-```ts
-{
-  "compilerOptions": {
-    // ...{} your compiler options
-  },
-  "include": ["global.d.ts"], /* link the file here*/
-}
-```
 
 
 ### License

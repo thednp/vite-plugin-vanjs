@@ -3,10 +3,10 @@
   "version": "0.0.1",
   "author": "thednp",
   "license": "MIT",
-  "description": "A Vite plugin for VanJS to simplify SSR and SSG aplication development.",
-  "main": "index.mjs",
-  "module": "index.mjs",
-  "types": "index.d.ts",
+  "description": "A Vite plugin for VanJS to enable JSX transformation and simplify SSR and SSG aplication development.",
+  "main": "src/index.mjs",
+  "module": "src/index.mjs",
+  "types": "src/index.d.ts",
   "files": [
     "index.mjs",
     "index.d.ts",
@@ -22,27 +22,31 @@
   ],
   "exports": {
     ".": {
-      "import": "./index.mjs",
-      "require": "./index.mjs",
-      "types": "./index.d.ts",
-      "vanjs/ssr": "./vanjs-ssr.d.ts"
+      "import": "./src/index.mjs",
+      "require": "./src/index.mjs",
+      "types": "./src/index.d.ts"
     }
   },
   "scripts": {
-    "prepublishOnly": "pnpm up && pnpm lint && pnpm format && pnpm build && pnpm badges",
+    "prepublishOnly": "pnpm up && pnpm lint && pnpm format && pnpm badges",
     "badges": "npx -p dependency-version-badge update-badge vanjs-core mini-van-plate typescript vite",
     "format": "deno fmt src",
     "lint": "pnpm lint:ts && pnpm check:ts",
     "lint:ts": "deno lint src",
     "fix:ts": "deno lint src --fix",
-    "check:ts": "tsc -noEmit",
-    "build": "vite build"
+    "check:ts": "tsc -noEmit"
   },
   "dependencies": {
-    "mini-van-plate": "^0.6.1",
-    "vanjs-core": "^1.5.2"
+    "@babel/core": "^7.26.0",
+    "@babel/generator": "^7.26.3",
+    "@babel/parser": "^7.26.3",
+    "@babel/traverse": "^7.26.4"
   },
   "devDependencies": {
+    "@babel/types": "^7.26.3",
+    "@types/babel__core": "^7.20.5",
+    "@types/babel__generator": "^7.6.8",
+    "@types/babel__traverse": "^7.20.6",
     "@types/node": "^22.10.2",
     "typescript": "~5.7.2",
     "vite": "^6.0.3"

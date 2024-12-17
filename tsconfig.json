@@ -22,12 +22,8 @@
     "removeComments": false,
     "allowSyntheticDefaultImports": true,
     "noEmit": true,
-    "checkJs": true,
-    "paths": {
-      // "vanjs/ssr": ["./src/types/vanjs.d.ts"]
-      "vanjs/ssr": ["vanjs-ssr.d.ts"]
-    }
+    "checkJs": true
   },
-  "include": ["index.d.ts", "vanjs-ssr.d.ts"],
+  "include": ["src"],
   "exclude": ["node_modules", "experiments", "coverage"],
 }
