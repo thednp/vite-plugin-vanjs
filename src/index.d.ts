@@ -1,4 +1,4 @@
-import { type Plugin, type FilterPattern, createFilter } from 'vite';
+import { type Plugin, type FilterPattern } from 'vite';
 
 /** Configuration options for vite-plugin-solid. */
 export interface VitePluginVanJSOptions {

@@ -8,9 +8,9 @@
   "module": "src/index.mjs",
   "types": "src/index.d.ts",
   "files": [
-    "index.mjs",
-    "index.d.ts",
-    "vanjs-ssr.d.ts"
+    "src/index.mjs",
+    "src/index.d.ts",
+    "src/vanjs-ssr.d.ts"
   ],
   "keywords": [
     "vite",
