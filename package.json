@@ -4,14 +4,11 @@
   "author": "thednp",
   "license": "MIT",
   "description": "A Vite plugin for VanJS to enable JSX transformation and simplify SSR and SSG aplication development.",
-  "main": "src/index.mjs",
-  "module": "src/index.mjs",
+  "main": "src/index.mts",
+  "module": "src/index.mts",
   "types": "src/index.d.ts",
   "files": [
-    "src/index.mjs",
-    "src/index.d.ts",
-    "src/vanjs-ssr.d.ts",
-    "src/transform.mjs"
+    "src"
   ],
   "keywords": [
     "vite",
@@ -23,9 +20,20 @@
   ],
   "exports": {
     ".": {
-      "import": "./src/index.mjs",
-      "require": "./src/index.mjs",
-      "types": "./src/index.d.ts"
+      "types": "./src/index.d.ts",
+      "import": "./src/index.mts"
+    },
+    "./jsx": {
+      "types": "./src/jsx/index.d.ts",
+      "import": "./src/jsx/index.js"
+    },
+    "./jsx-runtime": {
+      "types": "./src/jsx/jsx-runtime.d.ts",
+      "import": "./src/jsx/jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./src/jsx/jsx-dev-runtime.d.ts",
+      "import": "./src/jsx/jsx-dev-runtime.js"
     }
   },
   "scripts": {
@@ -38,16 +46,12 @@
     "check:ts": "tsc -noEmit"
   },
   "dependencies": {
-    "@babel/core": "^7.26.0",
-    "@babel/generator": "^7.26.3",
-    "@babel/parser": "^7.26.3",
-    "@babel/traverse": "^7.26.4"
+    "csstype": "^3.1.3",
+    "mini-van-plate": "^0.6.1",
+    "vanjs-core": "^1.5.2",
+    "vanjs-ext": "^0.6.2"
   },
   "devDependencies": {
-    "@babel/types": "^7.26.3",
-    "@types/babel__core": "^7.20.5",
-    "@types/babel__generator": "^7.6.8",
-    "@types/babel__traverse": "^7.20.6",
     "@types/node": "^22.10.2",
     "typescript": "~5.7.2",
     "vite": "^6.0.3"

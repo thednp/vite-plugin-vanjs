@@ -24,20 +24,19 @@ import { defineConfig } from 'vite';
 import vanjs from 'vite-plugin-vanjs';
 
 export default defineConfig({
-  plugins: [vanjs(
-    jsx: false,
-  )],
+  plugins: [vanjs()],
 });
 ```
 
-For SSR applications, you need to import the shared `env` object, vite-plugin-vanjs makes sure to load it where needed.
+For your convenience and for SSR applications expecially, you need to import from `vanjs` virtual module, so **vite-plugin-vanjs** makes sure to load the right modules where needed.
+
 ```ts
 // my-component.ts
-import { env } from 'mini-van-plate/shared';
+import { van } from 'vanjs';
 
 // use van as usual
 const MyComponent = () => {
-  return env.van.div("Hello from VanJS!");
+  return van.div("Hello from VanJS!");
 };
 ```
 
@@ -46,22 +45,19 @@ const MyComponent = () => {
 
 ```tsx
 // App.tsx
-import { env } from 'mini-van-shared';
-
-const { van } = env;
+import { van } from 'vanjs';
 
 const App = () => {
-  const count = env.van.state(0);
+  const count = van.state(0);
 
   return (
-    <button onClick={() => count++}>{count.val}</button>
+    <button onClick={() => count.val++}>{count}</button>
   );
 }
 
 van.add(document.getElementById("app")!, <App />);
 
 ```
-
 
 
 ### License

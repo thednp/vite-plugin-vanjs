@@ -1,8 +1,6 @@
-import { transformVanJS } from './transform.mjs';
+import { type VitePluginVanJSPlugin} from '.';
 
-/** @type {import('./index.d.ts').default} */
-export default function vanjsPlugin(config = {}) {
-  const jsx = config.jsx !== false;
+const vanjsPlugin: VitePluginVanJSPlugin = (config = {}) => {
   const entries = ['src/entry-client', 'src/entry-server', ...(config.entries || [])].filter(Boolean);
 
   return {
@@ -11,7 +9,7 @@ export default function vanjsPlugin(config = {}) {
     transform(code, id) {
       if (entries.some((entry) => id.includes(entry))) {
         // Inject code to make 'van' available in both client and server environments
-        const newCode = `// vite-plugin-vanjs
+        return `// vite-plugin-vanjs
 import { env, registerEnv, dummyVanX } from "mini-van-plate/shared";
 import vanPlate from "mini-van-plate/van-plate";
 import vanCore from "vanjs-core";
@@ -30,11 +28,10 @@ function vanSetup() {
 
 vanSetup();
 ${code}`;
-        return newCode;
-      } else if (jsx) {
-        return transformVanJS(code, id, config);
       }
       return code;
     },
   };
 }
+
+export default vanjsPlugin;
