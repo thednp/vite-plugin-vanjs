@@ -1,4 +1,6 @@
 import { type Plugin } from 'vite';
 export * from './jsx';
+import './global';
 
-export declare type VitePluginVanJSPlugin = () => Plugin;
+declare type VitePluginVanJSPlugin = () => Plugin;
+export default VitePluginVanJSPlugin;
