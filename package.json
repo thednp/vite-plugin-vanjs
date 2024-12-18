@@ -4,8 +4,8 @@
   "author": "thednp",
   "license": "MIT",
   "description": "A Vite plugin for VanJS to enable JSX transformation and simplify SSR and SSG aplication development.",
-  "main": "src/index.mts",
-  "module": "src/index.mts",
+  "main": "src/index.js",
+  "module": "src/index.js",
   "types": "src/index.d.ts",
   "files": [
     "src"
@@ -21,7 +21,7 @@
   "exports": {
     ".": {
       "types": "./src/index.d.ts",
-      "import": "./src/index.mts"
+      "import": "./src/index.js"
     },
     "./jsx": {
       "types": "./src/jsx/index.d.ts",
