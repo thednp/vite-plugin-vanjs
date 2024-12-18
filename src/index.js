@@ -1,7 +1,6 @@
 // import path from 'node:path';
 // import process from "node:process";
 
-/** @typedef {import('vite').Plugin} */
 export default function vanjsPlugin() {
   // let root = process.cwd();
 
@@ -18,22 +17,22 @@ export default function vanjsPlugin() {
     /**
      * @param {string} id
      */
-    resolveId(id) {
-      // console.log('resolveId', {id, });
-      if (id === 'vanjs') return id;
-      // if (id.includes('vite-plugin-vanjs/jsx-')) {
+    // resolveId(id) {
+    //   // console.log('resolveId', {id, });
+    //   if (id === 'vanjs') return id;
+    //   // if (id.includes('vite-plugin-vanjs/jsx-')) {
         
-      //   console.log({[id]: resolve(id)});
-      //   // return null;
-      //   return resolve(id);
-      // }
-      return null
-    },
+    //   //   console.log({[id]: resolve(id)});
+    //   //   // return null;
+    //   //   return resolve(id);
+    //   // }
+    //   // return null
+    // },
 
     /**
      * @param {string} id 
      */
-    load (id) {
+    load(id) {
       // console.log('load', {id});
       if (id === "vanjs") {
         return `// vanjs
