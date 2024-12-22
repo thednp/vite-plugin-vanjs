@@ -14,7 +14,9 @@ export type VitePluginVanJSPlugin = Plugin<VitePluginVanJSPluginOptions> & {
     };
 };
 
-// export * from "vite-plugin-vanjs/setup";
-// export * from "vite-plugin-vanjs/jsx";
+export * from "vite-plugin-vanjs/setup";
+export * from "vite-plugin-vanjs/jsx";
+// export * from "../setup";
+// export * from "../jsx";
 // export * from "@vanjs/setup";
 // export * from "@vanjs/jsx";

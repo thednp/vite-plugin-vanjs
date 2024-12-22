@@ -12,6 +12,7 @@
   "types": "./dist/index.d.ts",
   "files": [
     "dist",
+    "setup",
     "jsx",
     "tsconfig.json",
     "package.json",
@@ -43,8 +44,8 @@
       "import": "./jsx/src/index.mjs"
     },
     "./jsx-runtime": {
-      "types": "./jsx/jsx/jsx-runtime.d.ts",
-      "import": "./jsx/jsx/jsx-runtime.mjs"
+      "types": "./jsx/src/jsx-runtime.d.ts",
+      "import": "./jsx/src/jsx-runtime.mjs"
     },
     "./jsx-dev-runtime": {
       "types": "./jsx/src/jsx-dev-runtime.d.ts",
