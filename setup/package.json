@@ -1,0 +1,16 @@
+{
+    "name": "setup",
+    "version": "0.0.1",
+    "main": "./index.cjs",
+    "module": "./index.mjs",
+    "types": "./types.d.ts",
+    "type": "module",
+    "exports": {
+      ".": {
+        "types": "./types.d.ts",
+        "require": "./index.cjs",
+        "import": "./index.mjs"
+      } 
+    },
+    "sideEffects": false
+}

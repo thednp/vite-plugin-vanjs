@@ -12,7 +12,6 @@ export const styleToString = (style) => {
 };
 export const setAttribute = (element, key, value) => {
     // Convert Style Object
-    console.log('setAttribute', key, value);
     if (key === "style") {
         const attr = styleToString(value);
         element.setAttribute(key, attr);
@@ -36,5 +35,13 @@ export const setAttribute = (element, key, value) => {
         }
         element.setAttribute(key, value);
         return;
+    }
+    // Set Boolean Attribute
+    if (typeof value === "boolean") {
+        if (value) {
+          element.setAttribute(key, "");
+          return;
+        }
+        element.removeAttribute(key);
     }
 };

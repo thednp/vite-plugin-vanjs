@@ -1,0 +1,32 @@
+{
+  "name": "jsx",
+  "type": "module",
+  "types": "./src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "require": "./src/index.js",
+      "import": "./src/index.js"
+    },
+    "./jsx-runtime": {
+      "types": "./src/jsx-runtime.d.ts",
+      "require": "./src/jsx-runtime.js",
+      "import": "./src/jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./src/jsx-dev-runtime.d.ts",
+      "require": "./src/jsx-dev-runtime.js",
+      "import": "./src/jsx-dev-runtime.js"
+    }
+  },
+  "files": [
+    "src",
+    "jsx-runtime.d.ts"
+  ],
+  "peerDependencies": {
+    "vite-plugin-vanjs": "^0.0.1"
+  },
+  "devDependencies": {
+    "vite-plugin-vanjs": "^0.0.1"
+  }
+}

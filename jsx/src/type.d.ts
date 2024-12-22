@@ -1,12 +1,11 @@
 import CSS from "csstype";
 import { State } from "vanjs-core";
-import { VanNode } from "./createElement";
+import { VanNode } from "./jsx";
 export type Primitive = string | number | boolean | bigint;
 export type Key = number | string | symbol;
 export type PrimitiveChild = Primitive;
-interface EventHandler<E extends Event = Event, T extends Element = HTMLElement> {
-    (event?: E): void;
-    target: EventTarget & T;
+interface EventHandler<E extends Event = Event> {
+    (event: E): void;
 }
 export interface DOMAttributes {
     onCopy?: EventHandler<ClipboardEvent> | undefined;
@@ -29,7 +28,7 @@ export interface DOMAttributes {
     onChangeCapture?: EventHandler<Event> | undefined;
     onBeforeInput?: EventHandler<Event> | undefined;
     onBeforeInputCapture?: EventHandler<Event> | undefined;
-    onInput?: EventHandler<InputEvent, HTMLInputElement> | undefined;
+    onInput?: EventHandler<Event> | undefined;
     onInputCapture?: EventHandler<Event> | undefined;
     onReset?: EventHandler<Event> | undefined;
     onResetCapture?: EventHandler<Event> | undefined;
@@ -385,7 +384,7 @@ export interface DOMAttributes {
     onChangeCapture?: EventHandler<Event> | undefined;
     onBeforeInput?: EventHandler<Event> | undefined;
     onBeforeInputCapture?: EventHandler<Event> | undefined;
-    onInput?: EventHandler<InputEvent, HTMLInputElement> | undefined;
+    onInput?: EventHandler<Event> | undefined;
     onInputCapture?: EventHandler<Event> | undefined;
     onReset?: EventHandler<Event> | undefined;
     onResetCapture?: EventHandler<Event> | undefined;
@@ -536,7 +535,6 @@ export interface ReactiveAttributes<T> {
 export interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes, ReactiveAttributes<T> {
     accessKey?: string | undefined;
     autoFocus?: boolean | undefined;
-    class?: string | undefined;
     className?: string | undefined;
     contentEditable?: Booleanish | "inherit" | undefined;
     contextMenu?: string | undefined;
@@ -590,7 +588,6 @@ export interface HTMLAttributes<T> extends AriaAttributes, DOMAttributes, Reacti
     is?: string | undefined;
 }
 export interface SVGAttributes<T> extends AriaAttributes, DOMAttributes, ReactiveAttributes<T> {
-    class?: string | undefined;
     className?: string | undefined;
     color?: string | undefined;
     height?: number | string | undefined;
@@ -1043,7 +1040,6 @@ export interface KeygenHTMLAttributes<T> extends HTMLAttributes<T> {
 export interface LabelHTMLAttributes<T> extends HTMLAttributes<T> {
     form?: string | undefined;
     htmlFor?: string | undefined;
-    for?: string | undefined;
 }
 export interface LiHTMLAttributes<T> extends HTMLAttributes<T> {
     value?: string | ReadonlyArray<string> | number | undefined;
@@ -1115,7 +1111,6 @@ export interface OptionHTMLAttributes<T> extends HTMLAttributes<T> {
 export interface OutputHTMLAttributes<T> extends HTMLAttributes<T> {
     form?: string | undefined;
     htmlFor?: string | undefined;
-    for?: string | undefined;
     name?: string | undefined;
 }
 export interface ParamHTMLAttributes<T> extends HTMLAttributes<T> {

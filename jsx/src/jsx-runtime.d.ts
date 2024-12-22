@@ -1,4 +1,4 @@
-import { type JSXElementType, VanElement } from "./createElement";
+import { JSXElementType, VanElement } from "./jsx";
 import { InnerElement, Key, TagOption } from "./type";
 export declare namespace JSX {
     type ElementType = string | JSXElementType<unknown>;
