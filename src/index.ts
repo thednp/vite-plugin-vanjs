@@ -15,8 +15,8 @@ const VitePluginVanJS = (config: VitePluginVanJSPluginOptions = {}) => {
 
       // Inject code to make 'van' available in server environment
       const result = `// vite-loader
-// import v from "vite-plugin-vanjs/setup";
-import v from "@vanjs/setup";
+import v from "vite-plugin-vanjs/setup";
+// import v from "@vanjs/setup";
 import { registerEnv } from "mini-van-plate/shared";
 registerEnv(v);
 ${code}`;

@@ -14,6 +14,7 @@
     "dist",
     "setup",
     "jsx",
+    "tsconfig.node.json",
     "tsconfig.json",
     "package.json",
     "jsx-runtime.d.ts",
