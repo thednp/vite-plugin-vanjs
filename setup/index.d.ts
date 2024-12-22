@@ -1,16 +1,16 @@
-import setup from "./index.mjs";
-import "./global";
+// import setup from "./index.mjs";
+export * from "./global";
 
-// declare module "@vanjs/setup" {
-//     export default setup;
-// }
-// declare module "@vanjs/van" {
-//     import v from "vite-plugin-vanjs/setup";
-//     export default v.van;
-// }
-// declare module "@vanjs/vanX" {
-//     import v from "vite-plugin-vanjs/setup";
-//     export default v.vanX;
-// }
+import { dummyVanX } from "mini-van-plate/shared";
+import vanPlate from "mini-van-plate/van-plate";
+import vanCore from "vanjs-core";
+import * as vanX from "vanjs-ext";
 
-export default setup;
+type VansSetup = {
+    isServer: boolean,
+    van: typeof vanPlate & typeof vanCore,
+    vanX: typeof dummyVanX | typeof vanX,
+}
+
+export default VansSetup;
+

@@ -10,6 +10,6 @@ export { }
 
 declare namespace vansSetup {
     const isServer: boolean;
-    const van: import("mini-van-plate/van-plate").Van | import("vanjs-core").Van;
+    const van: import("vanjs-core").Van | import("mini-van-plate/van-plate").Van;
     const vanX: import("mini-van-plate/shared").VanXObj | typeof import("vanjs-ext");
 }
