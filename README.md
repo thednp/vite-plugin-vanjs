@@ -1,4 +1,4 @@
-# vite-plugin-vanjs
+## vite-plugin-vanjs
 
 [![NPM Version](https://img.shields.io/npm/v/vite-plugin-vanjs.svg)](https://www.npmjs.com/package/vite-plugin-vanjs)
 [![NPM Downloads](https://img.shields.io/npm/dm/vite-plugin-vanjs.svg)](http://npm-stat.com/charts.html?package=vite-plugin-vanjs)
@@ -15,7 +15,7 @@ The recommended templates for you to use are the [vite-starter-vanjs-ssr](https:
 
 If you don't need an SSR/SSG application, you simply make use of the JSX transformation capability.
 
-## Install
+### Install
 
 1) Install the plugin:
 
@@ -39,8 +39,9 @@ deno add npm:vite-plugin-vanjs
 ```
 
 
-## Usage
+### Usage
 
+Update your `vite.config.mts` file:
 ```ts
 // vite.config.mts
 import { defineConfig } from 'vite';
@@ -50,6 +51,9 @@ export default defineConfig({
   plugins: [vanjs()],
 });
 ```
+
+
+**Example**:
 
 For your convenience and for your SSR applications/extensions expecially, you need to import from `@vanjs/van` virtual module, so **vite-plugin-vanjs** makes sure to load the right modules where needed.
 
@@ -65,15 +69,17 @@ const MyComponent = () => {
 The plugin also exports `vanX`.
 
 ```ts
-// my-component.ts
+// my-list.ts
 import van from '@vanjs/van';
 import vanX from '@vanjs/vanX';
 
-// use van as usual
+type ListItem = { text: string, done: boolean };
+
+// use VanJS as usual
 const MyList = () => {
-  const items = vanX.reactive([]);
+  const items = vanX.reactive<ListItem[]>([]);
   const { div, button, span, a, input, del } = van.tags;
-  const inputDom = input({ type: "text", placeholder: "your new item" })
+  const inputDom = input({ type: "text", placeholder: "your new item" });
   return div(
     inputDom,
     button({onclick: () => items.push({text: inputDom.value, done: false})}, "Add"),
@@ -89,6 +95,18 @@ const MyList = () => {
 
 ### JSX Transformation
 
+To enable JSX transformation, you have to edit your `tsconfig.json` as follows:
+
+```json
+{
+  "compilerOptions": {
+    // {... your other compiler options }
+    "jsx": "preserve",
+    "jsxImportSource": "@vanjs/jsx"
+  },}
+```
+
+**Example**:
 ```tsx
 // App.tsx
 import type { ChildDom } from "vanjs-core";
@@ -105,16 +123,20 @@ const App = () => {
 van.add(document.getElementById("app")!, <App /> as ChildDom);
 
 ```
-To enable JSX transformation, you have to edit your `tsconfig.json` as follows:
 
-```json
-{
-  "compilerOptions": {
-    // {... your other compiler options }
-    "jsx": "preserve",
-    "jsxImportSource": "@vanjs/jsx"
-  },}
-```
+**Notes**:
+* you can use `ref` as a `van.state`, `class` instead of `className`, `for` instead of `htmlFor`;
+* you can use style as both an object and a string;
+* for a JSX started template, check out the [vite-starter-vanjs-ssr-jsx](https://github.com/thednp/vite-starter-vanjs-ssr-jsx).
+* for a pure started template, check out the [vite-starter-vanjs-ssr](https://github.com/thednp/vite-starter-vanjs-ssr).
+
+
+
+### Credits
+* [van-jsx](https://github.com/herudi/van-jsx) a simple Vanilla JSX implementation;
+* [vanjs-jsx](https://github.com/vanjs-org/van/tree/main/addons/van_jsx) the official VanJS addon;
+* [surplus](https://github.com/adamhaile/surplus/blob/master/index.d.ts) for Typescript definitions also used by SolidJS;
+* [inferno](https://github.com/infernojs/inferno/blob/master/packages/inferno/src/core/types.ts) also typescript definitions.
 
 
 ### License
