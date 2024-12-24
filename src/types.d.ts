@@ -1,4 +1,4 @@
-import type { Plugin } from 'vite';
+import type { Plugin } from "vite";
 export * from "../jsx";
 export * from "../setup";
-export default () => Plugin;
+export default function VitePluginVanJS(): Plugin;

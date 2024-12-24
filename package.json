@@ -54,14 +54,13 @@
     }
   },
   "scripts": {
-    "prepublishOnly": "pnpm up && pnpm lint && pnpm format && pnpm badges && pnpm build",
+    "prepublishOnly": "pnpm up && pnpm lint && pnpm format && pnpm badges",
     "badges": "npx -p dependency-version-badge update-badge vanjs-core mini-van-plate typescript vite",
-    "format": "deno fmt src",
+    "format": "deno fmt src setup jsx",
     "lint": "pnpm lint:ts && pnpm check:ts",
     "lint:ts": "deno lint src",
     "fix:ts": "deno lint src --fix",
-    "check:ts": "tsc -noEmit",
-    "build": "vite build"
+    "check:ts": "tsc -noEmit"
   },
   "dependencies": {
     "csstype": "^3.1.3",

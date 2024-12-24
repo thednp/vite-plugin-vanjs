@@ -4,13 +4,13 @@ import type { Fragment } from "./fragment.d.ts";
 
 declare function jsx(
   type: any,
-  props: any
+  props: any,
 ): () =>
   | (Node & {
-      [key: string]: any;
-    })
+    [key: string]: any;
+  })
   | (Node & {
-      [key: string]: any;
-    })[];
+    [key: string]: any;
+  })[];
 
-export { jsx, jsx as jsxs, jsx as jsxDEV, Fragment };
+export { Fragment, jsx, jsx as jsxDEV, jsx as jsxs };

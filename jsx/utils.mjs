@@ -8,8 +8,11 @@ export const setAttribute = (element, key, value) => {
 };
 
 export const styleToString = (style) => {
-  return typeof style === "string" ? style
-    : typeof style === "object" ? Object.entries(style).reduce((acc, key) => acc +
+  return typeof style === "string"
+    ? style
+    : typeof style === "object"
+    ? Object.entries(style).reduce((acc, key) =>
+      acc +
       key[0]
         .split(/(?=[A-Z])/)
         .join("-")
@@ -17,5 +20,5 @@ export const styleToString = (style) => {
       ":" +
       key[1] +
       ";", "")
-      : "";
+    : "";
 };

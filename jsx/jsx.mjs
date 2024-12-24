@@ -4,13 +4,13 @@ import { setAttribute, styleToString } from "./utils.mjs";
 export const jsx = (jsxTag, { children, ref, style, ...props }) => {
   if (typeof jsxTag === "string") {
     const ele = van.tags[jsxTag](children);
-    
+
     for (const [k, value] of Object.entries(props)) {
       if (typeof value === "function" && !k.startsWith("on")) {
         van.derive(() => setAttribute(ele, k, value()));
         continue;
       }
-      
+
       if (typeof value === "function" && k.startsWith("on")) {
         ele.addEventListener(k.slice(2).toLowerCase(), value);
         continue;
@@ -20,7 +20,7 @@ export const jsx = (jsxTag, { children, ref, style, ...props }) => {
         van.derive(() => setAttribute(ele, k, value.val));
         continue;
       }
-      
+
       setAttribute(ele, k, value);
     }
     if (style) {
@@ -35,5 +35,7 @@ export const jsx = (jsxTag, { children, ref, style, ...props }) => {
     return ele;
   }
 
-  return typeof jsxTag === "function" ? jsxTag({ children, ref, style, ...props }) : null;
-}
+  return typeof jsxTag === "function"
+    ? jsxTag({ children, ref, style, ...props })
+    : null;
+};

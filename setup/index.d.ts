@@ -6,9 +6,9 @@ import vanCore from "vanjs-core";
 import * as vanX from "vanjs-ext";
 
 type VansSetup = {
-    isServer: boolean,
-    van: typeof vanPlate & typeof vanCore,
-    vanX: typeof dummyVanX | typeof vanX,
-}
+  isServer: boolean;
+  van: typeof vanPlate & typeof vanCore;
+  vanX: typeof dummyVanX | typeof vanX;
+};
 
 export default VansSetup;
