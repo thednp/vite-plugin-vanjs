@@ -1,5 +1,5 @@
 import van from "@vanjs/van";
-import setup from "@vanjs/van";
+import setup from "@vanjs/setup";
 import { setAttribute, styleToString } from "./utils.mjs";
 
 export const jsx = (jsxTag, { children, ref, style, ...props }) => {
