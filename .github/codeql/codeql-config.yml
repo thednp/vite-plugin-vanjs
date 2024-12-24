@@ -1,2 +1,4 @@
 paths:
-  - index.mjs
+  - src
+  - setup
+  - jsx
