@@ -19,7 +19,11 @@
     }
   },
   "peerDependencies": {
-    "vite-plugin-vanjs": "^0.0.1"
+    "vite-plugin-vanjs": "*",
+    "csstype": "*",
+    "mini-van-plate": "*",
+    "vanjs-core": "*",
+    "vanjs-ext": "*"
   },
   "sideEffects": false
 }
