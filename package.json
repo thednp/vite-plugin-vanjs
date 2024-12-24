@@ -9,7 +9,7 @@
   "sideEffects": false,
   "main": "./src/index.mts",
   "module": "./src/index.mts",
-  "types": "./src/index.d.ts",
+  "types": "./src/types.d.ts",
   "files": [
     "src",
     "setup",
