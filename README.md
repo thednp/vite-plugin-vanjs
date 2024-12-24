@@ -126,6 +126,7 @@ van.add(document.getElementById("app")!, <App /> as ChildDom);
 ```
 
 **Notes**:
+* in some cases like this one, enforcing a certain typescript type via `as` might be in good order depending on who renders your component;
 * you can use `ref` as a `van.state`, `class` instead of `className`, `for` instead of `htmlFor`;
 * you can use style as both an object and a string;
 * for a JSX started template, check out the [vite-starter-vanjs-ssr-jsx](https://github.com/thednp/vite-starter-vanjs-ssr-jsx).
