@@ -7,8 +7,8 @@
   "repository": "https://github.com/thednp/vite-plugin-vanjs",
   "type": "module",
   "sideEffects": false,
-  "main": "./src/index.mts",
-  "module": "./src/index.mts",
+  "main": "./src/index.mjs",
+  "module": "./src/index.mjs",
   "types": "./src/types.d.ts",
   "files": [
     "src",
@@ -32,8 +32,8 @@
   "exports": {
     ".": {
       "types": "./src/types.d.ts",
-      "import": "./src/index.mts",
-      "default": "./src/index.mts"
+      "import": "./src/index.mjs",
+      "default": "./src/index.mjs"
     },
     "./setup": {
       "types": "./setup/index.d.ts",
