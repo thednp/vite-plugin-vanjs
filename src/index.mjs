@@ -1,4 +1,8 @@
-import path from "node:path";
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export default function VitePluginVanJS() {
   return {
@@ -8,10 +12,10 @@ export default function VitePluginVanJS() {
       return {
         resolve: {
           alias: {
-            "@vanjs/jsx": path.resolve(__dirname, "../jsx"),
-            "@vanjs/setup": path.resolve(__dirname, "../setup"),
-            "@vanjs/van": path.resolve(__dirname, "../setup/van"),
-            "@vanjs/vanX": path.resolve(__dirname, "../setup/vanX"),
+            "@vanjs/jsx": resolve(__dirname, "../jsx"),
+            "@vanjs/setup": resolve(__dirname, "../setup"),
+            "@vanjs/van": resolve(__dirname, "../setup/van"),
+            "@vanjs/vanX": resolve(__dirname, "../setup/vanX"),
           },
         },
         optimizeDeps: {
