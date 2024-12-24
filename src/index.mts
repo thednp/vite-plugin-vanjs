@@ -1,7 +1,6 @@
-import type { Plugin } from "vite";
 import path from "node:path";
 
-export default function VitePluginVanJS(): Plugin {
+export default function VitePluginVanJS() {
   return {
     name: "vanjs",
     enforce: "pre",
