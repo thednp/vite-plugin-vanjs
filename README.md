@@ -100,7 +100,7 @@ To enable JSX transformation, you have to edit your `tsconfig.json` as follows:
 ```json
 {
   "compilerOptions": {
-    // {... your other compiler options }
+    /* {... your other compiler options } */
     "jsx": "preserve",
     "jsxImportSource": "@vanjs/jsx"
   },}
