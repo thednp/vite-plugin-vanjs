@@ -1,28 +1,29 @@
-import type { VitePluginVanJSPluginOptions, VitePluginVanJSPlugin } from './types';
-// import './types.d.ts';
+import type { Plugin } from 'vite';
+import path from 'node:path';
 
-const VitePluginVanJS = (config: VitePluginVanJSPluginOptions = {}) => {
-  const defaultEntries = ['src/entry-client', 'src/entry-server'];
-  const entries = [...defaultEntries, ...(config.entries || [])];
-
+export default function VitePluginVanJS(): Plugin {
   return {
     name: 'vanjs',
     enforce: 'pre',
-    transform(code: string, id?: string) {
-      if (!id || !entries.some((entry) => id.includes(entry))) {
-        return { code, map: null };
-      }
-
-      // Inject code to make 'van' available in server environment
-      const result = `// vite-loader
-import v from "vite-plugin-vanjs/setup";
-// import v from "@vanjs/setup";
-import { registerEnv } from "mini-van-plate/shared";
-registerEnv(v);
-${code}`;
-      return { code: result, map: null };
+    config() {
+      return {
+        resolve: {
+          alias: {
+            '@vanjs/jsx': path.resolve(__dirname, '../jsx'),
+            '@vanjs/setup': path.resolve(__dirname, '../setup'),
+            '@vanjs/van': path.resolve(__dirname, '../setup/van'),
+            '@vanjs/vanX': path.resolve(__dirname, '../setup/vanX'),
+          }
+        },
+        optimizeDeps: {
+          include: ['vanjs-core', 'mini-van-plate', 'vanjs-ext']
+        },
+        esbuild: {
+          jsx: "automatic",
+          jsxFactory: 'jsx',
+          jsxFragment: 'Fragment',
+        },
+      };
     }
-  } satisfies VitePluginVanJSPlugin;
+  };
 }
-
-export default VitePluginVanJS;

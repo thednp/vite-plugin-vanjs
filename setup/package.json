@@ -1,16 +1,25 @@
 {
-    "name": "setup",
-    "version": "0.0.1",
-    "main": "./index.cjs",
-    "module": "./index.mjs",
-    "types": "./index.d.ts",
-    "type": "module",
-    "exports": {
-      ".": {
-        "types": "./index.d.ts",
-        "require": "./index.cjs",
-        "import": "./index.mjs"
-      } 
+  "name": "setup",
+  "main": "./index.mjs",
+  "module": "./index.mjs",
+  "types": "./index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.mjs"
     },
-    "sideEffects": false
+    "./van": {
+      "types": "./van.d.ts",
+      "import": "./van.mjs"
+    },
+    "./vanX": {
+      "types": "./vanX.d.ts",
+      "import": "./vanX.mjs"
+    }
+  },
+  "peerDependencies": {
+    "vite-plugin-vanjs": "^0.0.1"
+  },
+  "sideEffects": false
 }

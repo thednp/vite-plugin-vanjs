@@ -1,31 +1,23 @@
 {
   "name": "jsx",
   "type": "module",
-  "types": "./src/index.d.ts",
+  "types": "index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.d.ts",
-      "require": "./src/index.js",
-      "import": "./src/index.js"
+      "types": "./index.d.ts",
+      "import": "./index.mjs"
     },
     "./jsx-runtime": {
-      "types": "./src/jsx-runtime.d.ts",
-      "require": "./src/jsx-runtime.js",
-      "import": "./src/jsx-runtime.js"
+      "types": "./jsx-runtime.d.ts",
+      "import": "./jsx-runtime.mjs"
     },
     "./jsx-dev-runtime": {
-      "types": "./src/jsx-dev-runtime.d.ts",
-      "require": "./src/jsx-dev-runtime.js",
-      "import": "./src/jsx-dev-runtime.js"
+      "types": "./jsx-dev-runtime.d.ts",
+      "import": "./jsx-dev-runtime.mjs"
     }
   },
-  "files": [
-    "src",
-    "jsx-runtime.d.ts",
-    "src/jsx-dev-runtime.d.ts"
-  ],
   "peerDependencies": {
     "vite-plugin-vanjs": "^0.0.1"
   },
-  "devDependencies": {}
+  "sideEffects": false
 }

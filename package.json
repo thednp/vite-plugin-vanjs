@@ -7,17 +7,17 @@
   "repository": "https://github.com/thednp/vite-plugin-vanjs",
   "type": "module",
   "sideEffects": false,
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.d.ts",
   "files": [
-    "dist",
+    "src",
     "setup",
     "jsx",
-    "tsconfig.node.json",
     "tsconfig.json",
     "package.json",
     "jsx-runtime.d.ts",
+    "jsx-dev-runtime.d.ts",
     "README.md",
     "LICENSE"
   ],
@@ -31,9 +31,9 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.cjs"
+      "types": "./src/types.d.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
     },
     "./setup": {
       "types": "./setup/index.d.ts",
@@ -41,16 +41,16 @@
       "require": "./setup/index.cjs"
     },
     "./jsx": {
-      "types": "./jsx/src/index.d.ts",
-      "import": "./jsx/src/index.mjs"
+      "types": "./jsx/index.d.ts",
+      "import": "./jsx/index.mjs"
     },
     "./jsx-runtime": {
-      "types": "./jsx/src/jsx-runtime.d.ts",
-      "import": "./jsx/src/jsx-runtime.mjs"
+      "types": "./jsx/jsx-runtime.d.ts",
+      "import": "./jsx/jsx-runtime.mjs"
     },
     "./jsx-dev-runtime": {
-      "types": "./jsx/src/jsx-dev-runtime.d.ts",
-      "import": "./jsx/src/jsx-dev-runtime.mjs"
+      "types": "./jsx/jsx-dev-runtime.d.ts",
+      "import": "./jsx/jsx-dev-runtime.mjs"
     }
   },
   "scripts": {
@@ -72,13 +72,6 @@
   "devDependencies": {
     "@types/node": "^22.10.2",
     "typescript": "5.6.2",
-    "vite": "^6.0.5",
-    "vite-plugin-dts": "^4.4.0"
-  },
-  "packageManager": "pnpm@9.10.0",
-  "engines": {
-    "node": ">=20",
-    "pnpm": ">=9.10.0",
-    "deno": ">=2.0.4"
+    "vite": "^6.0.5"
   }
 }

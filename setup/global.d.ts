@@ -1,24 +1,24 @@
-import setup from "./index";
-
-// import { dummyVanX } from "mini-van-plate/shared";
-// import vanPlate from "mini-van-plate/van-plate";
-// import vanCore from "vanjs-core";
-// import * as vanX from "vanjs-ext";
-
-// type VansSetup = {
-//     isServer: boolean,
-//     van: typeof vanPlate & typeof vanCore,
-//     vanX: typeof dummyVanX | typeof vanX,
-// }
-
-export declare module "@vanjs/setup" {
-    export default setup;
+declare module '@vanjs/van' {
+  import type { Van } from 'vanjs-core';
+  const van: Van;
+  export default van;
 }
-export declare module "@vanjs/van" {
-    import v from "vite-plugin-vanjs/setup";
-    export default v.van;
+
+declare module '@vanjs/vanX' {
+  import * as VanX from 'vanjs-ext';
+  const vanX: typeof VanX;
+  export default vanX;
 }
-export declare module "@vanjs/vanX" {
-    import v from "vite-plugin-vanjs/setup";
-    export default v.vanX;
+
+declare module '@vanjs/setup' {
+  import type { Van } from 'vanjs-core';
+  import * as VanX from 'vanjs-ext';
+  
+  interface Setup {
+    isServer: boolean;
+    van: Van;
+    vanX: typeof VanX;
+  }
+  const setup: Setup;
+  export default setup;
 }

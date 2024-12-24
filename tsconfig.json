@@ -27,19 +27,7 @@
     "checkJs": true,
     "jsx": "react-jsx",
     "jsxImportSource": "vite-plugin-vanjs",
-    "paths": {
-      "~/*": ["./src/*"],
-      // "@vanjs/h": ["./src/jsx/index.ts", "./dist/jsx/index.mjs"],
-      // "@vanjs/loader": ["./src/loader/index.ts", "./dist/loader/index.mjs"],
-      // "@vanjs/setup": ["setup/index.mjs", "./dist/setup/index.mjs"],
-      // "@vanjs/van": ["./src/van/index.ts", "./dist/van/index.mjs"],
-      // "@vanjs/vanx": ["./src/vanx/index.ts", "./dist/vanx/index.mjs"]
-    }
   },
   "include": ["./src/**/*", "./jsx/**/*.d.ts", "setup/**/*"],
-  "references": [{ "path": "./tsconfig.node.json" }],
-  "exclude": [
-    "node_modules", "experiments", "coverage", //"dist", 
-    // "jsx/**/*.js", "src/**/*.jsx"
-  ],
+  "exclude": ["node_modules", "experiments", "coverage"],
 }
