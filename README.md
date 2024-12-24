@@ -15,6 +15,30 @@ The recommended templates for you to use are the [vite-starter-vanjs-ssr](https:
 
 If you don't need an SSR/SSG application, you simply make use of the JSX transformation capability.
 
+## Install
+
+1) Install the plugin:
+
+```bash
+pnpm add vite-plugin-vanjs
+```
+
+```bash
+npm install vite-plugin-vanjs
+```
+
+```bash
+deno add npm:vite-plugin-vanjs
+```
+
+2) To add typescript support, edit your `src/vite-env.d.ts` as follows:
+
+```ts
+/// <reference types="vite/client" />
+/// <reference types="vite-plugin-vanjs" />
+```
+
+
 ## Usage
 
 ```ts
@@ -67,7 +91,7 @@ const MyList = () => {
 
 ```tsx
 // App.tsx
-import type{ ChildDom } from "vanjs-core";
+import type { ChildDom } from "vanjs-core";
 import van from '@vanjs/van';
 
 const App = () => {
@@ -81,9 +105,7 @@ const App = () => {
 van.add(document.getElementById("app")!, <App /> as ChildDom);
 
 ```
-To enable JSX transformation, you have to follow these two steps:
-
-1) Edit your `tsconfig.json` as follows:
+To enable JSX transformation, you have to edit your `tsconfig.json` as follows:
 
 ```json
 {
@@ -92,13 +114,6 @@ To enable JSX transformation, you have to follow these two steps:
     "jsx": "preserve",
     "jsxImportSource": "@vanjs/jsx"
   },}
-```
-
-2) Edit your `src/vite-env.d.ts` as follows:
-
-```ts
-/// <reference types="vite/client" />
-/// <reference types="vite-plugin-vanjs" />
 ```
 
 
