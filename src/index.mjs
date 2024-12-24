@@ -18,7 +18,6 @@ export default function VitePluginVanJS() {
             "@vanjs/vanX": resolve(__dirname, "../setup/vanX"),
           },
         },
-
         esbuild: {
           jsx: "automatic",
           jsxFactory: "jsx",
