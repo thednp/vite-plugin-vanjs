@@ -100,7 +100,7 @@ To enable JSX transformation, you have to edit your `tsconfig.json` as follows:
 ```json
 {
   "compilerOptions": {
-    /* {... your other compiler options } */
+    /*{... your other compiler options }*/
     "jsx": "preserve",
     "jsxImportSource": "@vanjs/jsx"
   }
@@ -129,8 +129,8 @@ van.add(document.getElementById("app")!, <App /> as ChildDom);
 * in some cases like this one, enforcing a certain typescript type via `as` might be in good order depending on who renders your component;
 * you can use `ref` as a `van.state`, `class` instead of `className`, `for` instead of `htmlFor`;
 * you can use style as both an object and a string;
-* for a JSX started template, check out the [vite-starter-vanjs-ssr-jsx](https://github.com/thednp/vite-starter-vanjs-ssr-jsx).
-* for a pure started template, check out the [vite-starter-vanjs-ssr](https://github.com/thednp/vite-starter-vanjs-ssr).
+* for a JSX starter template, check out the [vite-starter-vanjs-ssr-jsx](https://github.com/thednp/vite-starter-vanjs-ssr-jsx).
+* for a pure vanilla starter template, check out the [vite-starter-vanjs-ssr](https://github.com/thednp/vite-starter-vanjs-ssr).
 
 
 
