@@ -1,4 +1,3 @@
-import type { ChildDom } from "vanjs-core";
 import type { JSX } from "./jsx";
 
 export type FragmentProps = {
