@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-vanjs",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "thednp",
   "license": "MIT",
   "description": "A Vite plugin for VanJS to enable JSX transformation and simplify aplication development.",

@@ -5,19 +5,48 @@ declare module "@vanjs/van" {
 }
 
 declare module "@vanjs/vanX" {
-  import * as VanX from "vanjs-ext";
-  const vanX: typeof VanX;
+  import {
+    calc,
+    compact,
+    list,
+    noreactive,
+    raw,
+    reactive,
+    replace,
+    stateFields,
+  } from "vanjs-ext";
+  const vanX: {
+    calc: typeof calc;
+    reactive: typeof reactive;
+    noreactive: typeof noreactive;
+    stateFields: typeof stateFields;
+    raw: typeof raw;
+    list: typeof list;
+    replace: typeof replace;
+    compact: typeof compact;
+  };
   export default vanX;
+  export {
+    calc,
+    compact,
+    list,
+    noreactive,
+    raw,
+    reactive,
+    replace,
+    stateFields,
+  };
 }
 
 declare module "@vanjs/setup" {
   import type { Van } from "vanjs-core";
-  import * as VanX from "vanjs-ext";
+  import type * as vanX from "vanjs-ext";
+  import type { dummyVanX } from "mini-van-plate/shared";
 
   interface Setup {
     isServer: boolean;
     van: Van;
-    vanX: typeof VanX;
+    vanX: typeof vanX | typeof dummyVanX;
   }
   const setup: Setup;
   export default setup;

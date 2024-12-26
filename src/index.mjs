@@ -25,5 +25,32 @@ export default function VitePluginVanJS() {
         },
       };
     },
+    transform(code, id) {
+      let newCode = code;
+
+      const vanCoreReg = /import\s*.*\s*from\s*['"]vanjs-core['"]/g;
+      const vanExtReg = /import\s*.*\s*from\s*['"]vanjs-ext['"]/g;
+      const isSetupFile = /vite-plugin-vanjs[\\/]setup/.test(id);
+
+      if (!isSetupFile) {
+        if (vanCoreReg.test(newCode)) {
+          newCode = newCode.replace(
+            vanCoreReg,
+            (match) => match.replace("vanjs-core", "@vanjs/van"),
+          );
+        }
+        if (vanExtReg.test(newCode)) {
+          newCode = newCode.replace(
+            vanExtReg,
+            (match) => match.replace("vanjs-ext", "@vanjs/vanX"),
+          );
+        }
+      }
+
+      return {
+        code: newCode,
+        map: null,
+      };
+    },
   };
 }
