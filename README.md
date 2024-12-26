@@ -7,13 +7,11 @@
 [![mini-van-plate version](https://img.shields.io/badge/mini--van--plate-0.6.1-brightgreen)](https://github.com/vanjs-org/mini-van-plate)
 [![vite version](https://img.shields.io/badge/vite-6.0.5-brightgreen)](https://github.com/vitejs)
 
-A Vite plugin for VanJS to enable JSX transformation and simplify application development. It will load the appropriate Van or VanX objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required objects in an isomorphic server/client enviroment.
+A Vite plugin for VanJS to enable JSX transformation and simplify application development and enables you to create SSR applications or SSG (static) pages. It will automatically load the appropriate Van or VanX objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required objects in an isomorphic enviroment.
 
-If you're planning to do SSR apps, the `van-ext` is also required along with `mini-van-plate`.
+The plugin uses `van-ext` along with `mini-van-plate` so you can have everything ready from start. It also enables JSX transformation with minimal setup so you can write your code faster.
 
-The recommended templates for you to use are the [vite-starter-vanjs-ssr](https://github.com/thednp/vite-starter-vanjs-ssr) and [vite-starter-vanjs-ssr-jsx](https://github.com/thednp/vite-starter-vanjs-ssr-jsx) which already feature this plugin.
-
-If you don't need an SSR/SSG application, you simply make use of the JSX transformation capability.
+The recommended starter templates for you are the [vite-starter-vanjs-ssr](https://github.com/thednp/vite-starter-vanjs-ssr) and [vite-starter-vanjs-ssr-jsx](https://github.com/thednp/vite-starter-vanjs-ssr-jsx) which already include this plugin.
 
 
 ### Install
@@ -56,7 +54,7 @@ export default defineConfig({
 
 **Example**:
 
-While the plugin will resolve the appropriate modules depending on the environment, for your convenience, you can also import from `@vanjs/van` virtual module or `@vanjs/vanX`, so the plugin makes sure to load the right modules where needed.
+While the plugin will resolve the appropriate modules depending on the environment, for your convenience, you can also import the `@vanjs/van` and `@vanjs/vanX` virtual modules, so the plugin makes sure to load the right modules where needed.
 
 ```ts
 // my-component.ts

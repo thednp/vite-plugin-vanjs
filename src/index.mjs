@@ -37,7 +37,7 @@ export default function VitePluginVanJS() {
       const vanCoreReg = /import\s*.*\s*from\s*['"]vanjs-core['"]/g;
       const vanExtReg = /import\s*.*\s*from\s*['"]vanjs-ext['"]/g;
       const isSetupFile = /vite-plugin-vanjs[\\/]setup/.test(id);
-      const isVanXFile = /node_modules[\\/]vanjs-ext[\\/]src[\\/]van-x/.test(id);
+      const isVanXFile = /vanjs-ext[\\/]src[\\/]van-x/.test(id);
 
       if (!isSetupFile && !isVanXFile) {
         if (vanCoreReg.test(newCode)) {
