@@ -5,7 +5,7 @@
 [![typescript version](https://img.shields.io/badge/typescript-5.6.2-brightgreen)](https://www.typescriptlang.org/)
 [![vanjs-core version](https://img.shields.io/badge/vanjs--core-1.5.2-brightgreen)](https://github.com/vanjs-org/van)
 [![mini-van-plate version](https://img.shields.io/badge/mini--van--plate-0.6.1-brightgreen)](https://github.com/vanjs-org/mini-van-plate)
-[![vite version](https://img.shields.io/badge/vite-6.0.5-brightgreen)](https://github.com/vitejs)
+[![vite version](https://img.shields.io/badge/vite-6.0.6-brightgreen)](https://github.com/vitejs)
 
 A Vite plugin for VanJS to enable JSX transformation and simplify application development and enables you to create SSR applications or SSG (static) pages. It will automatically load the appropriate Van or VanX objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required objects in an isomorphic enviroment.
 
