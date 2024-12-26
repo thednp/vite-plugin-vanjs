@@ -10,6 +10,12 @@ export default function VitePluginVanJS() {
     enforce: "pre",
     config() {
       return {
+        build: {
+          optimizeDeps: {
+            include: ["vanjs-core", "vanjs-ext", "mini-van-plate"],
+          },
+          dedupe: ["vanjs-core", "vanjs-ext", "mini-van-plate"],
+        },
         resolve: {
           alias: {
             "@vanjs/jsx": resolve(__dirname, "../jsx"),
@@ -31,8 +37,9 @@ export default function VitePluginVanJS() {
       const vanCoreReg = /import\s*.*\s*from\s*['"]vanjs-core['"]/g;
       const vanExtReg = /import\s*.*\s*from\s*['"]vanjs-ext['"]/g;
       const isSetupFile = /vite-plugin-vanjs[\\/]setup/.test(id);
+      const isVanXFile = /node_modules[\\/]vanjs-ext[\\/]src[\\/]van-x/.test(id);
 
-      if (!isSetupFile) {
+      if (!isSetupFile && !isVanXFile) {
         if (vanCoreReg.test(newCode)) {
           newCode = newCode.replace(
             vanCoreReg,
