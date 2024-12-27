@@ -42,6 +42,10 @@
       "types": "./setup/types.d.ts",
       "import": "./setup/index.mjs"
     },
+    "./router": {
+      "types": "./router/types.d.ts",
+      "import": "./router/index.mjs"
+    },
     "./server": {
       "types": "./server/types.d.ts",
       "import": "./server/index.mjs"
