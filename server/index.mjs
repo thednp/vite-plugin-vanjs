@@ -29,7 +29,7 @@ export const renderToString = async (source) => {
 
   // no source provided
   // @ts-ignore - this is server side code
-  console.warn("Render error: source not recognized: " + source);
+  console.warn("Render error! Source not recognized: " + source);
   return "";
 };
 
@@ -56,7 +56,7 @@ function renderPreloadLink(file) {
     return ` <link rel="preload" href="${file}" as="image" type="image/webp">`;
   } else {
     // @ts-ignore - this is server side code
-    console.warn("Render error: file not recognized: " + file);
+    console.warn("Render error! File format not recognized: " + file);
     return "";
   }
 }

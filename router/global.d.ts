@@ -15,7 +15,7 @@ declare module "@vanjs/router" {
    *   return Router(); // or <Router /> for JSX
    * }
    */
-  export const Router: () => VanNode | Promise<VanNode>;
+  export const Router: () => VanNode[];
 
   // link.mjs
   /**
@@ -63,7 +63,7 @@ declare module "@vanjs/router" {
   // routes.mjs
   export type Route = {
       path: string;
-      component: () => VanNode[] | Promise<VanNode[]>;
+      component: (() => VanNode) | Promise<VanNode>;
   }
   export const routes: Route[];
 
