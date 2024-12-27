@@ -9,7 +9,7 @@ export type LoadEvent = Event & { target: Window };
 export type PopEvent = PopStateEvent & { target: Window };
 
 // link.mjs
-export const Link: (props: Partial<HTMLAnchorElement>, ...children: VanNode[]) => HTMLAnchorElement;
+export const Link: (props: Partial<HTMLAnchorElement>, ...children: (Element | Node | string)[]) => HTMLAnchorElement;
 
 // helpers.mjs
 export const navigate: (href: string, options: { replace?: boolean } = {}) => void;

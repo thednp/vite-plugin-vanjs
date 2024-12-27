@@ -38,7 +38,7 @@ declare module "@vanjs/router" {
    *   );
    * }
    */
-  export const Link: (props: Partial<HTMLAnchorElement>, ...children: VanNode[]) => HTMLAnchorElement;
+  export const Link: (props: Partial<HTMLAnchorElement>, ...children: (Element | Node | string)[]) => HTMLAnchorElement;
 
   // helpers.mjs
   /**
