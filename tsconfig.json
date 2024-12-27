@@ -28,6 +28,6 @@
     "jsx": "preserve",
     "jsxImportSource": "vite-plugin-vanjs",
   },
-  "include": ["./src/**/*.ts", "./jsx/*.d.ts", "setup/**/*"],
+  "include": ["./src/**/*.ts", "./jsx/*.ts", "./setup/*.ts", "./router/*.ts", "./server/*.ts", "./dom/*.ts"],
   "exclude": ["node_modules", "experiments", "coverage"],
 }

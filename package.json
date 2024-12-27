@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-vanjs",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "author": "thednp",
   "license": "MIT",
   "description": "A Vite plugin for VanJS to enable JSX transformation and simplify aplication development.",
@@ -13,6 +13,9 @@
   "files": [
     "src",
     "setup",
+    "router",
+    "web",
+    "server",
     "jsx",
     "tsconfig.json",
     "package.json",
@@ -36,12 +39,19 @@
       "default": "./src/index.mjs"
     },
     "./setup": {
-      "types": "./setup/index.d.ts",
-      "import": "./setup/index.mjs",
-      "require": "./setup/index.cjs"
+      "types": "./setup/types.d.ts",
+      "import": "./setup/index.mjs"
+    },
+    "./server": {
+      "types": "./server/types.d.ts",
+      "import": "./server/index.mjs"
+    },
+    "./dom": {
+      "types": "./dom/types.d.ts",
+      "import": "./dom/index.mjs"
     },
     "./jsx": {
-      "types": "./jsx/index.d.ts",
+      "types": "./jsx/types.d.ts",
       "import": "./jsx/index.mjs"
     },
     "./jsx-runtime": {

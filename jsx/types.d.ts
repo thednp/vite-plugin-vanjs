@@ -1,6 +1,6 @@
 /// <reference path="global.d.ts" />
-import type { JSX } from "./jsx.d.ts";
-import type { Fragment } from "./fragment.d.ts";
+import type { JSX } from "./jsx";
+import type { Fragment } from "./fragment";
 
 declare function jsx(
   type: any,

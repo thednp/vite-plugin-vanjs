@@ -1,5 +1,5 @@
 {
-  "name": "setup",
+  "name": "server",
   "main": "./index.mjs",
   "module": "./index.mjs",
   "types": "./types.d.ts",
@@ -8,19 +8,10 @@
     ".": {
       "types": "./types.d.ts",
       "import": "./index.mjs"
-    },
-    "./van": {
-      "types": "./van.d.ts",
-      "import": "./van.mjs"
-    },
-    "./vanX": {
-      "types": "./vanX.d.ts",
-      "import": "./vanX.mjs"
     }
   },
   "peerDependencies": {
     "vite-plugin-vanjs": "*",
-    "csstype": "*",
     "mini-van-plate": "*",
     "vanjs-core": "*",
     "vanjs-ext": "*"

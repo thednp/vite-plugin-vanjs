@@ -10,18 +10,15 @@ export default function VitePluginVanJS() {
     enforce: "pre",
     config() {
       return {
-        build: {
-          optimizeDeps: {
-            include: ["vanjs-core", "vanjs-ext", "mini-van-plate"],
-          },
-          dedupe: ["vanjs-core", "vanjs-ext", "mini-van-plate"],
-        },
         resolve: {
           alias: {
-            "@vanjs/jsx": resolve(__dirname, "../jsx"),
             "@vanjs/setup": resolve(__dirname, "../setup"),
             "@vanjs/van": resolve(__dirname, "../setup/van"),
             "@vanjs/vanX": resolve(__dirname, "../setup/vanX"),
+            "@vanjs/dom": resolve(__dirname, "../dom"),
+            "@vanjs/server": resolve(__dirname, "../server"),
+            "@vanjs/router": resolve(__dirname, "../router"),
+            "@vanjs/jsx": resolve(__dirname, "../jsx"),
           },
         },
         esbuild: {

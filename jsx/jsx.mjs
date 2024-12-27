@@ -1,6 +1,6 @@
 import van from "@vanjs/van";
 import setup from "@vanjs/setup";
-import { setAttribute, styleToString } from "./utils.mjs";
+import { setAttribute, styleToString } from "../dom/index.mjs";
 
 export const jsx = (jsxTag, { children, ref, style, ...props }) => {
   if (typeof jsxTag === "string") {

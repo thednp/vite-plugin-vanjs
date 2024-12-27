@@ -3,7 +3,7 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./index.d.ts",
+      "types": "./types.d.ts",
       "import": "./index.mjs"
     },
     "./jsx-runtime": {
