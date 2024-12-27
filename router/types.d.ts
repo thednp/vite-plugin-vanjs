@@ -5,8 +5,6 @@ export type VanNode = Element | Element[] | undefined;
 
 // router.mjs
 export const Router: () => VanNode | Promise<VanNode>;
-export type LoadEvent = Event & { target: Window };
-export type PopEvent = PopStateEvent & { target: Window };
 
 // link.mjs
 export const Link: (props: Partial<HTMLAnchorElement>, ...children: (Element | Node | string)[]) => HTMLAnchorElement;

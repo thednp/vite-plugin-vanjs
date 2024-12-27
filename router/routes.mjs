@@ -1,11 +1,6 @@
 // router/routes.js
-import { reactive } from "vanjs-ext";
-
-export const routes = reactive([]);
-
-/**
- * @typedef {} VanNode
- */
+/** @type {Route[]} */
+export const routes = [];
 
 /**
  * @typedef {Object} Route
@@ -15,17 +10,9 @@ export const routes = reactive([]);
 
 /**
  * @param {Route} route
- * @example
- * import { Home } from '../pages/home.js'
- * import { About } from '../pages/about.js'
- * import { NotFound } from '../pages/not-found.js'
-
- * route({ path: '/', component: Home });
- * route({ path: '/about', component: About });
- * route({ path: '*', component: NotFound });
  */
 export const route = (route) => {
-  routes.push(route)
+  routes.push(route);
 }
 
 /**

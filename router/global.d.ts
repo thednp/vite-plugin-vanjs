@@ -17,9 +17,6 @@ declare module "@vanjs/router" {
    */
   export const Router: () => VanNode | Promise<VanNode>;
 
-  export type LoadEvent = Event & { target: Window };
-  export type PopEvent = PopStateEvent & { target: Window };
-
   // link.mjs
   /**
    * A virtual component that creates an anchor element
@@ -66,7 +63,7 @@ declare module "@vanjs/router" {
   // routes.mjs
   export type Route = {
       path: string;
-      component: () => VanNode | Promise<VanNode>;
+      component: () => VanNode[] | Promise<VanNode[]>;
   }
   export const routes: Route[];
 

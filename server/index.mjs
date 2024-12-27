@@ -11,18 +11,18 @@ export const renderToString = async (source) => {
     return source.trim();
   }
   if (typeof source === "function") {
-    return renderToString(source());
+    return await renderToString(source());
   }
   if (typeof source === "object" && "render" in source) {
     return source.render();
   }
   if (source instanceof Promise) {
-    return renderToString(await source);
+    return await renderToString(await source);
   }
   if (Array.isArray(source)) {
     const elements = [];
     for (const el of source) {
-      elements.push(renderToString(el));
+      elements.push(await renderToString(el));
     }
     return elements.join("");
   }

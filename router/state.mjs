@@ -1,5 +1,5 @@
 // router/state.js
-import { reactive } from "vanjs-ext";
+import van from "vanjs-core";
 import setup from "../setup/index.mjs";
 
 const initialPath = !setup.isServer ? window.location.pathname : '/'
@@ -8,22 +8,23 @@ const initialSearch = !setup.isServer ? window.location.search : ''
 /**
  * @type {typeof import("./types.d.ts").routerState}
  */
-export const routerState = reactive({
-  pathname: initialPath,
-  searchParams: new URLSearchParams(initialSearch),
-})
+export const routerState = {
+  pathname: van.state(initialPath),
+  searchParams: van.state(new URLSearchParams(initialSearch)),
+}
 
 /**
  * @type {typeof import("./types.d.ts").setRouterState}
  */
-export const setRouterState = (href, replace = false) => {
-  const urlParams = new URL(href);
-  const { pathname, searchParams } = urlParams;
+export const setRouterState = (url = '/', replace = false) => {
+  const [pathname, search] = url.split('?');
+  const searchParams = new URLSearchParams(search);
+  const newState = pathname + searchParams.toString();
 
   if (!setup.isServer) {
-    if (replace) window.history.replaceState({}, '', urlParams.toString());
-    else window.history.pushState({}, '', urlParams.toString());
+    if (replace) window.history.replaceState({}, '', newState);
+    else window.history.pushState({}, '', newState);
   }
-  routerState.pathname = pathname;
-  routerState.searchParams = searchParams;
+  routerState.pathname.val = pathname;
+  routerState.searchParams.val = searchParams;
 }
