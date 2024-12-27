@@ -14,7 +14,7 @@
     "src",
     "setup",
     "router",
-    "web",
+    "dom",
     "server",
     "jsx",
     "tsconfig.json",
