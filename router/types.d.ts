@@ -4,7 +4,7 @@ import { reactive } from "vanjs-ext";
 export type VanNode = Element | Element[] | undefined;
 
 // router.mjs
-export const Router: () => VanNode[];
+export const Router: (() => VanNode[]) | Promise<VanNode[]>;
 
 // link.mjs
 export const Link: (props: Partial<HTMLAnchorElement>, ...children: (Element | Node | string)[]) => HTMLAnchorElement;
@@ -17,7 +17,7 @@ export const redirect: (href?: string) => void | (() => void);
 // routes.mjs
 export type Route = {
     path: string;
-    component: (() => VanNode) | Promise<VanNode>;
+    component: (() => VanNode | VanNode[]) | Promise<VanNode | VanNode[]>;
 }
 
 export const routes: Route[];
