@@ -18,5 +18,5 @@ declare module "@vanjs/server" {
    * @param source the source
    * @returns HTML string
    */
-  export const renderToString: (source: Source) => string;
+  export const renderToString: (source: Source) => Promise<string>;
 }

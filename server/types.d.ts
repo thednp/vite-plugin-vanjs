@@ -19,4 +19,4 @@ export type Source = number | string | VanElement | VanElement[] | TagFunc | und
  * @param source the source
  * @returns HTML string
  */
-export const renderToString: (source: Source) => string;
+export const renderToString: (source: Source) => Promise<string>;
