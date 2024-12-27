@@ -1,13 +1,7 @@
 import { basename } from "node:path";
 
-/** @typedef {import("mini-van-plate/van-plate").Element} VanElement */
-/** @typedef {import("mini-van-plate/van-plate").TagFunc} TagFunc */
-
-/** @typedef {number | string | VanElement | VanElement[] | TagFunc | undefined} Source */
-
 /**
- * @param {Source } source
- * @returns {string}
+ * @type {typeof import("./types.d.ts").renderToString}
  */
 export const renderToString = async (source) => {
   if (typeof source === "number") {
@@ -17,18 +11,18 @@ export const renderToString = async (source) => {
     return source.trim();
   }
   if (typeof source === "function") {
-    return await renderToHTML(source());
+    return renderToString(source());
   }
   if (typeof source === "object" && "render" in source) {
     return source.render();
   }
   if (source instanceof Promise) {
-    return await renderToHTML(await source);
+    return renderToString(await source);
   }
   if (Array.isArray(source)) {
     const elements = [];
     for (const el of source) {
-      elements.push(renderToHTML(el));
+      elements.push(renderToString(el));
     }
     return elements.join("");
   }
@@ -68,9 +62,7 @@ function renderPreloadLink(file) {
 }
 
 /**
- * @param {string[]} modules
- * @param {Record<string, string[]>} manifest
- * @returns {string}
+ * @type {typeof import("./types.d.ts").renderPreloadLinks}
  */
 export function renderPreloadLinks(modules, manifest) {
   let links = "";
