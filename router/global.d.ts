@@ -110,4 +110,17 @@ declare module "@vanjs/router" {
  * @returns {TagFunc<HTMLIFrameElement>}
  */
   export const unwrap: (source: Element | (() => Element | Element[]), ...children?: Element[]) => TagFunc<HTMLIFrameElement>;
+
+
+  export type ComponentModule = {
+      component: () => VanNode | VanNode[];
+      route: RouteEntry;
+  }
+
+  /**
+ * Registers a lazy component.
+ * @param importFn
+ * @returns 
+ */
+  export const lazy = (importFn: Promise<VanNode>) => ComponentModule
 }
