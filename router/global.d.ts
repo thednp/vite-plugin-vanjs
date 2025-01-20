@@ -101,4 +101,13 @@ declare module "@vanjs/router" {
    * @param {boolean} replace when true, will replace the current history entry
    */
   export const setRouterState: (href: string, replace?: boolean | undefined) => void;
+
+  /**
+ * Merge the children of an Element or an array of elements with an optional array of children
+ * into the childen of a single HTMLFragmentElement element.
+ * @param  source
+ * @param  {...Element[]} children
+ * @returns {TagFunc<HTMLIFrameElement>}
+ */
+  export const unwrap: (source: Element | (() => Element | Element[]), ...children?: Element[]) => TagFunc<HTMLIFrameElement>;
 }
