@@ -1,5 +1,5 @@
 // router/routes.mjs
-import { extractParams } from "./helpers";
+import { extractParams, isLazyComponent } from "./helpers";
 
 /** @typedef {import("./types.d.ts").RouteEntry} RouteEntry */
 /** @typedef {import("./types.d.ts").Route} Route */
