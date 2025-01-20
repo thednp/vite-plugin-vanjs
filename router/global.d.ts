@@ -4,7 +4,7 @@ declare module "@vanjs/router" {
   import { reactive } from "vanjs-ext";
   import van from "vanjs-core";
 
-  type VanNode = TagFunc<Element> | Element | Element[] | undefined;
+  type VanNode = TagFunc<Element> | Element | Element[];
 
   // router.mjs
   /**
@@ -19,7 +19,7 @@ declare module "@vanjs/router" {
    * }
    */
   // export const Router: () => VanNode[] | Promise<() => VanNode[]>;
-  export const Router: () => (VanNode[] | Promise<VanNode | VanNode[]>);
+  export const Router: () => (VanNode[] | VanNode);
 
   // link.mjs
   /**
@@ -106,11 +106,10 @@ declare module "@vanjs/router" {
  * Merge the children of an Element or an array of elements with an optional array of children
  * into the childen of a single HTMLFragmentElement element.
  * @param  source
- * @param  {...Element[]} children
+ * @param  {...VanNode[]} children
  * @returns {TagFunc<HTMLIFrameElement>}
  */
   export const unwrap: (source: Element | (() => Element | Element[]), ...children?: Element[]) => TagFunc<HTMLIFrameElement>;
-
 
   export type ComponentModule = {
       component: () => VanNode | VanNode[];

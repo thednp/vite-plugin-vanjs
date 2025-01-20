@@ -1,22 +1,46 @@
-// router/router.mjs
-import setup from "../setup/index.mjs";
-import { routerState, setRouterState } from "./state.mjs";
-import { matchRoute } from "./routes.mjs";
-
-/** @typedef {import('./types.d.ts').RouteEntry["component"]} PageComponent */
+import van from 'vanjs-core'
+import setup from "@vanjs/setup"
+import { routerState } from './state.js'
+import { matchRoute } from './routes.js'
+import { unwrap, executeLifecycle } from './helpers.js'
 
 export const Router = () => {
-  if (!setup.isServer) {
-    const hrefCallback = () => {
-      const { pathname, search } = window.location;
-      setRouterState(pathname + (search ? `?${search}` : ""));
-    };
-    window.addEventListener("popstate", hrefCallback);
-    window.onload = hrefCallback;
+  const { div } = van.tags;
+  // const meta = defaultMeta();
+
+  const mainLayout = () => {
+    const route = matchRoute(routerState.pathname.val)
+    if (!route) return () => div('404 - Not Found');
+    
+    routerState.params = route.params || {}
+    // Server-side or async component: use renderComponent
+    if (setup.isServer) {
+      const renderComponent = async () => {
+        try {
+          // console.log('renderComponent.route', route);
+          const module = await route.component();
+          const component = module.component();
+          // console.log('renderComponent.module', module)
+          await executeLifecycle(module, route.params);
+          // console.log('renderComponent.component', component)
+          return unwrap(component).children
+          // return unwrap( component).children
+  
+          // return div('Invalid component')
+        } catch (error) {
+          console.error('Router error:', error)
+          return () => div('Error loading page')
+        }
+      }
+
+      return renderComponent()
+    }
+
+    const module = route.component(route);
+    // Client-side lazy component, lifeCycle is already executed on the server
+    // or when A component has been clicked in the client
+    return unwrap(module.component)
   }
 
-  /** @type {PageComponent | undefined} */
-  const Page = matchRoute(routerState.pathname.val);
-  const routeComponents = Page();
-  return Array.isArray(routeComponents) ? routeComponents : [routeComponents];
-};
+  return mainLayout()
+}
