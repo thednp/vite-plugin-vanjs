@@ -4,28 +4,30 @@ import { basename } from "node:path";
  * @type {typeof import("./types.d.ts").renderToString}
  */
 export const renderToString = async (source) => {
+  const source = typeof inputSource === "function" ? inputSource() : inputSource;
   if (typeof source === "number") {
-    return String(source);
+    return String(source)
   }
   if (typeof source === "string") {
-    return source.trim();
+    return source.trim()
   }
-  if (typeof source === "function") {
-    return await renderToString(source());
-  }
+  // if (typeof source === "function") {
+  //   return renderToString(source())
+  // }
   if (typeof source === "object" && "render" in source) {
-    return source.render();
+    return source.render()
   }
   if (source instanceof Promise) {
-    return await renderToString(await source);
+    return renderToString(await source)
   }
   if (Array.isArray(source)) {
-    const elements = [];
+    const elements = []
     for (const el of source) {
-      elements.push(await renderToString(el));
+      elements.push(await renderToString(el))
     }
-    return elements.join("");
+    return elements.join("")
   }
+  // return String(source)
 
   // no source provided
   // @ts-ignore - this is server side code
