@@ -3,7 +3,7 @@ import { basename } from "node:path";
 /**
  * @type {typeof import("./types.d.ts").renderToString}
  */
-export const renderToString = async (source) => {
+export const renderToString = async (inputSource) => {
   const source = typeof inputSource === "function" ? inputSource() : inputSource;
   if (typeof source === "number") {
     return String(source)
