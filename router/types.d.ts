@@ -1,32 +1,38 @@
 /// <reference path="global.d.ts" />
 import { reactive } from "vanjs-ext";
+import { Van } from "vanjs-core";
 
 export type VanNode = Element | Element[] | undefined;
 
-// router.mjs
-export const Router: (() => VanNode[]) | Promise<VanNode[]>;
+export const Router: () => VanNode[] | Promise<() => VanNode[]>;
 
-// link.mjs
-export const Link: (props: Partial<HTMLAnchorElement>, ...children: (Element | Node | string)[]) => HTMLAnchorElement;
+export type ComponentModule = {
+    component: () => VanNode | VanNode[];
+    route: RouteEntry;
+}
 
-// helpers.mjs
+export type GetCachedRoute = (key: string) => ComponentModule;
+export type CacheRoute = (key: string, route: ComponentModule) => void;
+
+export const A: (props: Partial<HTMLAnchorElement>, ...children: (Element | Node | string)[]) => HTMLAnchorElement;
+
 export const navigate: (href: string, options: { replace?: boolean } = {}) => void;
 export const reload: () => void;
 export const redirect: (href?: string) => void | (() => void);
 
-// routes.mjs
-export type Route = {
+export type RouteEntry = {
     path: string;
-    component: (() => VanNode | VanNode[]) | Promise<VanNode | VanNode[]>;
+    component: () => VanNode | VanNode[] | Promise<VanNode | VanNode[]>;
+    preload?: (params?: Record<string, string>) => any;
+    load?: (params?: Record<string, string>) => any;
 }
 
-export const routes: Route[];
-export const route: (route: Route) => void;
+export const routes: RouteEntry[];
+export const Route: (route: Route) => void;
 
-// state.mjs
 export type RouterState = {
-    pathname: string;
-    searchParams: URLSearchParams;
+    pathname: Van.state<string>;
+    searchParams: Van.state<URLSearchParams>;
 }
 export const routerState: typeof reactive<RouterState>;
 export const setRouterState: (href: string, replace?: boolean | undefined) => void;

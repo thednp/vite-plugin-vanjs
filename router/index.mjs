@@ -1,5 +1,6 @@
 export * from "./router";
 export * from "./routes";
-export * from "./link";
+export * from "./a";
 export * from "./state";
+export * from "./lazy";
 export * from "./helpers";

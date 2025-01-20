@@ -1,25 +1,56 @@
-// router/routes.js
-/** @type {Route[]} */
+// router/routes.mjs
+import { extractParams } from "./helpers";
+
+/** @typedef {import("./types.d.ts").RouteEntry} RouteEntry */
+/** @typedef {import("./types.d.ts").Route} Route */
+
+/** @type {RouteEntry[]} */
 export const routes = [];
 
 /**
- * @typedef {Object} Route
+ * @typedef {Object} RouteEntry
  * @property {string} path
  * @property {() => VanNode | Promise<VanNode>} component
  */
 
 /**
- * @param {Route} route
+ * @param {RouteEntry} routeProps
  */
-export const route = (route) => {
-  routes.push(route);
-}
+export const Route = (routeProps) => {
+  const { component, preload, load, ...rest } = routeProps;
+
+  // If component has lifecycle methods but isn't lazy, make it lazy
+  if (!isLazyComponent(component)) {
+    const wrappedComponent = lazy(() =>
+      Promise.resolve({
+        Page: component,
+        route: { preload, load },
+      })
+    );
+    routes.push({ ...rest, component: wrappedComponent });
+    return;
+  }
+
+  // Otherwise keep original component
+  routes.push(routeProps);
+};
 
 /**
- * @param {string} path 
- * @returns {Route["component"]}
+ * Find a registered route that matches the given path
+ * @param {string} path
+ * @returns {Route["component"] | null}
  */
 export const matchRoute = (path) => {
-  const route = routes.find(r => r.path === path) || routes.find(r => r.path === '*')
-  return route.component;
-}
+  const exactMatch = routes.find((r) => r.path === path);
+  if (exactMatch) return { ...exactMatch, params: {} };
+
+  for (const route of routes) {
+    if (route.path === "*") continue;
+    const params = extractParams(route.path, path);
+    if (params) {
+      return { ...route, params };
+    }
+  }
+
+  return routes.find((r) => r.path === "*") || null;
+};

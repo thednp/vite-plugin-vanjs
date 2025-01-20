@@ -17,6 +17,7 @@ export default function VitePluginVanJS() {
             "@vanjs/vanX": resolve(__dirname, "../setup/vanX"),
             "@vanjs/dom": resolve(__dirname, "../dom"),
             "@vanjs/server": resolve(__dirname, "../server"),
+            "@vanjs/meta": resolve(__dirname, "../meta"),
             "@vanjs/router": resolve(__dirname, "../router"),
             "@vanjs/jsx": resolve(__dirname, "../jsx"),
           },

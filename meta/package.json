@@ -1,5 +1,5 @@
 {
-  "name": "server",
+  "name": "meta",
   "main": "./index.mjs",
   "module": "./index.mjs",
   "types": "./types.d.ts",
@@ -12,9 +12,7 @@
   },
   "peerDependencies": {
     "vite-plugin-vanjs": "*",
-    "mini-van-plate": "*",
-    "vanjs-core": "*",
-    "vanjs-ext": "*"
+    "vanjs-core": "*"
   },
   "sideEffects": false
 }

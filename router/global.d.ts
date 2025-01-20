@@ -1,7 +1,10 @@
-declare module "@vanjs/router" {
-  import { reactive } from "vanjs-ext";
 
-  type VanNode = Element | Element[] | undefined;
+declare module "@vanjs/router" {
+  import { TagFunc } from "mini-van-plate";
+  import { reactive } from "vanjs-ext";
+  import van from "vanjs-core";
+
+  type VanNode = TagFunc<Element> | Element | Element[] | undefined;
 
   // router.mjs
   /**
@@ -15,7 +18,8 @@ declare module "@vanjs/router" {
    *   return Router(); // or <Router /> for JSX
    * }
    */
-  export const Router: (() => VanNode[]) | Promise<VanNode[]>;
+  // export const Router: () => VanNode[] | Promise<() => VanNode[]>;
+  export const Router: () => (VanNode[] | Promise<VanNode | VanNode[]>);
 
   // link.mjs
   /**
@@ -35,7 +39,7 @@ declare module "@vanjs/router" {
    *   );
    * }
    */
-  export const Link: (props: Partial<HTMLAnchorElement>, ...children: (Element | Node | string)[]) => HTMLAnchorElement;
+  export const A: (props: Partial<HTMLAnchorElement>, ...children: (Element | Node | string)[]) => HTMLAnchorElement;
 
   // helpers.mjs
   /**
@@ -61,15 +65,15 @@ declare module "@vanjs/router" {
   export const redirect: (href?: string) => void | (() => void);
 
   // routes.mjs
-  export type Route = {
+  export type RouteEntry = {
       path: string;
-      component: (() => VanNode | VanNode[]) | Promise<VanNode | VanNode[]>;
+      component: () => VanNode | VanNode[] | Promise<VanNode | VanNode[]>;
   }
-  export const routes: Route[];
+  export const routes: RouteEntry[];
 
   /**
    * Registers a new route in the router state.
-   * @param {Route} route the route to register
+   * @param {RouteEntry} route the route to register
    * 
    * @example
    * import { route } from '@vanjs/router';
@@ -78,7 +82,7 @@ declare module "@vanjs/router" {
    * route({ path: '/about', component: About });
    * route({ path: '*', component: NotFound });
    */
-  export const route: (route: Route) => void;
+  export const Route: (route: RouteEntry) => void;
 
   // state.mjs
   export type RouterState = {
@@ -88,10 +92,8 @@ declare module "@vanjs/router" {
   /**
    * A reactive object that holds the current router state.
    * This state is maintained by both server and client.
-   *
-   * @see https://vanjs.org/x#reactive-object
    */
-  export const routerState: typeof reactive<RouterState>;
+  export const routerState: typeof van.state<RouterState>;
 
   /**
    * Sets the router state to the specified href.

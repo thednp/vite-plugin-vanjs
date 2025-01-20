@@ -1,17 +1,17 @@
-// router/Router.js
+// router/router.mjs
 import setup from "../setup/index.mjs";
-import { routerState, setRouterState } from './state.mjs'
-import { matchRoute } from './routes.mjs'
+import { routerState, setRouterState } from "./state.mjs";
+import { matchRoute } from "./routes.mjs";
 
-/** @typedef {import('./types.d.ts').Route["component"]} PageComponent */
+/** @typedef {import('./types.d.ts').RouteEntry["component"]} PageComponent */
 
 export const Router = () => {
   if (!setup.isServer) {
     const hrefCallback = () => {
       const { pathname, search } = window.location;
-      setRouterState(pathname + (search ? `?${search}` : ''));
-    }
-    window.addEventListener('popstate', hrefCallback);
+      setRouterState(pathname + (search ? `?${search}` : ""));
+    };
+    window.addEventListener("popstate", hrefCallback);
     window.onload = hrefCallback;
   }
 
@@ -19,4 +19,4 @@ export const Router = () => {
   const Page = matchRoute(routerState.pathname.val);
   const routeComponents = Page();
   return Array.isArray(routeComponents) ? routeComponents : [routeComponents];
-}
+};
