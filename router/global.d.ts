@@ -18,8 +18,7 @@ declare module "@vanjs/router" {
    *   return Router(); // or <Router /> for JSX
    * }
    */
-  // export const Router: () => VanNode[] | Promise<() => VanNode[]>;
-  export const Router: () => (VanNode[] | VanNode);
+  export const Router: () => VanNode | VanNode[] | Promise<VanNode | VanNode[]>;
 
   // link.mjs
   /**
@@ -39,7 +38,7 @@ declare module "@vanjs/router" {
    *   );
    * }
    */
-  export const A: (props: Partial<HTMLAnchorElement>, ...children: (Element | Node | string)[]) => HTMLAnchorElement;
+  export const A: (props: Partial<HTMLAnchorProps>, ...children: (Element | Node | string)[]) => HTMLAnchorElement;
 
   // helpers.mjs
   /**
@@ -121,5 +120,5 @@ declare module "@vanjs/router" {
  * @param importFn
  * @returns 
  */
-  export const lazy = (importFn: Promise<VanNode>) => ComponentModule
+  export const lazy = (importFn: Promise<VanNode>) => Promise<ComponentModule>
 }
