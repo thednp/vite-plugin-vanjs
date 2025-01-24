@@ -1,17 +1,29 @@
 ## vite-plugin-vanjs
 
+[![Coverage Status](https://coveralls.io/repos/github/thednp/vite-plugin-vanjs/badge.svg)](https://coveralls.io/github/thednp/vite-plugin-vanjs)
+[![ci](https://github.com/thednp/vite-plugin-vanjs/actions/workflows/ci.yml/badge.svg)](https://github.com/thednp/vite-plugin-vanjs/actions/workflows/ci.yml)
 [![NPM Version](https://img.shields.io/npm/v/vite-plugin-vanjs.svg)](https://www.npmjs.com/package/vite-plugin-vanjs)
 [![NPM Downloads](https://img.shields.io/npm/dm/vite-plugin-vanjs.svg)](http://npm-stat.com/charts.html?package=vite-plugin-vanjs)
 [![typescript version](https://img.shields.io/badge/typescript-5.6.2-brightgreen)](https://www.typescriptlang.org/)
 [![vanjs-core version](https://img.shields.io/badge/vanjs--core-1.5.3-brightgreen)](https://github.com/vanjs-org/van)
 [![mini-van-plate version](https://img.shields.io/badge/mini--van--plate-0.6.1-brightgreen)](https://github.com/vanjs-org/mini-van-plate)
-[![vite version](https://img.shields.io/badge/vite-6.0.9-brightgreen)](https://github.com/vitejs)
+[![vitest version](https://img.shields.io/badge/vitest-3.0.4-brightgreen)](https://www.vitest.dev/)
+[![vite version](https://img.shields.io/badge/vite-6.0.11-brightgreen)](https://github.com/vitejs)
 
-A Vite plugin for VanJS to enable JSX transformation and simplify application development and enables you to create SSR applications or SSG (static) pages. It will automatically load the appropriate Van or VanX objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required objects in an isomorphic enviroment.
+A mini meta-framework for VanJS developed around the awesome Vite bundler. The plugin comes with a set of modules to simplify your workflow:
+* ***@vanjs/router*** - one of the most important part of an application, this one allows you to split code and lazy load components with ease, handles both Client Side Rendering and Server Side Rendering and makes it really easy to work with;
+* ***@vanjs/meta*** - allows you to create meta data for your pages as well as add other assets;
+* ***@vanjs/jsx*** - enables JSX transformation.
 
-The plugin uses `van-ext` along with `mini-van-plate` so you can have everything ready from start. It also enables JSX transformation with minimal setup so you can write your code faster.
 
-The recommended starter templates for you are the [vite-starter-vanjs-ssr](https://github.com/thednp/vite-starter-vanjs-ssr) and [vite-starter-vanjs-ssr-jsx](https://github.com/thednp/vite-starter-vanjs-ssr-jsx) which already include this plugin.
+In addition the plugin will automatically load the appropriate Van or VanX objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required objects in an isomorphic enviroment.
+
+### Notes 
+* The plugin uses `van-ext` along with `mini-van-plate` so you can have everything ready from start. 
+
+* The recommended starter templates for you are the [vite-starter-vanjs-ssr](https://github.com/thednp/vite-starter-vanjs-ssr) and [vite-starter-vanjs-ssr-jsx](https://github.com/thednp/vite-starter-vanjs-ssr-jsx) which already include this plugin.
+
+* In the near future we're going to have a `npm create-vanjs` CLI so stick around!
 
 
 ### Install
@@ -30,7 +42,7 @@ npm install vite-plugin-vanjs
 deno add npm:vite-plugin-vanjs
 ```
 
-2) To add typescript support, edit your `src/vite-env.d.ts` as follows:
+2) To add typescript support, edit your `src/vite-env.d.ts` (or any global types you have set in your app) as follows:
 
 ```ts
 /// <reference types="vite/client" />
@@ -54,7 +66,7 @@ export default defineConfig({
 
 **Example**:
 
-While the plugin will resolve the appropriate modules depending on the environment, for your convenience, you can also import the `@vanjs/van` and `@vanjs/vanX` virtual modules, so the plugin makes sure to load the right modules where needed.
+While the plugin will resolve the appropriate modules automatically depending on the environment, for your convenience, you can also import the `@vanjs/van` and `@vanjs/vanX` virtual modules, so the plugin makes sure to load the right modules where needed.
 
 ```ts
 // my-component.ts
@@ -119,7 +131,7 @@ const App = () => {
   );
 }
 
-van.add(document.getElementById("app")!, <App /> as ChildDom);
+van.add(document.getElementById("app") as HTMLElement, <App />);
 
 ```
 
@@ -136,7 +148,7 @@ van.add(document.getElementById("app")!, <App /> as ChildDom);
 * [van-jsx](https://github.com/herudi/van-jsx) a simple Vanilla JSX implementation;
 * [vanjs-jsx](https://github.com/vanjs-org/van/tree/main/addons/van_jsx) the official VanJS addon;
 * [surplus](https://github.com/adamhaile/surplus/blob/master/index.d.ts) for Typescript definitions also used by SolidJS;
-* [inferno](https://github.com/infernojs/inferno/blob/master/packages/inferno/src/core/types.ts) also typescript definitions.
+* [inferno](https://github.com/infernojs/inferno/blob/master/packages/inferno/src/core/types.ts) also for typescript definitions.
 
 
 ### License

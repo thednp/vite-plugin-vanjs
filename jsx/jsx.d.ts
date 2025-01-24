@@ -16,7 +16,7 @@ export = JSX;
 
 declare namespace JSX {
   // type FunctionMaybe<T = unknown> = { (): T } | T;
-  type FunctionMaybe<T = unknown> = State<T> | T;
+  type FunctionMaybe<T = unknown> = (() => T) | State<T> | T;
   type Element =
     | ChildDom
     | Node
@@ -85,10 +85,12 @@ declare namespace JSX {
   }
 
   interface IntrinsicAttributes {
-    ref?: unknown | ((e: unknown) => void);
+    // ref?: unknown | ((e: unknown) => void);
+    ref?: State<T>;
   }
   interface CustomAttributes<T> {
-    ref?: State<T> | T | ((el: T) => void);
+    // ref?: State<T> | T | ((el: T) => void);
+    ref?: State<T>;
   }
   interface ExplicitProperties {}
   interface ExplicitAttributes {}
@@ -295,7 +297,11 @@ declare namespace JSX {
 
   interface CSSProperties extends csstype.PropertiesHyphen {
     // Override
-    [key: `-${string}`]: string | number | undefined;
+    [key: `-${string}`]:
+      | State<string | number | undefined>
+      | string
+      | number
+      | undefined;
   }
 
   type HTMLAutocapitalize =

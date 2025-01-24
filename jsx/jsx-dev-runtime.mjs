@@ -4,4 +4,4 @@ export {
   jsx as createElement,
   jsx as jsxDEV,
   jsx as jsxs,
-} from "./index.mjs";
+} from ".";

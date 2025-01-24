@@ -4,28 +4,31 @@ import { basename } from "node:path";
  * @type {typeof import("./types.d.ts").renderToString}
  */
 export const renderToString = async (inputSource) => {
-  const source = typeof inputSource === "function" ? inputSource() : inputSource;
+  const source = typeof inputSource === "function"
+    ? inputSource()
+    : inputSource;
   if (typeof source === "number") {
-    return String(source)
+    return String(source);
   }
   if (typeof source === "string") {
-    return source.trim()
+    return source.trim();
   }
-  // if (typeof source === "function") {
-  //   return renderToString(source())
-  // }
+  if (typeof source === "boolean") {
+    return String(source);
+  }
   if (typeof source === "object" && "render" in source) {
-    return source.render()
+    return source.render();
   }
   if (source instanceof Promise) {
-    return renderToString(await source)
+    return renderToString(await source);
   }
+  /* istanbul ignore else */
   if (Array.isArray(source)) {
-    const elements = []
+    const elements = [];
     for (const el of source) {
-      elements.push(await renderToString(el))
+      elements.push(await renderToString(el));
     }
-    return elements.join("")
+    return elements.join("");
   }
   // return String(source)
 
@@ -36,11 +39,11 @@ export const renderToString = async (inputSource) => {
 };
 
 /**
- * @param {string | undefined} file 
+ * @param {string} file
  * @returns {string}
  */
 function renderPreloadLink(file) {
-  if (file.endsWith(".js")) {
+  if (file.endsWith(".js") || file.endsWith(".mjs")) {
     return `<link rel="modulepreload" as="script" crossorigin href="${file}">`;
   } else if (file.endsWith(".css")) {
     return `<link rel="stylesheet" href="${file}">`;
@@ -71,11 +74,14 @@ export function renderPreloadLinks(modules, manifest) {
   const seen = new Set();
   modules.forEach((id) => {
     const files = manifest[id];
+    /* istanbul ignore else */
     if (files?.length) {
       files.forEach((file) => {
+        /* istanbul ignore else */
         if (!seen.has(file)) {
           seen.add(file);
           const filename = basename(file);
+          /* istanbul ignore next - impossible to test */
           if (manifest[filename]) {
             for (const depFile of manifest[filename]) {
               links += renderPreloadLink(depFile);

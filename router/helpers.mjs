@@ -1,6 +1,7 @@
 import setup from "@vanjs/setup";
 import van from "vanjs-core";
 import { routerState, setRouterState } from "./state";
+import { matchRoute } from "./routes";
 
 /** @typedef {import("./types.d.ts").Route} Route */
 /** @typedef {import("./types.d.ts").VanNode} VanNode */
@@ -21,7 +22,7 @@ export const isCurrentPage = (pageName) => {
  * into the childen of a single HTMLFragmentElement element.
  * @param {Element | () => Element | Element[]} source
  * @param  {...Element[]} children
- * @returns {TagFunc<HTMLIFrameElement>}
+ * @returns {TagFunc<HTMLFragmentElement> | HTMLElement}
  */
 export const unwrap = (source, ...children) => {
   const layout = () => {
@@ -36,7 +37,7 @@ export const unwrap = (source, ...children) => {
       : [source];
 
     return van.tags.fragment(
-      ...(children || []),
+      ...(children || /* istanbul ignore next */ []),
       ...pageChildren,
     );
   };
@@ -65,97 +66,48 @@ export const isLazyComponent = (component) => {
  * @returns
  */
 export const executeLifecycle = async ({ route }, params) => {
+  // istanbul ignore next
   if (!route) return true;
   try {
     if (route?.preload) await route.preload(params);
     if (route?.load) await route.load(params);
     return true;
   } catch (error) {
+    // istanbul ignore next
     console.error("Lifecycle execution error:", error);
+    // istanbul ignore next
     return false;
   }
 };
 
 /**
- * Check if object is instanceof Promise
- * @param {unknown} obj
- * @returns {obj is Promise}
- */
-export const isPromise = (obj) => {
-  return obj instanceof Promise;
-};
-
-/**
- * Isomorphic navigation utility
+ * Client only navigation utility.
  * @param {string} path - The path to navigate to
- * @param {object} options - Navigation options
+ * @param {{ replace: boolean } | undefined} options - Navigation options
  * @param {boolean} options.replace - Whether to replace current history entry
  * @returns {void}
  */
 export const navigate = (path, options = {}) => {
   const { replace = false } = options;
 
+  // istanbul ignore else
   if (!setup.isServer) {
     // Client-side navigation
     const url = new URL(path, window.location.origin);
-    // console.log('Navigating to:', url.toString(), path)
+    const route = matchRoute(url.pathname);
 
     // Update history
     if (replace) {
-      window.history.replaceState({}, "", url);
+      window.history.replaceState({}, "", path);
     } else {
-      window.history.pushState({}, "", url);
+      window.history.pushState({}, "", path);
     }
 
     // Update router state
-    setRouterState(path);
+    setRouterState(url.pathname, url.search, route?.params);
   } else {
     // Server-side navigation - throw error
     console.error("Direct navigation is not supported on server");
-  }
-};
-
-/**
- * Isomorphic reload utility
- * @param {boolean} forceFetch - Force fetch from server
- * @returns {void}
- */
-export const reload = (forceFetch = false) => {
-  if (!setup.isServer) {
-    // Client-side reload
-    if (forceFetch) {
-      window.location.reload();
-    } else {
-      // Soft reload - just update router state
-      const { pathname, search } = window.location;
-      setRouterState(pathname, search);
-    }
-  } else {
-    // Server-side reload - throw error
-    console.error("Reload is not supported on server");
-  }
-};
-
-/**
- * Isomorphic redirect utility
- * @param {string} path - The path to redirect to
- * @param {object} options - Redirect options
- * @param {number} options.status - HTTP status code (server-side only)
- * @param {boolean} options.replace - Whether to replace current history entry (client-side only)
- * @returns {void}
- */
-export const redirect = (path, options = {}) => {
-  const { status = 302, replace = true } = options;
-
-  if (!setup.isServer) {
-    // Client-side redirect
-    navigate(path, { replace });
-  } else {
-    // Server-side redirect
-    const error = new Error(`Redirect to ${path}`);
-    error.status = status;
-    error.location = path;
-    throw error;
   }
 };
 
@@ -186,15 +138,61 @@ export const extractParams = (pattern, path) => {
   return params;
 };
 
+/**
+ * Client only reload utility
+ * WORK IN PROGRESS
+ * @param {boolean} forceFetch - Force fetch from server
+ * @returns {void}
+ */
+// export const reload = (forceFetch = false) => {
+//   if (!setup.isServer) {
+//     // Client-side reload
+//     if (forceFetch) {
+//       window.location.reload();
+//     } else {
+//       // Soft reload - just update router state
+//       const { pathname, search } = window.location;
+//       setRouterState(pathname, search);
+//     }
+//   } else {
+//     // Server-side reload - throw error
+//     console.error("Reload is not supported on server");
+//   }
+// };
+
+/**
+ * Isomorphic redirect utility
+ * WORK IN PROGRESS
+ * @param {string} path - The path to redirect to
+ * @param {object} options - Redirect options
+ * @param {number} options.status - HTTP status code (server-side only)
+ * @param {boolean} options.replace - Whether to replace current history entry (client-side only)
+ * @returns {void}
+ */
+// export const redirect = (path, options = {}) => {
+//   const { status = 302, replace = true } = options;
+
+//   if (!setup.isServer) {
+//     // Client-side redirect
+//     navigate(path, { replace });
+//   } else {
+//     // Server-side redirect
+//     const error = new Error(`Redirect to ${path}`);
+//     error.status = status;
+//     error.location = path;
+//     throw error;
+//   }
+// };
+
 // Utility to handle server-side redirects in your server entry point
-export const handleServerRedirect = (error, res) => {
-  if (error.location && error.status) {
-    res.writeHead(error.status, {
-      Location: error.location,
-      "Content-Type": "text/plain",
-    });
-    res.end(`Redirecting to ${error.location}...`);
-    return true;
-  }
-  return false;
-};
+// export const handleServerRedirect = (error, res) => {
+//   if (error.location && error.status) {
+//     res.writeHead(error.status, {
+//       Location: error.location,
+//       "Content-Type": "text/plain",
+//     });
+//     res.end(`Redirecting to ${error.location}...`);
+//     return true;
+//   }
+//   return false;
+// };

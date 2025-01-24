@@ -1,4 +1,12 @@
 declare module "@vanjs/server" {
+  import type { PropsWithKnownKeys } from "vanjs-core";
+  import type { SupportedTags } from "@vanjs/meta";
+  import type { JSX } from "@vanjs/jsx";
+  import type {
+    Element as VanElement,
+    TagFunc,
+  } from "mini-van-plate/van-plate";
+
   /**
    * A function that takes a list of files and a manifest and returns a string
    * representing the HTML markup for preload links.
@@ -6,11 +14,30 @@ declare module "@vanjs/server" {
    * @param manifest the vite manifest
    * @returns HTML string
    */
-  export const renderPreloadLinks: (files: string[], manifest: Record<string, string[]>) => string;
+  export const renderPreloadLinks: (
+    files: string[],
+    manifest: Record<string, string[]>,
+  ) => string;
 
-  type VanElement = import("mini-van-plate/van-plate").Element;
-  type TagFunc = import("mini-van-plate/van-plate").TagFunc;
-  export type Source = number | string | VanElement | VanElement[] | TagFunc | undefined;
+  type ValidVanNode =
+    | boolean
+    | number
+    | string
+    | VanElement
+    | TagFunc;
+
+  type VanComponent = () =>
+    | ValidVanNode
+    | ValidVanNode[]
+    | SupportedTags
+    | SupportedTags[];
+  export type Source =
+    | JSX.Element
+    | VanComponent
+    | (() => VanComponent)
+    | Promise<ValidVanNode>
+    | ValidVanNode
+    | undefined;
 
   /**
    * A function that takes a multitude of source types and returns a string

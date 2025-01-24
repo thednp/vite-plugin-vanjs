@@ -23,9 +23,11 @@ export const A = (props, ...children) => {
   });
 
   const anchor = van.tags.a(newProps, ...children);
+  /* istanbul ignore else */
   if (!setup.isServer) {
     anchor.addEventListener("click", async (e) => {
       e.preventDefault();
+      /* istanbul ignore next */
       if (isCurrentPage(href)) return;
 
       const route = matchRoute(href);
@@ -39,6 +41,7 @@ export const A = (props, ...children) => {
     anchor.addEventListener("mouseenter", async () => {
       const route = matchRoute(href);
 
+      /* istanbul ignore else */
       if (route?.component) {
         route.component();
       }

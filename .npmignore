@@ -1,0 +1,14 @@
+.nyc_output
+.vscode
+.github
+.gitignore
+node_modules
+experiments
+docs
+demo
+coverage
+postcss.config.cjs
+tailwind.config.js
+tsconfig.json
+vite.env.dts
+test

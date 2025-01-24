@@ -1,6 +1,6 @@
 import van from "@vanjs/van";
 import setup from "@vanjs/setup";
-import { setAttribute, styleToString } from "../dom/index.mjs";
+import { setAttribute, styleToString } from "../client/index";
 
 export const jsx = (jsxTag, { children, ref, style, ...props }) => {
   if (typeof jsxTag === "string") {
@@ -28,6 +28,7 @@ export const jsx = (jsxTag, { children, ref, style, ...props }) => {
 
       setAttribute(newElement, k, value);
     }
+    /* istanbul ignore else */
     if (style) {
       if (typeof style === "function") {
         van.derive(() => newElement.style.cssText = styleToString(style()));
@@ -42,5 +43,5 @@ export const jsx = (jsxTag, { children, ref, style, ...props }) => {
 
   return typeof jsxTag === "function"
     ? jsxTag({ children, ref, style, ...props })
-    : null;
+    : /* istanbul ignore next */ null;
 };

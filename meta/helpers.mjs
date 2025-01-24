@@ -2,20 +2,21 @@ import setup from "@vanjs/setup";
 
 /** @type {import('./types.d.ts').ParseAttributes} */
 export const parseAttributes = (attributeString) => {
+  /** @type {Record<string, string>} */
   const attributes = {};
   const attributeRegex = /([a-zA-Z0-9_-]+)(?:="([^"]*?)")?/g;
   let match;
 
   while ((match = attributeRegex.exec(attributeString)) !== null) {
     const name = match[1];
-    const value = match[2] || "";
+    const value = match[2] || /* istanbul ignore next */ "";
     attributes[name] = value;
   }
 
   return attributes;
 };
 
-/** @type {import('./types.d.ts').GetTagAttribute} */
+/** @type {typeof import('./types.d.ts').getTagAttribute} */
 const getTagAttribute = (tag) => {
   const attributes = [
     "name",

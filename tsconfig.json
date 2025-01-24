@@ -26,8 +26,20 @@
     "noEmit": true,
     "checkJs": true,
     "jsx": "preserve",
-    "jsxImportSource": "vite-plugin-vanjs",
+    "jsxImportSource": "@vanjs/jsx",
+    // "types": ["vanjs-core", "vanjs-ext", "mini-van-plate"],
   },
-  "include": ["./src/**/*.ts", "./jsx/*.ts", "./setup/*.ts", "./router/*.ts", "./meta/*.ts", "./server/*.ts", "./dom/*.ts"],
+  "include": [
+    "./tests/*.ts",
+    "./tests/*.tsx",
+    "./src/*.ts",
+    "./jsx/*.ts",
+    "./setup/*.ts",
+    "./router/*.ts",
+    "./meta/*.ts",
+    "./server/*.ts",
+    "./client/*.ts",
+    // "./tests/vite-env.d.ts"
+  ],
   "exclude": ["node_modules", "experiments", "coverage"],
 }

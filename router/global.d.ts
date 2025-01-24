@@ -1,10 +1,11 @@
-
 declare module "@vanjs/router" {
-  import { TagFunc } from "mini-van-plate";
-  import { reactive } from "vanjs-ext";
-  import van from "vanjs-core";
+  import type {
+    Element as VanElement,
+    TagFunc,
+  } from "mini-van-plate/van-plate";
+  import van, { PropsWithKnownKeys, type Van } from "vanjs-core";
 
-  type VanNode = TagFunc<Element> | Element | Element[];
+  type VanNode = HTMLElement | VanElement | TagFunc;
 
   // router.mjs
   /**
@@ -13,42 +14,49 @@ declare module "@vanjs/router" {
    *
    * @example
    * import { Router } from '@vanjs/router';
-   * 
+   *
    * export const App = () => {
    *   return Router(); // or <Router /> for JSX
    * }
    */
-  export const Router: () => VanNode | VanNode[] | Promise<VanNode | VanNode[]>;
+  //   export const Router: () => VanNode | VanNode[] | Promise<VanNode | VanNode[]>;
+  export const Router: () => VanNode | VanNode[];
 
-  // link.mjs
+  // a.mjs
   /**
    * A virtual component that creates an anchor element
    * that navigates to the specified href when clicked.
    *
    * @example
-   * import { Link } from '@vanjs/router';
+   * import { A } from '@vanjs/router';
    * import van from 'vanjs-core';
-   * 
+   *
    * export const Navigation = () => {
    *   const { nav } = van.tags
    *   return nav(
-   *     Link({ href="/" }, "Home"), // or <Link href="/">Home</Link> with JSX
-   *     Link({ href="/about" }, "About"), // or <Link href="/about">About</Link> with JSX
+   *     A({ href="/" }, "Home"), // or <A href="/">Home</A> with JSX
+   *     A({ href="/about" }, "About"), // or <A href="/about">About</A> with JSX
    *     // ...other children
    *   );
    * }
    */
-  export const A: (props: Partial<HTMLAnchorProps>, ...children: (Element | Node | string)[]) => HTMLAnchorElement;
+  export const A: (
+    props: PropsWithKnownKeys<HTMLAnchorProps>,
+    ...children: (Element | Node | string)[]
+  ) => HTMLAnchorElement;
 
   // helpers.mjs
   /**
    * Navigates to the specified href in the client and sets the router state.
    * Keep in mind that the router handles the search params and hash.
    *
-   * @param {string} href the URL to navigate to
-   * @param {{ replace?: boolean }} options when true, will replace the current history entry
+   * @param href the URL to navigate to
+   * @param options when true, will replace the current history entry
    */
-  export const navigate: (href: string, options: { replace?: boolean } = {}) => void;
+  export const navigate: (
+    href: string,
+    options?: { replace?: boolean },
+  ) => void;
 
   /**
    * A client only helper function that reloads the current page.
@@ -63,62 +71,97 @@ declare module "@vanjs/router" {
    */
   export const redirect: (href?: string) => void | (() => void);
 
+  export type VanComponent = () => VanNode | VanNode[];
+
   // routes.mjs
   export type RouteEntry = {
-      path: string;
-      component: () => VanNode | VanNode[] | Promise<VanNode | VanNode[]>;
-  }
+    path: string;
+    component: Promise<ComponentModule>;
+    preload?: (params?: Record<string, string>) => any;
+    load?: (params?: Record<string, string>) => any;
+  };
+
+  export type RouteProps = {
+    path: string;
+    component: VanComponent | (() => ComponentModule);
+    preload?: (params?: Record<string, string>) => any;
+    load?: (params?: Record<string, string>) => any;
+  };
   export const routes: RouteEntry[];
 
   /**
    * Registers a new route in the router state.
-   * @param {RouteEntry} route the route to register
-   * 
+   * @param route the route to register
+   *
    * @example
-   * import { route } from '@vanjs/router';
-   * 
-   * route({ path: '/', component: Home });
-   * route({ path: '/about', component: About });
-   * route({ path: '*', component: NotFound });
+   * import { Route, lazy } from '@vanjs/router';
+   * import Home from './pages/Home';
+   * import NotFound from './pages/NotFound';
+   *
+   * Route({ path: '/', component: Home });
+   * Route({ path: '/about', component: lazy(() => import("./pages/About.ts")) });
+   * Route({ path: '*', component: NotFound });
    */
-  export const Route: (route: RouteEntry) => void;
+  export const Route: (route: RouteProps) => void;
 
   // state.mjs
   export type RouterState = {
-      pathname: string;
-      searchParams: URLSearchParams;
-  }
+    pathname: string;
+    searchParams: URLSearchParams;
+    params: Record<string, string>;
+  };
   /**
    * A reactive object that holds the current router state.
    * This state is maintained by both server and client.
    */
-  export const routerState: typeof van.state<RouterState>;
+  export const routerState: {
+    pathname: van.state<RouterState.pathname>;
+    searchParams: van.state<RouterState.searchParams>;
+    params?: van.state<RouterState.params>;
+  };
 
   /**
    * Sets the router state to the specified href.
-   * @param {string} href the URL to navigate to
-   * @param {boolean} replace when true, will replace the current history entry
+   * @param href the URL to navigate to
+   * @param search the search string
+   * @param params the route params object
    */
-  export const setRouterState: (href: string, replace?: boolean | undefined) => void;
+  export const setRouterState: (
+    href: string,
+    search?: string,
+    params?: Record<string, string>,
+  ) => void;
 
   /**
- * Merge the children of an Element or an array of elements with an optional array of children
- * into the childen of a single HTMLFragmentElement element.
- * @param  source
- * @param  {...VanNode[]} children
- * @returns {TagFunc<HTMLIFrameElement>}
- */
-  export const unwrap: (source: Element | (() => Element | Element[]), ...children?: Element[]) => TagFunc<HTMLIFrameElement>;
+   * Merge the children of an Element or an array of elements with an optional array of children
+   * into the childen of a single HTMLFragmentElement element.
+   * @param  source
+   * @param  {...VanNode[]} children
+   */
+  export const unwrap: (
+    source: VanNode | VanNode[] | (() => VanNode | VanNode[]),
+    ...children: VanNode[]
+  ) => VanNode;
 
   export type ComponentModule = {
-      component: () => VanNode | VanNode[];
-      route: RouteEntry;
-  }
+    component: VanComponent;
+    route: Pick<RouteEntry, "load" | "preload">;
+  };
+
+  export type DynamicModule = {
+    default?: VanComponent;
+    Page: VanComponent;
+    route: Pick<RouteEntry, "load" | "preload">;
+  };
+
+  //   export type LazyComponent = Promise<DynamicModule> | (() => Promise<DynamicModule>);
+  export type LazyComponent = Promise<DynamicModule>;
+
+  type LazyRoute = (importFn: () => LazyComponent) => () => ComponentModule;
 
   /**
- * Registers a lazy component.
- * @param importFn
- * @returns 
- */
-  export const lazy = (importFn: Promise<VanNode>) => Promise<ComponentModule>
+   * Registers a lazy component.
+   * @param importFn
+   */
+  export const lazy: LazyRoute;
 }

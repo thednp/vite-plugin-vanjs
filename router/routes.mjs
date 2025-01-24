@@ -3,19 +3,13 @@ import { extractParams, isLazyComponent } from "./helpers";
 import { lazy } from "./lazy";
 
 /** @typedef {import("./types.d.ts").RouteEntry} RouteEntry */
-/** @typedef {import("./types.d.ts").Route} Route */
+/** @typedef {import("./types.d.ts").RouteProps} RouteProps */
 
 /** @type {RouteEntry[]} */
 export const routes = [];
 
 /**
- * @typedef {Object} RouteEntry
- * @property {string} path
- * @property {() => VanNode | Promise<VanNode>} component
- */
-
-/**
- * @param {RouteEntry} routeProps
+ * @param {RouteProps} routeProps
  */
 export const Route = (routeProps) => {
   const { component, preload, load, ...rest } = routeProps;
@@ -24,7 +18,7 @@ export const Route = (routeProps) => {
   if (!isLazyComponent(component)) {
     const wrappedComponent = lazy(() =>
       Promise.resolve({
-        Page: component,
+        default: component,
         route: { preload, load },
       })
     );
@@ -39,7 +33,7 @@ export const Route = (routeProps) => {
 /**
  * Find a registered route that matches the given path
  * @param {string} path
- * @returns {Route["component"] | null}
+ * @returns {RouteEntry | null}
  */
 export const matchRoute = (path) => {
   const exactMatch = routes.find((r) => r.path === path);

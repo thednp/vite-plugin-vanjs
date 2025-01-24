@@ -1,5 +1,5 @@
 {
-  "name": "dom",
+  "name": "client",
   "main": "./index.mjs",
   "module": "./index.mjs",
   "types": "./types.d.ts",

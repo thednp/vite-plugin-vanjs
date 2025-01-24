@@ -1,8 +1,9 @@
 declare module "@vanjs/jsx" {
   import type { ChildDom, Primitive } from "vanjs-core";
+  import type { Element as VanElement } from "mini-van-plate/van-plate";
   export const Fragment = ({ children }: { children?: JSX.Element }) =>
     JSX.Element;
-  export type VanElement = Element;
+  // export type VanElement = Element;
   export type VanNode =
     | Primitive
     | ChildDom

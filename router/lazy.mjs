@@ -14,6 +14,7 @@ export const lazy = (importFn) => {
   if (setup.isServer) {
     return async () => {
       const cached = getCached(importFn);
+      /* istanbul ignore next */
       if (cached) {
         return cached;
       }
@@ -34,6 +35,7 @@ export const lazy = (importFn) => {
     if (initialized) return;
 
     const cached = getCached(importFn);
+    /* istanbul ignore next */
     if (cached) {
       component.val = cached.component;
       route.val = cached.route;

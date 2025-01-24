@@ -1,14 +1,17 @@
 declare module "@vanjs/meta" {
   import { type PropsWithKnownKeys } from "vanjs-core";
-  import { type TagFunc } from "mini-van-plate/van-plate";
+  import type {
+    Element as VanElement,
+    TagFunc,
+  } from "mini-van-plate/van-plate";
 
-  export type CreateTags = () => Map<
+  export const createHeadTags: () => Map<
     string,
-    SupportedTags | TagFunc<SupportedTags>
+    SupportedTags | TagFunc
   >;
-  export type GetTags = () => Map<
+  export const getHeadTags: () => Map<
     string,
-    SupportedTags | TagFunc<SupportedTags>
+    SupportedTags | TagFunc
   >;
   export type ResetTags = () => void;
   export type InitializeTags = () => void;
@@ -22,11 +25,26 @@ declare module "@vanjs/meta" {
 
   export type TagProps = PropsWithKnownKeys<SupportedTags>;
 
-  export type HeadTags = SupportedTags[] | TagFunc<SupportedTags>[];
+  export type HeadTags = SupportedTags[] | TagFunc[];
 
-  export type AddMeta = (tag: TagProps) => void;
+  export type AddMeta = (tag?: TagProps) => void;
 
-  export type HeadComp = () => HeadTags;
+  // export declare const Head: () => () => TagFunc[];
+  export declare const Head: () => () => SupportedTags[];
+  export const Title: (
+    props: PropsWithKnownKeys<HTMLTitleElement>,
+    content?: string,
+  ) => null;
+  export const Meta: (props: PropsWithKnownKeys<HTMLMetaElement>) => null;
+  export const Style: (
+    props: PropsWithKnownKeys<HTMLStyleElement>,
+    content?: string,
+  ) => null;
+  export const Link: (props: PropsWithKnownKeys<HTMLLinkElement>) => null;
+  export const Script: (
+    props: PropsWithKnownKeys<HTMLScriptElement>,
+    content?: string,
+  ) => null;
 
   export type ParseAttributes = (
     attributeString: string,
@@ -35,4 +53,8 @@ declare module "@vanjs/meta" {
   export type GetTagAttribute = (tag: TagProps) => string;
 
   export type GetTagKey = (tag: TagProps) => string;
+
+  export const initializeHeadTags: InitializeTags;
+  export const resetHeadTags: ResetTags;
+  export const addMeta: AddMeta;
 }

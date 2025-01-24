@@ -17,10 +17,14 @@ export const routerState = {
 /**
  * @type {typeof import("./types.d.ts").setRouterState}
  */
-export const setRouterState = (path, search) => {
+export const setRouterState = (path, search = undefined, params) => {
   const [pathname, searchParams] = path.split("?");
+  // console.log('setRouterState', { pathname, searchParams: searchParams || search, params })
   routerState.pathname.val = pathname;
   routerState.searchParams.val = new URLSearchParams(
     search || searchParams || "",
   );
+  routerState.params.val = params || {};
+
+  // console.log('finalState', routerState);
 };

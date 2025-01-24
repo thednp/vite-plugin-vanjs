@@ -1,12 +1,12 @@
 import setup from "@vanjs/setup";
 import { getTagKey } from "./helpers";
 
-/** @typedef {import("./types.d.ts").GetTags} GetTags */
-/** @typedef {import("./types.d.ts").CreateTags} CreateTags */
-/** @typedef {import("./types.d.ts").ResetTags} ResetTags */
-/** @typedef {import("./types.d.ts").InitializeTags} InitializeTags */
+/** @typedef {typeof import("./types.d.ts").getHeadTags} GetTags */
+/** @typedef {typeof import("./types.d.ts").createHeadTags} CreateTags */
+/** @typedef {typeof import("./types.d.ts").resetHeadTags} ResetTags */
+/** @typedef {typeof import("./types.d.ts").initializeHeadTags} InitializeTags */
 /** @typedef {import("./types.d.ts").AddMeta} AddMeta */
-/** @typedef {import("./types.d.ts").HeadComp} HeadComp */
+/** @typedef {typeof import("./types.d.ts").Head} HeadComp */
 
 /**
  * Create a new Map for each request on server
@@ -50,6 +50,7 @@ export const resetHeadTags = () => {
  */
 export const initializeHeadTags = () => {
   const tags = getHeadTags();
+  /* istanbul ignore else */
   if (!tags.size && !setup.isServer) {
     [...document.head.children].forEach((tag) => {
       tags.set(getTagKey(tag), tag);

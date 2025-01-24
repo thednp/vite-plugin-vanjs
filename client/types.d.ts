@@ -8,7 +8,11 @@ import * as CSS from "csstype";
  * @param key the attribute name
  * @param value the attribute value
  */
-export const setAttribute: (element: Element, name: string, value: boolean | string | number | null | undefined) => void;
+export const setAttribute: (
+  element: Element,
+  name: string,
+  value: boolean | string | number | null | undefined,
+) => void;
 
 /**
  * Normalize the style value and convert it to a string
@@ -19,9 +23,12 @@ export const setAttribute: (element: Element, name: string, value: boolean | str
 export const styleToString: (source: string | CSS.Properties) => string;
 
 /**
- * Hydrate the root element with the given content.
+ * Hydrate a target element with the given content(s).
  *
- * @param root the root element
+ * @param target the root element
  * @param content the element(s) to hydrate
  */
-export const hydrateRoot: (root: Element, content: Element | Element[]) => Element;
+export const hydrate: (
+  target: HTMLElement,
+  content: HTMLElement | HTMLElement[],
+) => HTMLElement;

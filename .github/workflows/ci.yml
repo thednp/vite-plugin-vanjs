@@ -1,0 +1,67 @@
+name: CI & Test
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - jsx
+      - router
+      - meta
+      - server
+      - client
+      - src
+      - test
+      - package.json
+      - .github/workflows/ci.yml
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    name: Test on Node
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: PNPM setup
+        uses: pnpm/action-setup@v3
+
+      - name: Deno Setup
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Node Setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      # - name: Install doc dependencies
+      #   run: cd demo && pnpm install --no-frozen-lockfile
+
+      - name: Make sure to format
+        run: pnpm format
+
+      - name: Typecheck & ESLint
+        run: pnpm lint
+
+      - name: Build
+        run: pnpm build
+
+      # - name: Build Docs
+      #   run: pnpm build:docs
+
+      - name: Run Unit Tests
+        run: pnpm test
+
+      - name: Upload coverage report to coveralls.io...
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}          
