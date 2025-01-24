@@ -82,7 +82,6 @@ import { reactive } from "vanjs-ext";
 import { list } from "vanjs-ext";`;
     const transformed = plugin.transform(sampleCode, '/modules/some-path.js');
 
-    console.log(transformed.code)
     expect(transformed.code).to.include('@vanjs/van')
     expect(transformed.code).to.include('@vanjs/vanX')
   });

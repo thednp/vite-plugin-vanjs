@@ -79,10 +79,10 @@
     "test-ui": "vitest --config vitest.config.mts --ui=true",
     "prepublishOnly": "pnpm up && pnpm lint && pnpm format && pnpm badges",
     "badges": "npx -p dependency-version-badge update-badge vanjs-core mini-van-plate typescript vitest vite",
-    "format": "deno fmt src setup jsx router meta server client",
+    "format": "deno fmt src meta router setup client server jsx",
     "lint": "pnpm lint:ts && pnpm check:ts",
-    "lint:ts": "deno lint src",
-    "fix:ts": "deno lint src --fix",
+    "lint:ts": "deno lint src meta router setup client server jsx",
+    "fix:ts": "deno lint src meta router setup client server jsx --fix",
     "check:ts": "tsc -noEmit"
   },
   "peerDependencies": {

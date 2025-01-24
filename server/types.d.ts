@@ -1,5 +1,4 @@
 /// <reference path="global.d.ts" />
-import type { PropsWithKnownKeys } from "vanjs-core";
 import type { Element as VanElement, TagFunc } from "mini-van-plate/van-plate";
 
 /**

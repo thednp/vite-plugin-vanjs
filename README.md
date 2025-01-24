@@ -8,9 +8,9 @@
 [![vanjs-core version](https://img.shields.io/badge/vanjs--core-1.5.3-brightgreen)](https://github.com/vanjs-org/van)
 [![mini-van-plate version](https://img.shields.io/badge/mini--van--plate-0.6.1-brightgreen)](https://github.com/vanjs-org/mini-van-plate)
 [![vitest version](https://img.shields.io/badge/vitest-3.0.4-brightgreen)](https://www.vitest.dev/)
-[![vite version](https://img.shields.io/badge/vite-6.0.11-brightgreen)](https://github.com/vitejs)
+[![vite version](https://img.shields.io/badge/vite-6.0.11-brightgreen)](https://vite.dev)
 
-A mini meta-framework for VanJS developed around the awesome Vite bundler. The plugin comes with a set of modules to simplify your workflow:
+A mini meta-framework for [VanJS](https://vanjs.org/) developed around the awesome Vite bundler. The plugin comes with a set of modules to simplify your workflow:
 * ***@vanjs/router*** - one of the most important part of an application, this one allows you to split code and lazy load components with ease, handles both Client Side Rendering and Server Side Rendering and makes it really easy to work with;
 * ***@vanjs/meta*** - allows you to create meta data for your pages as well as add other assets;
 * ***@vanjs/jsx*** - enables JSX transformation.

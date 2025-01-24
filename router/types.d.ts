@@ -1,6 +1,7 @@
 /// <reference path="global.d.ts" />
 import type { Element as VanElement, TagFunc } from "mini-van-plate/van-plate";
-import van, { type PropsWithKnownKeys, type Van } from "vanjs-core";
+import van from "vanjs-core";
+import type { PropsWithKnownKeys } from "vanjs-core";
 
 type VanNode = Element | VanElement | TagFunc;
 
@@ -71,15 +72,15 @@ export type VanComponent = () => VanNode | VanNode[];
 export type RouteEntry = {
   path: string;
   component: Promise<ComponentModule>;
-  preload?: (params?: Record<string, string>) => any;
-  load?: (params?: Record<string, string>) => any;
+  preload?: (params?: Record<string, string>) => void;
+  load?: (params?: Record<string, string>) => void;
 };
 
 export type RouteProps = {
   path: string;
   component: VanComponent | (() => ComponentModule);
-  preload?: (params?: Record<string, string>) => any;
-  load?: (params?: Record<string, string>) => any;
+  preload?: (params?: Record<string, string>) => void;
+  load?: (params?: Record<string, string>) => void;
 };
 export const routes: RouteEntry[];
 
@@ -143,9 +144,9 @@ export type ComponentModule = {
 };
 
 export type DynamicModule = {
-  default?: VanComponent;
   Page: VanComponent;
-  route: Pick<RouteEntry, "load" | "preload">;
+  default?: VanComponent;
+  route?: Pick<RouteEntry, "load" | "preload">;
 };
 
 export type LazyComponent =

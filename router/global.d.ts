@@ -77,15 +77,15 @@ declare module "@vanjs/router" {
   export type RouteEntry = {
     path: string;
     component: Promise<ComponentModule>;
-    preload?: (params?: Record<string, string>) => any;
-    load?: (params?: Record<string, string>) => any;
+    preload?: (params?: Record<string, string>) => void;
+    load?: (params?: Record<string, string>) => void;
   };
 
   export type RouteProps = {
     path: string;
     component: VanComponent | (() => ComponentModule);
-    preload?: (params?: Record<string, string>) => any;
-    load?: (params?: Record<string, string>) => any;
+    preload?: (params?: Record<string, string>) => void;
+    load?: (params?: Record<string, string>) => void;
   };
   export const routes: RouteEntry[];
 
@@ -149,9 +149,9 @@ declare module "@vanjs/router" {
   };
 
   export type DynamicModule = {
-    default?: VanComponent;
     Page: VanComponent;
-    route: Pick<RouteEntry, "load" | "preload">;
+    default?: VanComponent;
+    route?: Pick<RouteEntry, "load" | "preload">;
   };
 
   //   export type LazyComponent = Promise<DynamicModule> | (() => Promise<DynamicModule>);

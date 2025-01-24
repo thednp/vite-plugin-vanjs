@@ -2,8 +2,8 @@
 import van from "vanjs-core";
 import setup from "../setup/index.mjs";
 
-const initialPath = !setup.isServer ? window.location.pathname : "/";
-const initialSearch = !setup.isServer ? window.location.search : "";
+const initialPath = !setup.isServer ? globalThis.location.pathname : "/";
+const initialSearch = !setup.isServer ? globalThis.location.search : "";
 
 /**
  * @type {typeof import("./types.d.ts").routerState}
@@ -19,12 +19,9 @@ export const routerState = {
  */
 export const setRouterState = (path, search = undefined, params) => {
   const [pathname, searchParams] = path.split("?");
-  // console.log('setRouterState', { pathname, searchParams: searchParams || search, params })
   routerState.pathname.val = pathname;
   routerState.searchParams.val = new URLSearchParams(
     search || searchParams || "",
   );
   routerState.params.val = params || {};
-
-  // console.log('finalState', routerState);
 };

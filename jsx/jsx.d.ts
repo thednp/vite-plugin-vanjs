@@ -1,5 +1,7 @@
+// deno-lint-ignore-file no-empty-interface ban-types
+
 import * as csstype from "csstype";
-import type { ChildDom, Primitive, State } from "vanjs-core";
+import type { ChildDom, State } from "vanjs-core";
 
 /**
  * Based on JSX types for Surplus and Inferno and adapted for `dom-expressions`.
@@ -52,13 +54,13 @@ declare namespace JSX {
 
   interface BoundEventHandler<T, E extends Event> {
     0: (
-      data: any,
+      data: unknown,
       e: E & {
         currentTarget: T;
         target: DOMElement;
       },
     ) => void;
-    1: any;
+    1: unknown;
   }
   type EventHandlerUnion<T, E extends Event> =
     | EventHandler<T, E>
@@ -725,7 +727,7 @@ declare namespace JSX {
     translate?: FunctionMaybe<"yes" | "no">;
     about?: FunctionMaybe<string>;
     datatype?: FunctionMaybe<string>;
-    inlist?: FunctionMaybe<any>;
+    inlist?: FunctionMaybe<unknown>;
     popover?: FunctionMaybe<boolean | "manual" | "auto">;
     prefix?: FunctionMaybe<string>;
     property?: FunctionMaybe<string>;
@@ -774,7 +776,7 @@ declare namespace JSX {
     >;
   }
   interface AnchorHTMLAttributes<T> extends HTMLAttributes<T> {
-    download?: FunctionMaybe<any>;
+    download?: FunctionMaybe<unknown>;
     href?: FunctionMaybe<string>;
     hreflang?: FunctionMaybe<string>;
     media?: FunctionMaybe<string>;
@@ -789,7 +791,7 @@ declare namespace JSX {
   interface AreaHTMLAttributes<T> extends HTMLAttributes<T> {
     alt?: FunctionMaybe<string>;
     coords?: FunctionMaybe<string>;
-    download?: FunctionMaybe<any>;
+    download?: FunctionMaybe<unknown>;
     href?: FunctionMaybe<string>;
     hreflang?: FunctionMaybe<string>;
     ping?: FunctionMaybe<string>;

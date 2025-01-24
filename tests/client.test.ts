@@ -25,7 +25,6 @@ describe(`Test client-side meta`, () => {
     defaultHead();
     const headTags = Head();
     const allTags = headTags();
-    // console.log(headTags(), typeof headTags);
 
     expect(allTags).to.have.length(7);
     expect(allTags[0].tagName).to.equal("TITLE");

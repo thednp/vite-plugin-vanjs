@@ -13,12 +13,12 @@ declare module "@vanjs/jsx" {
     | null;
 
   export function jsx(
-    tag: string | ((props: any) => VanNode),
+    tag: string | ((props: unknown) => VanNode),
     props: {
       children?: VanNode;
       style?: string | CSSProperties | (() => CSSProperties);
       ref?: State<Element>;
-      [key: string]: any;
+      [key: string]: unknown;
     },
   ): VanNode;
 

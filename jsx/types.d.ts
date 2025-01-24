@@ -1,16 +1,16 @@
 /// <reference path="global.d.ts" />
-import type { JSX } from "./jsx";
 import type { Fragment } from "./fragment";
 
 declare function jsx(
-  type: any,
-  props: any,
+  type: unknown,
+  props: unknown,
 ): () =>
   | (Node & {
-    [key: string]: any;
+    [key: string]: unknown;
   })
   | (Node & {
-    [key: string]: any;
+    [key: string]: unknown;
   })[];
-
+  
+export type { JSX } from "./jsx";
 export { Fragment, jsx, jsx as jsxDEV, jsx as jsxs };

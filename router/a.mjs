@@ -33,12 +33,11 @@ export const A = (props, ...children) => {
       const route = matchRoute(href);
       const module = await route.component();
       await executeLifecycle(module, route.params);
-      // console.log('A.click', route)
 
       navigate(href);
     });
 
-    anchor.addEventListener("mouseenter", async () => {
+    anchor.addEventListener("mouseenter", () => {
       const route = matchRoute(href);
 
       /* istanbul ignore else */

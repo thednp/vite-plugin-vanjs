@@ -93,14 +93,14 @@ export const navigate = (path, options = {}) => {
   // istanbul ignore else
   if (!setup.isServer) {
     // Client-side navigation
-    const url = new URL(path, window.location.origin);
+    const url = new URL(path, globalThis.location.origin);
     const route = matchRoute(url.pathname);
 
     // Update history
     if (replace) {
-      window.history.replaceState({}, "", path);
+      globalThis.history.replaceState({}, "", path);
     } else {
-      window.history.pushState({}, "", path);
+      globalThis.history.pushState({}, "", path);
     }
 
     // Update router state
