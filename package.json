@@ -15,7 +15,7 @@
     "setup",
     "router",
     "meta",
-    "dom",
+    "client",
     "server",
     "jsx",
     "tsconfig.json",
