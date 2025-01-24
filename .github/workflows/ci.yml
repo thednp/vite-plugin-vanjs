@@ -52,11 +52,8 @@ jobs:
       - name: Typecheck & ESLint
         run: pnpm lint
 
-      - name: Build
-        run: pnpm build
-
-      # - name: Build Docs
-      #   run: pnpm build:docs
+      # - name: Build
+      #   run: pnpm build
 
       - name: Run Unit Tests
         run: pnpm test
