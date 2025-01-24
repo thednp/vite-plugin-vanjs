@@ -3,7 +3,7 @@
   "version": "0.0.4",
   "author": "thednp",
   "license": "MIT",
-  "description": "A Vite plugin for VanJS to enable JSX transformation and simplify aplication development.",
+  "description": "A mini meta-framework for VanJS powered by Vite",
   "repository": "https://github.com/thednp/vite-plugin-vanjs",
   "type": "module",
   "sideEffects": false,
