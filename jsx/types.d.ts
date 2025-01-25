@@ -11,6 +11,6 @@ declare function jsx(
   | (Node & {
     [key: string]: unknown;
   })[];
-  
+
 export type { JSX } from "./jsx";
 export { Fragment, jsx, jsx as jsxDEV, jsx as jsxs };

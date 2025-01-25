@@ -26,7 +26,7 @@ declare module "@vanjs/client" {
    */
   export const styleToString: (source: string | CSS.Properties) => string;
 
-  type ChildElement = TagFunc | VanElement | HTMLElement;
+  type ChildElement = TagFunc | VanElement | HTMLElement | SVGElement;
 
   /**
    * Hydrate the target element with the given content(s).

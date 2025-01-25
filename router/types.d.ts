@@ -3,7 +3,7 @@ import type { Element as VanElement, TagFunc } from "mini-van-plate/van-plate";
 import van from "vanjs-core";
 import type { PropsWithKnownKeys } from "vanjs-core";
 
-type VanNode = Element | VanElement | TagFunc;
+type VanNode = SVGElement | HTMLElement | VanElement | TagFunc;
 
 // router.mjs
 /**
