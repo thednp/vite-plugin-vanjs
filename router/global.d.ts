@@ -1,10 +1,10 @@
 declare module "@vanjs/router" {
-  import type { Element, TagFunc } from "mini-van-plate/van-plate";
+  import type { Element } from "mini-van-plate/van-plate";
   import van from "vanjs-core";
   import type { PropsWithKnownKeys } from "vanjs-core";
 
   type VanElement = Element & { children: VanNode[] };
-  type VanNode = SVGElement | HTMLElement | VanElement | TagFunc;
+  type VanNode = SVGElement | HTMLElement | VanElement;
 
   // router.mjs
   /**
