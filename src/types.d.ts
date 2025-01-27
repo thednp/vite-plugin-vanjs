@@ -15,8 +15,7 @@ declare const VitePluginVanJS: () => {
     };
     esBuild: {
       jsx: "string";
-      jsxFactory: "string";
-      jsxFragment: "string";
+      jsxImportSource: "string";
     };
   };
   transform(code: string, id?: string): {

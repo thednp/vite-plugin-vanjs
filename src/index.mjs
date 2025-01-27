@@ -24,8 +24,7 @@ export default function VitePluginVanJS() {
         },
         esbuild: {
           jsx: "automatic",
-          jsxFactory: "jsx",
-          jsxFragment: "Fragment",
+          jsxImportSource: "@vanjs/jsx",
         },
       };
     },

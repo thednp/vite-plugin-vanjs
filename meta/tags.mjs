@@ -1,5 +1,5 @@
 import van from "vanjs-core";
-import { addMeta } from "./Head";
+import { addMeta } from "./Head.mjs";
 
 /** @typedef {import("vanjs-core").PropsWithKnownKeys} PropsWithKnownKeys */
 /** @typedef {import("./types.d.ts").TagProps} TagProps */

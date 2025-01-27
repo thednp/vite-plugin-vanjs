@@ -1,3 +1,3 @@
-export * from "./Head";
-export * from "./tags";
-export * from "./helpers";
+export * from "./Head.mjs";
+export * from "./tags.mjs";
+export * from "./helpers.mjs";
