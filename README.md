@@ -10,13 +10,15 @@
 [![vitest version](https://img.shields.io/badge/vitest-3.0.4-brightgreen)](https://www.vitest.dev/)
 [![vite version](https://img.shields.io/badge/vite-6.0.11-brightgreen)](https://vite.dev)
 
-A mini meta-framework for [VanJS](https://vanjs.org/) developed around the awesome Vite bundler. The plugin comes with a set of modules to simplify your workflow:
-* ***@vanjs/router*** - one of the most important part of an application, this one allows you to split code and lazy load components with ease, handles both Client Side Rendering and Server Side Rendering and makes it really easy to work with;
-* ***@vanjs/meta*** - allows you to create meta data for your pages as well as add other assets;
-* ***@vanjs/jsx*** - enables JSX transformation.
+A mini meta-framework for [VanJS](https://vanjs.org/) developed around the awesome [Vite](https://vite.dev). The plugin comes with a set of modules to simplify your workflow:
+* ***@vanjs/router*** - one of the most important part of an application, this one allows you to split code and lazy load components with ease, handles both Client Side Rendering (SSR) and Server Side Rendering (CSR) and makes it really easy to work with;
+* ***@vanjs/meta*** - allows you to create metadata for your pages as well as load additional assets with ease;
+* ***@vanjs/jsx*** - enables JSX transformation;
+* ***@vanjs/setup*** - enables loading VanJS modules isomorphically;
+* ***@vanjs/server*** - provides various tools for Server Side Rendering;
+* ***@vanjs/client*** - provides various tools for Client Side Rendering.
 
-
-In addition the plugin will automatically load the appropriate Van or VanX objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required objects in an isomorphic enviroment.
+The plugin will automatically load the appropriate Van or VanX objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required objects in an isomorphic enviroment.
 
 ### Notes 
 * The plugin uses `van-ext` along with `mini-van-plate` so you can have everything ready from start. 
@@ -85,7 +87,7 @@ const MyComponent = () => {
   return van.div("Hello from VanJS!");
 };
 ```
-The plugin also exports `vanX`.
+Using `vanX` in your code:
 
 ```ts
 // my-list.ts
@@ -113,7 +115,7 @@ const MyList = () => {
 
 
 ### Router
-The **vite-plugin-vanjs** provides a router with load and preload ability, code splitting and lazy loading, all via the exported `@vanjs/router`. This functionality is still in an early stage, but it manages to work with both Server Side Rendering (SSR) when using an appropriate starter template, as well as Client Side Rendering (CSR/SPA - your classic VanJS app), as we'll see in the example below.
+The **vite-plugin-vanjs** provides a router with load and preload capability, code splitting and lazy loading, all via the exported `@vanjs/router` module. This functionality is still in early stages, but it manages to work with both Server Side Rendering (SSR) when using an appropriate starter template, as well as Client Side Rendering (CSR/SPA - your classic VanJS app), as we'll see in the example below.
 
 Here's a basic example, let's start with the `app.ts`:
 
@@ -166,7 +168,9 @@ export function Page() {
   )
 }
 ```
-**Note** - when hovering the `A` component, if it links to a lazy component it will trigger that page component preload, but not preload any data.
+**Notes**
+- when hovering the `A` component, if it links to a lazy component it will trigger that page component preload, but not preload any data;
+- if you use the regular `a` from `van.tags` instead of the `A` component, your application will work as a classic Multi-Page App (MPA).
 
 
 ### Metadata
@@ -211,7 +215,9 @@ function App() {
 // render or hydrate the app
 van.add(document.body, App());
 ```
-**Note** - the `Style` component doesn't have any unique attribute so we must use a unique ID to prevent duplicates.
+**Note**
+- the `Style` component doesn't have any unique attribute so we must use a unique ID to prevent duplicates;
+- all provided metadata components don't return any markup, their function is to register new tags or update existing tags.
 
 
 ### JSX Transformation
@@ -241,17 +247,17 @@ const App = () => {
   );
 }
 
-van.add(document.getElementById("app") as HTMLElement, <App />);
+const root = document.getElementById("app") as HTMLElement;
 
+van.add(root, <App />);
 ```
 
 **Notes**:
-* in some cases like this one, enforcing a certain typescript type via `as` might be in good order depending on who renders your component;
+* in cases like this one, enforcing a certain typescript type via `as` might be in good order depending on who renders your component;
 * you can use `ref` as a `van.state`, `class` instead of `className`, `for` instead of `htmlFor`;
 * you can use style as both an object and a string;
 * for a JSX starter template, check out the [vite-starter-vanjs-ssr-jsx](https://github.com/thednp/vite-starter-vanjs-ssr-jsx).
 * for a pure vanilla starter template, check out the [vite-starter-vanjs-ssr](https://github.com/thednp/vite-starter-vanjs-ssr).
-
 
 
 ### Credits
