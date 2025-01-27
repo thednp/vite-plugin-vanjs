@@ -6,7 +6,7 @@
 [![NPM Downloads](https://img.shields.io/npm/dm/vite-plugin-vanjs.svg)](http://npm-stat.com/charts.html?package=vite-plugin-vanjs)
 [![typescript version](https://img.shields.io/badge/typescript-5.6.2-brightgreen)](https://www.typescriptlang.org/)
 [![vanjs-core version](https://img.shields.io/badge/vanjs--core-1.5.3-brightgreen)](https://github.com/vanjs-org/van)
-[![mini-van-plate version](https://img.shields.io/badge/mini--van--plate-0.6.1-brightgreen)](https://github.com/vanjs-org/mini-van-plate)
+[![mini-van-plate version](https://img.shields.io/badge/mini--van--plate-0.6.3-brightgreen)](https://github.com/vanjs-org/mini-van-plate)
 [![vitest version](https://img.shields.io/badge/vitest-3.0.4-brightgreen)](https://www.vitest.dev/)
 [![vite version](https://img.shields.io/badge/vite-6.0.11-brightgreen)](https://vite.dev)
 
@@ -31,7 +31,7 @@ In addition the plugin will automatically load the appropriate Van or VanX objec
 1) Install the plugin:
 
 ```bash
-pnpm add vite-plugin-vanjs
+pnpm install vite-plugin-vanjs
 ```
 
 ```bash
@@ -39,7 +39,15 @@ npm install vite-plugin-vanjs
 ```
 
 ```bash
-deno add npm:vite-plugin-vanjs
+deno install npm:vite-plugin-vanjs
+```
+
+```bash
+bun add vite-plugin-vanjs
+```
+
+```bash
+yarn add vite-plugin-vanjs
 ```
 
 2) To add typescript support, edit your `src/vite-env.d.ts` (or any global types you have set in your app) as follows:
@@ -102,6 +110,108 @@ const MyList = () => {
   )
 };
 ```
+
+
+### Router
+The **vite-plugin-vanjs** provides a router with load and preload ability, code splitting and lazy loading, all via the exported `@vanjs/router`. This functionality is still in an early stage, but it manages to work with both Server Side Rendering (SSR) when using an appropriate starter template, as well as Client Side Rendering (CSR/SPA - your classic VanJS app), as we'll see in the example below.
+
+Here's a basic example, let's start with the `app.ts`:
+
+```ts
+// src/app.ts
+import van from "vanjs-core";
+import { Router, Route, A } from "@vanjs/router";
+
+// define routes
+Route({ path: '/', component: () => van.tags.div('Hello VanJS') });
+Route({ path: '/about', component: lazy(() => import('./pages/about'))});
+Route({ path: '*', component: () => van.tags.div('404 - Page Not Found') });
+
+function App() {
+  // the Router is only an outlet
+  export default Route();
+}
+
+// render or hydrate the app
+van.add(document.body, App());
+```
+
+Here's how a page should look like, pay attention to the comments:
+```ts
+// src/pages/about.ts
+import van from "vanjs-core";
+import { A } from "@vanjs/router";
+
+// define routes
+export const route = {
+  preload: async () => {
+    // in most cases you may want to enforce user access control
+    console.log('About preload triggered');
+  },
+  load: async () => {
+    // Load data if needed
+    // you might want to cache this data
+    console.log('About load triggered');
+  }
+}
+
+// you must export your page component as either
+// a named export "Page" or a default export
+export function Page() {
+  const { div, h1, p, br } = van.tags;
+  return div(
+    h1('About'),
+    p('This is the about page'),
+    A({ href: "/" }, "Back to Home")
+  )
+}
+```
+**Note** - when hovering the `A` component, if it links to a lazy component it will trigger that page component preload, but not preload any data.
+
+
+### Metadata
+The **vite-plugin-vanjs** also provides metadata management via the exported `@vanjs/meta` module. This module works with both SSR and CSR, and makes it easy to work with.
+
+Depending on the type of application, it's generally very easy to setup the system to work properly, we only need to make sure that we execute functions in a specific order:
+
+* first we call the `initializeHeadTags` which allows the module to store the current tags that come from either a vite starter template `index.html` or the server (SSR); if we don't call this function, the existing tags will be removed and some of them are important (especially `charset` and `viewport`);
+* then we define a set of default tags to be used by both client and server (if using an SSR template) on all pages that don't come with any metadata tags;
+* lastly, on other pages, we define tags that override both the existing and the default tags
+
+Ok let's start again with the `app.ts`:
+```ts
+import van from 'vanjs-core'
+import { Style, Title, Meta, initializeHeadTags } from '@vanjs/meta'
+
+function App() {
+  const { div, h1, p } van.tags;
+
+  // when app is first time executed
+  // we need to register tags coming
+  // from the index.html template
+  initializeHeadTags();
+
+  // a good practice is to define some default tags
+  // they are used on pages where no tags are set
+  Title("VanJS + Vite App");
+  Meta({ name: "description", content: "Sample app description" });
+  Meta({ property: "og:description", content: "Some open graph description for your app" });
+  Link({ href: 'path-to/your-style.css', rel: "stylesheet" });
+  Script({ src: 'path-to/your-script.js' });
+  Style({ id: "app-style" },
+    `p { margin-bottom: 1rem }`
+  );
+
+  return div(
+    h1('Hello VanJS!'),
+    p('Sample paragraph.')
+  );
+}
+
+// render or hydrate the app
+van.add(document.body, App());
+```
+**Note** - the `Style` component doesn't have any unique attribute so we must use a unique ID to prevent duplicates.
 
 
 ### JSX Transformation

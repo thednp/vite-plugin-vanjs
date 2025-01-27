@@ -135,7 +135,7 @@ describe(`Test client-side meta`, () => {
     van.hydrate(document.body, (body) => hydrate(body, Router()));
 
     await new Promise(res => setTimeout(res, 17));
-    console.log({ html: document.body.innerHTML });
+    // console.log({ html: document.body.innerHTML });
 
     Anchor.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
     await new Promise(res => setTimeout(res, 17));

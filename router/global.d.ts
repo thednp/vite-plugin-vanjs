@@ -19,7 +19,6 @@ declare module "@vanjs/router" {
    *   return Router(); // or <Router /> for JSX
    * }
    */
-  //   export const Router: () => VanNode | VanNode[] | Promise<VanNode | VanNode[]>;
   export const Router: () => VanNode | VanNode[];
 
   // a.mjs
