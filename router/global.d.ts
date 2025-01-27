@@ -1,10 +1,9 @@
 declare module "@vanjs/router" {
-  import type {
-    Element as VanElement,
-    TagFunc,
-  } from "mini-van-plate/van-plate";
-  import van, { PropsWithKnownKeys, type Van } from "vanjs-core";
+  import type { Element, TagFunc } from "mini-van-plate/van-plate";
+  import van from "vanjs-core";
+  import type { PropsWithKnownKeys } from "vanjs-core";
 
+  type VanElement = Element & { children: VanNode[] };
   type VanNode = SVGElement | HTMLElement | VanElement | TagFunc;
 
   // router.mjs
@@ -153,14 +152,11 @@ declare module "@vanjs/router" {
     route?: Pick<RouteEntry, "load" | "preload">;
   };
 
-  //   export type LazyComponent = Promise<DynamicModule> | (() => Promise<DynamicModule>);
   export type LazyComponent = Promise<DynamicModule>;
-
-  type LazyRoute = (importFn: () => LazyComponent) => () => ComponentModule;
 
   /**
    * Registers a lazy component.
    * @param importFn
    */
-  export const lazy: LazyRoute;
+  export const lazy: (importFn: () => LazyComponent) => () => ComponentModule;
 }
