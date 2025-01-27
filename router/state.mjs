@@ -1,6 +1,6 @@
 // router/state.js
 import van from "vanjs-core";
-import setup from "../setup/index.mjs";
+import setup from "@vanjs/setup";
 
 const initialPath = !setup.isServer ? globalThis.location.pathname : "/";
 const initialSearch = !setup.isServer ? globalThis.location.search : "";

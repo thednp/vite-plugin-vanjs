@@ -1,7 +1,7 @@
 import setup from "@vanjs/setup";
 import van from "vanjs-core";
-import { routerState, setRouterState } from "./state";
-import { matchRoute } from "./routes";
+import { routerState, setRouterState } from "./state.mjs";
+import { matchRoute } from "./routes.mjs";
 
 /** @typedef {import("./types.d.ts").Route} Route */
 /** @typedef {import("./types.d.ts").VanNode} VanNode */

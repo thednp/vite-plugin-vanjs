@@ -1,8 +1,8 @@
 import van from "vanjs-core";
 import setup from "@vanjs/setup";
-import { routerState } from "./state";
-import { matchRoute } from "./routes";
-import { executeLifecycle, unwrap } from "./helpers";
+import { routerState } from "./state.mjs";
+import { matchRoute } from "./routes.mjs";
+import { executeLifecycle, unwrap } from "./helpers.mjs";
 
 export const Router = () => {
   const { div } = van.tags;

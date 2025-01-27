@@ -1,6 +1,6 @@
 import setup from "@vanjs/setup";
 import van from "vanjs-core";
-import { cache, getCached } from "./cache";
+import { cache, getCached } from "./cache.mjs";
 
 /** @typedef {import('./types').VanNode} VanNode */
 /** @typedef {import('./types').ComponentModule} ComponentModule */
