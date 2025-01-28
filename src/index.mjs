@@ -10,6 +10,9 @@ export default function VitePluginVanJS() {
     enforce: "pre",
     config() {
       return {
+        ssr: {
+          noExternal: ["vanjs-*", "*-vanjs", "@vanjs/*"],
+        },
         resolve: {
           alias: {
             "@vanjs/setup": resolve(__dirname, "../setup"),
