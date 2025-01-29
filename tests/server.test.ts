@@ -1,5 +1,5 @@
 import { expect, test, describe } from "vitest";
-import { Head, Title, Meta, Script, Style, Link, resetHeadTags } from "@vanjs/meta";
+import { Head, Title, Meta, Script, Style, Link, resetHeadTags, extractTags } from "@vanjs/meta";
 import van from "@vanjs/van";
 import vanX from "@vanjs/vanX";
 import vanjs from "vite-plugin-vanjs";
@@ -63,7 +63,6 @@ describe(`Test server-side setup, meta & router`, () => {
     expect(markup).to.contain('<link rel="preload" href="/assets/img-2.jpeg" as="image" type="image/jpeg">');
     expect(markup).to.contain('<link rel="preload" href="/assets/img-3.png" as="image" type="image/png">');
     expect(markup).to.contain('<link rel="preload" href="/assets/img-4.webp" as="image" type="image/webp">');
-
 
     const mini = {
       'src/van.txt': ['/src/van.txt'],
@@ -162,5 +161,30 @@ import { list } from "vanjs-ext";`;
     // console.log({ html: document.body.innerHTML })
     html = await renderToString(Router());
     expect(html).to.contain('<h1>Hello VanJS!</h1>');
+  })
+
+  test("Test extractTags", async () => {
+    const html = `
+<head>
+  <script type="module" src="/@vite/client"></script>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="/vite.svg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VanJS + Vite Homepage</title>
+  <meta name="description" content="Home description">
+  <style type="text/css">@layer theme, base, components, utilities;</style>
+</head>`.trim();
+    const tags = await extractTags(html);
+    console.log(tags)
+    expect(tags).to.deep.equal([
+      {tag: Script, props: { type: 'module', src: '/@vite/client' }},
+      {tag: Meta, props: { charset: 'UTF-8' }},
+      {tag: Link, props: { rel: 'icon', type: 'image/svg+xml', href: '/vite.svg' }},
+      {tag: Meta, props: { name: 'viewport', content: 'width=device-width, initial-scale=1.0' }},
+      {tag: Title, content: 'VanJS + Vite Homepage'},
+      {tag: Meta, props: { name: 'description', content: 'Home description' }},
+      // style not supported yet
+      // {tag: Style, props: { type: 'text/css' }, content: '@layer theme, base, components, utilities;'},
+    ]);    
   })
 });

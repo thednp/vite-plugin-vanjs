@@ -5,7 +5,7 @@ import { addMeta } from "./Head.mjs";
 /** @typedef {import("./types.d.ts").TagProps} TagProps */
 
 /**
- * Add a new title tag
+ * Add a new `<title>` tag
  * @type {(props: PropsWithKnownKeys<HTMLTitleElement>, content?: string) => null}
  */
 export const Title = (props, content) => {
@@ -15,7 +15,7 @@ export const Title = (props, content) => {
 };
 
 /**
- * Add a new meta tag
+ * Add a new `<meta>` tag
  * @type {(props: PropsWithKnownKeys<HTMLMetaElement>) => null}
  */
 export const Meta = (props) => {
@@ -25,7 +25,7 @@ export const Meta = (props) => {
 };
 
 /**
- * Add a new link tag
+ * Add a new `<link>` tag
  * @type {(props: PropsWithKnownKeys<HTMLLinkElement>) => null}
  */
 export const Link = (props) => {
@@ -35,19 +35,17 @@ export const Link = (props) => {
 };
 
 /**
- * Add a new script tag
+ * Add a new `<script>` tag
  * @type {(props: PropsWithKnownKeys<HTMLScriptElement>, content?: string) => null}
  */
 export const Script = (props, content) => {
   const { script } = van.tags;
-  //   const realContent = content ? content.toString() : props;
-  //   const realProps = content ? props : props;
   addMeta(script(props, content));
   return null;
 };
 
 /**
- * Add a new style tag
+ * Add a new `<style>` tag
  * @type {(props: PropsWithKnownKeys<HTMLStyleElement>, content: string) => null}
  */
 export const Style = (props, content) => {

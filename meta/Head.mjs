@@ -5,7 +5,7 @@ import { getTagKey } from "./helpers.mjs";
 /** @typedef {typeof import("./types.d.ts").createHeadTags} CreateTags */
 /** @typedef {typeof import("./types.d.ts").resetHeadTags} ResetTags */
 /** @typedef {typeof import("./types.d.ts").initializeHeadTags} InitializeTags */
-/** @typedef {import("./types.d.ts").AddMeta} AddMeta */
+/** @typedef {typeof import("./types.d.ts").addMeta} AddMeta */
 /** @typedef {typeof import("./types.d.ts").Head} HeadComp */
 
 /**

@@ -13,8 +13,8 @@ declare module "@vanjs/meta" {
     string,
     SupportedTags | TagFunc
   >;
-  export type ResetTags = () => void;
-  export type InitializeTags = () => void;
+  export const resetHeadTags: () => void;
+  export const initializeHeadTags: () => void;
 
   export type SupportedTags =
     | HTMLTitleElement
@@ -27,34 +27,36 @@ declare module "@vanjs/meta" {
 
   export type HeadTags = SupportedTags[] | TagFunc[];
 
-  export type AddMeta = (tag?: TagProps) => void;
+  export const addMeta: (tag?: TagProps) => void;
 
-  // export declare const Head: () => () => TagFunc[];
-  export declare const Head: () => () => SupportedTags[];
+  export const Head: () => () => SupportedTags[];
+
   export const Title: (
     props: PropsWithKnownKeys<HTMLTitleElement>,
     content?: string,
   ) => null;
+
   export const Meta: (props: PropsWithKnownKeys<HTMLMetaElement>) => null;
+
   export const Style: (
     props: PropsWithKnownKeys<HTMLStyleElement>,
     content?: string,
   ) => null;
+
   export const Link: (props: PropsWithKnownKeys<HTMLLinkElement>) => null;
+
   export const Script: (
     props: PropsWithKnownKeys<HTMLScriptElement>,
     content?: string,
   ) => null;
 
-  export type ParseAttributes = (
+  export const parseAttributes: (
     attributeString: string,
   ) => Record<string, string>;
 
-  export type GetTagAttribute = (tag: TagProps) => string;
+  export const getTagAttribute: (tag: TagProps) => string;
 
-  export type GetTagKey = (tag: TagProps) => string;
+  export const getTagKey: (tag: TagProps) => string;
 
-  export const initializeHeadTags: InitializeTags;
-  export const resetHeadTags: ResetTags;
-  export const addMeta: AddMeta;
+  export const extractTags: (html: string) => Promise<{ tag: TagFunc<SupportedTags>, props: PropsWithKnownKeys<SupportedTags> }[]>;
 }

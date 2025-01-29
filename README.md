@@ -21,7 +21,7 @@ A mini meta-framework for [VanJS](https://vanjs.org/) developed around the aweso
 The plugin will automatically load the appropriate Van or VanX objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required objects in an isomorphic enviroment.
 
 ### Notes 
-* The plugin uses `van-ext` along with `mini-van-plate` so you can have everything ready from start. 
+* The plugin uses `van-ext` along with `mini-van-plate` so you can have everything ready from the start. 
 
 * The recommended starter templates for you are the [vite-starter-vanjs-ssr](https://github.com/thednp/vite-starter-vanjs-ssr) and [vite-starter-vanjs-ssr-jsx](https://github.com/thednp/vite-starter-vanjs-ssr-jsx) which already include this plugin.
 
@@ -33,19 +33,19 @@ The plugin will automatically load the appropriate Van or VanX objects depending
 1) Install the plugin:
 
 ```bash
-pnpm install vite-plugin-vanjs
-```
-
-```bash
 npm install vite-plugin-vanjs
 ```
 
 ```bash
-deno install npm:vite-plugin-vanjs
+pnpm add vite-plugin-vanjs
 ```
 
 ```bash
-bun add vite-plugin-vanjs
+deno add npm:vite-plugin-vanjs
+```
+
+```bash
+bun install vite-plugin-vanjs
 ```
 
 ```bash
@@ -112,6 +112,7 @@ const MyList = () => {
   )
 };
 ```
+**Note**: Anywhere you have **vite-plugin-vanjs** enabled in your Vite apps, all imports from `"vanjs-core"` or `"vanjs-ext"` will be replaced with `"@vanjs/van"` and `"@vanjs/vanX"` respectivelly. In addition you have the `isServer` getter in the `@vanjs/setup` module, something you can use to exclude execution in server environment.
 
 
 ### Router
@@ -122,7 +123,7 @@ Here's a basic example, let's start with the `app.ts`:
 ```ts
 // src/app.ts
 import van from "vanjs-core";
-import { Router, Route, A } from "@vanjs/router";
+import { Router, Route } from "@vanjs/router";
 
 // define routes
 Route({ path: '/', component: () => van.tags.div('Hello VanJS') });
@@ -142,7 +143,7 @@ Here's how a page should look like, pay attention to the comments:
 ```ts
 // src/pages/about.ts
 import van from "vanjs-core";
-import { A } from "@vanjs/router";
+import { A, navigate } from "@vanjs/router";
 
 // define routes
 export const route = {
@@ -160,17 +161,19 @@ export const route = {
 // you must export your page component as either
 // a named export "Page" or a default export
 export function Page() {
-  const { div, h1, p, br } = van.tags;
+  const { div, h1, p, button } = van.tags;
   return div(
     h1('About'),
     p('This is the about page'),
-    A({ href: "/" }, "Back to Home")
+    A({ href: "/" }, "Back to Home"),
+    button({ onclick: () => navigate('/about-details') }, "Learn more..")
   )
 }
 ```
 **Notes**
 - when hovering the `A` component, if it links to a lazy component it will trigger that page component preload, but not preload any data;
-- if you use the regular `a` from `van.tags` instead of the `A` component, your application will work as a classic Multi-Page App (MPA).
+- if you use the regular `a` from `van.tags` instead of the `A` component, your application will work as a classic Multi-Page App (MPA);
+- the `navigate` tool is used by the `A` component and you can also use it to navigate to different routes, something you can use with your API/logic.
 
 
 ### Metadata
@@ -221,12 +224,12 @@ van.add(document.body, App());
 
 
 ### JSX Transformation
-
-To enable JSX transformation, you have to edit your `tsconfig.json` as follows:
+To enable JSX transformation, you don't need to do anything except to add Typescript support if you need to. So edit your `tsconfig.json` as follows:
 
 ```json
 {
   "compilerOptions": {
+    /** other compilerOptions */
     "jsx": "preserve",
     "jsxImportSource": "@vanjs/jsx"
   }
@@ -236,7 +239,6 @@ To enable JSX transformation, you have to edit your `tsconfig.json` as follows:
 **Example**:
 ```tsx
 // App.tsx
-import type { ChildDom } from "vanjs-core";
 import van from '@vanjs/van';
 
 const App = () => {
