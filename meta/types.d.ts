@@ -39,6 +39,4 @@ export const getTagKey: (tag: TagProps) => string;
 
 export const extractTags: (
   html?: string,
-) => Promise<
-  { tag: TagFunc; content?: string; props: PropsWithKnownKeys<SupportedTags> }[]
->;
+) => { tag: TagFunc; props: PropsWithKnownKeys<SupportedTags> }[];
