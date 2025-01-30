@@ -52,7 +52,7 @@ export const getTagKey = (tag) => {
 };
 
 /** @type {typeof import('./types.d.ts').extractTags} */
-export const extractTags = async (html) => {
+export const extractTags = async (html = "") => {
   const { htmlToVanCode } = await import("vanjs-converter");
   const tagFuncs = await import("./tags.mjs");
   const { parse } = await import("json5");
@@ -70,7 +70,7 @@ export const extractTags = async (html) => {
       if (tagName?.length && typeof tagFuncs[tagName] === "function") {
         const props = tag === "title"
           ? code[i + 1].replace(/\"/g, "")
-          : parse(propsStr || "{}");
+          : parse(propsStr || /* istanbul ignore next */ "{}");
 
         output.push({
           tag: tagFuncs[tagName],

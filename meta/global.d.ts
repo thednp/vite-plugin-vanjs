@@ -14,7 +14,9 @@ declare module "@vanjs/meta" {
     SupportedTags | TagFunc
   >;
   export const resetHeadTags: () => void;
-  export const initializeHeadTags: () => void;
+  export const initializeHeadTags: (
+    _html?: string,
+  ) => void | (() => Promise<void>);
 
   export type SupportedTags =
     | HTMLTitleElement
@@ -59,8 +61,8 @@ declare module "@vanjs/meta" {
   export const getTagKey: (tag: TagProps) => string;
 
   export const extractTags: (
-    html: string,
+    html?: string,
   ) => Promise<
-    { tag: TagFunc<SupportedTags>; props: PropsWithKnownKeys<SupportedTags> }[]
+    { tag: TagFunc; props: PropsWithKnownKeys<SupportedTags> }[]
   >;
 }

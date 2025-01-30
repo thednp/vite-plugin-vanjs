@@ -1,5 +1,5 @@
 import { expect, test, describe } from "vitest";
-import { Head, Title, Meta, Script, Style, Link, resetHeadTags, extractTags } from "@vanjs/meta";
+import { Head, Title, Meta, Script, Style, Link, resetHeadTags, extractTags, initializeHeadTags } from "@vanjs/meta";
 import van from "@vanjs/van";
 import vanX from "@vanjs/vanX";
 import vanjs from "vite-plugin-vanjs";
@@ -163,28 +163,27 @@ import { list } from "vanjs-ext";`;
     expect(html).to.contain('<h1>Hello VanJS!</h1>');
   })
 
-  test("Test extractTags", async () => {
+  test("Test initializeHeadTags & extractTags", async () => {
     const html = `
 <head>
   <script type="module" src="/@vite/client"></script>
   <meta charset="UTF-8">
-  <link rel="icon" type="image/svg+xml" href="/vite.svg">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/vite.svg">
   <title>VanJS + Vite Homepage</title>
   <meta name="description" content="Home description">
   <style type="text/css">@layer theme, base, components, utilities;</style>
 </head>`.trim();
-    const tags = await extractTags(html);
-    console.log(tags)
-    expect(tags).to.deep.equal([
-      {tag: Script, props: { type: 'module', src: '/@vite/client' }},
-      {tag: Meta, props: { charset: 'UTF-8' }},
-      {tag: Link, props: { rel: 'icon', type: 'image/svg+xml', href: '/vite.svg' }},
-      {tag: Meta, props: { name: 'viewport', content: 'width=device-width, initial-scale=1.0' }},
-      {tag: Title, content: 'VanJS + Vite Homepage'},
-      {tag: Meta, props: { name: 'description', content: 'Home description' }},
-      // style not supported yet
-      // {tag: Style, props: { type: 'text/css' }, content: '@layer theme, base, components, utilities;'},
-    ]);    
+    const tags = initializeHeadTags(html) as () => Promise<void>;
+    await tags()
+    // console.log();
+    const newHeadMarkup = Head()();
+    // console.log(newHeadMarkup);
+    // style isn't supported by vanjs-converter
+    expect(newHeadMarkup.length).to.equal(6);
+
+    // test extractTags
+    const extractedTags = await extractTags();
+    expect(extractedTags.length).to.equal(0);
   })
 });

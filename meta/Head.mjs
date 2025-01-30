@@ -48,13 +48,22 @@ export const resetHeadTags = () => {
  * Initialize the head tags
  * @type {InitializeTags}
  */
-export const initializeHeadTags = () => {
+export const initializeHeadTags = (html) => {
   const tags = getHeadTags();
   /* istanbul ignore else */
   if (!tags.size && !setup.isServer) {
     [...document.head.children].forEach((tag) => {
       tags.set(getTagKey(tag), tag);
     });
+  } else if (setup.isServer) {
+    resetHeadTags();
+    return async () => {
+      const { extractTags } = await import("./helpers.mjs");
+      const serverTags = await extractTags(html);
+      serverTags.forEach(({ tag, props, content }) => {
+        tag(content || props);
+      });
+    };
   }
 };
 
