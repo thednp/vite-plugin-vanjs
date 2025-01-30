@@ -7,8 +7,8 @@ export const createHeadTags: () => Map<
   SupportedTags | TagFunc<SupportedTags>
 >;
 
-export const getHeadTags = () =>
-  (Map<string, SupportedTags | TagFunc<SupportedTags>>);
+export const getHeadTags =
+  () => (Map<string, SupportedTags | TagFunc<SupportedTags>>);
 export const resetHeadTags: () => void;
 export const initializeHeadTags: () => void;
 
@@ -23,7 +23,7 @@ export type TagProps = SupportedTags | PropsWithKnownKeys<SupportedTags>;
 
 export type HeadTags = SupportedTags[] | TagFunc<SupportedTags>[];
 
-export const addMeta = (tag: string | TagProps) => null;
+export const addMeta = (_tag: string | TagProps) => null;
 
 export const Head: () => HeadTags;
 
@@ -35,4 +35,8 @@ export const getTagAttribute: (tag: TagProps) => string;
 
 export const getTagKey: (tag: TagProps) => string;
 
-export const extractTags: (html: string) => Promise<{ tag: TagFunc<SupportedTags>, props: PropsWithKnownKeys<SupportedTags> }[]>;
+export const extractTags: (
+  html: string,
+) => Promise<
+  { tag: TagFunc<SupportedTags>; props: PropsWithKnownKeys<SupportedTags> }[]
+>;

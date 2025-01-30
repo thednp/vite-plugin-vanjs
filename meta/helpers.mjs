@@ -58,16 +58,24 @@ export const extractTags = async (html) => {
   const { parse } = await import("json5");
   const output = [];
 
-  const { tags, code } = htmlToVanCode(html, { skipEmptyText: true, indent: 0 });
+  const { tags, code } = htmlToVanCode(html, {
+    skipEmptyText: true,
+    indent: 0,
+  });
   let i = 0;
   for (const line of code) {
     const [tag, propsStr] = line.replace(/\)\,/g, "").split("(");
     if (tag?.length && tags.includes(tag)) {
       const tagName = tag[0].toUpperCase() + tag.slice(1);
       if (tagName?.length && typeof tagFuncs[tagName] === "function") {
-        const props = tag === "title" ? code[i + 1].replace(/\"/g, "") : parse(propsStr || "{}");
+        const props = tag === "title"
+          ? code[i + 1].replace(/\"/g, "")
+          : parse(propsStr || "{}");
 
-        output.push({ tag: tagFuncs[tagName], [tag === "title" ? "content" : "props"]: props });
+        output.push({
+          tag: tagFuncs[tagName],
+          [tag === "title" ? "content" : "props"]: props,
+        });
       }
     }
     i += 1;

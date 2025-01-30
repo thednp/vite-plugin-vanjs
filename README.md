@@ -11,7 +11,7 @@
 [![vite version](https://img.shields.io/badge/vite-6.0.11-brightgreen)](https://vite.dev)
 
 A mini meta-framework for [VanJS](https://vanjs.org/) developed around the awesome [Vite](https://vite.dev). The plugin comes with a set of modules to simplify your workflow:
-* ***@vanjs/router*** - one of the most important part of an application, this one allows you to split code and lazy load components with ease, handles both Client Side Rendering (SSR) and Server Side Rendering (CSR) and makes it really easy to work with;
+* ***@vanjs/router*** - one of the most important part of an application which allows you to split code and lazy load page like components with ease, handles both Client Side Rendering (SSR) and Server Side Rendering (CSR) and makes it really easy to work with;
 * ***@vanjs/meta*** - allows you to create metadata for your pages as well as load additional assets with ease;
 * ***@vanjs/jsx*** - enables JSX transformation;
 * ***@vanjs/setup*** - enables loading VanJS modules isomorphically;
@@ -21,7 +21,7 @@ A mini meta-framework for [VanJS](https://vanjs.org/) developed around the aweso
 The plugin will automatically load the appropriate Van or VanX objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required objects in an isomorphic enviroment.
 
 ### Notes 
-* The plugin uses `van-ext` along with `mini-van-plate` so you can have everything ready from the start. 
+* The plugin uses `van-ext` along with `mini-van-plate` so you can have everything ready from the start.
 
 * The recommended starter templates for you are the [vite-starter-vanjs-ssr](https://github.com/thednp/vite-starter-vanjs-ssr) and [vite-starter-vanjs-ssr-jsx](https://github.com/thednp/vite-starter-vanjs-ssr-jsx) which already include this plugin.
 
@@ -52,7 +52,7 @@ bun install vite-plugin-vanjs
 yarn add vite-plugin-vanjs
 ```
 
-2) To add typescript support, edit your `src/vite-env.d.ts` (or any global types you have set in your app) as follows:
+2) To add Typescript support, edit your `src/vite-env.d.ts` (or any global types you have set in your app) as follows:
 
 ```ts
 /// <reference types="vite/client" />
@@ -62,7 +62,7 @@ yarn add vite-plugin-vanjs
 
 ### Usage
 
-Update your `vite.config.mts` file:
+Update your `vite.config.ts` file:
 ```ts
 // vite.config.mts
 import { defineConfig } from 'vite';
@@ -84,7 +84,7 @@ import van from '@vanjs/van';
 
 // use van as usual
 const MyComponent = () => {
-  return van.div("Hello from VanJS!");
+  return van.tags.div("Hello from VanJS!");
 };
 ```
 Using `vanX` in your code:
@@ -112,11 +112,11 @@ const MyList = () => {
   )
 };
 ```
-**Note**: Anywhere you have **vite-plugin-vanjs** enabled in your Vite apps, all imports from `"vanjs-core"` or `"vanjs-ext"` will be replaced with `"@vanjs/van"` and `"@vanjs/vanX"` respectivelly. In addition you have the `isServer` getter in the `@vanjs/setup` module, something you can use to exclude execution in server environment.
+**Note**: Anywhere you have **vite-plugin-vanjs** enabled in your Vite apps, all imports from `"vanjs-core"` or `"vanjs-ext"` will be replaced with `"@vanjs/van"` and `"@vanjs/vanX"` respectivelly. In addition you have the `isServer` getter in the `@vanjs/setup` module, something you can use to exclude code execution in server/client environment.
 
 
 ### Router
-The **vite-plugin-vanjs** provides a router with load and preload capability, code splitting and lazy loading, all via the exported `@vanjs/router` module. This functionality is still in early stages, but it manages to work with both Server Side Rendering (SSR) when using an appropriate starter template, as well as Client Side Rendering (CSR/SPA - your classic VanJS app), as we'll see in the example below.
+The **vite-plugin-vanjs** plugin provides a router with load and preload capability, code splitting and lazy loading, all via the exported `@vanjs/router` module. This functionality is still in early stages, but it manages to work with both Server Side Rendering (SSR) when using an appropriate starter template, as well as Client Side Rendering (CSR/SPA - your classic VanJS app), as we'll see in the example below.
 
 Here's a basic example, let's start with the `app.ts`:
 
@@ -172,20 +172,20 @@ export function Page() {
 ```
 **Notes**
 - when hovering the `A` component, if it links to a lazy component it will trigger that page component preload, but not preload any data;
-- if you use the regular `a` from `van.tags` instead of the `A` component, your application will work as a classic Multi-Page App (MPA);
+- if you use the regular `a` from `van.tags` instead of the `A` component, your application will work just like a classic Multi-Page App (MPA);
 - the `navigate` tool is used by the `A` component and you can also use it to navigate to different routes, something you can use with your API/logic.
 
 
 ### Metadata
-The **vite-plugin-vanjs** also provides metadata management via the exported `@vanjs/meta` module. This module works with both SSR and CSR, and makes it easy to work with.
+The **vite-plugin-vanjs** plugin provides metadata management via the exported `@vanjs/meta` module. This module works with both SSR and CSR, and makes it easy to work with.
 
 Depending on the type of application, it's generally very easy to setup the system to work properly, we only need to make sure that we execute functions in a specific order:
 
-* first we call the `initializeHeadTags` which allows the module to store the current tags that come from either a vite starter template `index.html` or the server (SSR); if we don't call this function, the existing tags will be removed and some of them are important (especially `charset` and `viewport`);
+* first we call the `initializeHeadTags` which allows the module to store the current tags that come from either a Vite starter template `index.html` or the server (SSR); if we don't call this function, the existing tags will be removed and some of them are very important (especially `charset` and `viewport`);
 * then we define a set of default tags to be used by both client and server (if using an SSR template) on all pages that don't come with any metadata tags;
-* lastly, on other pages, we define tags that override both the existing and the default tags
+* lastly, on other pages, we define tags that override both the existing and the default tags.
 
-Ok let's start again with the `app.ts`:
+Here's a quick example, first let's start again with the `app.ts`:
 ```ts
 import van from 'vanjs-core'
 import { Style, Title, Meta, initializeHeadTags } from '@vanjs/meta'
@@ -220,7 +220,7 @@ van.add(document.body, App());
 ```
 **Note**
 - the `Style` component doesn't have any unique attribute so we must use a unique ID to prevent duplicates;
-- all provided metadata components don't return any markup, their function is to register new tags or update existing tags.
+- all provided metadata components don't return any markup, their function is to register new tags or update existing ones.
 
 
 ### JSX Transformation
@@ -251,12 +251,12 @@ const App = () => {
 
 const root = document.getElementById("app") as HTMLElement;
 
-van.add(root, <App />);
+van.add(root, <App /> as HTMLElement);
 ```
 
 **Notes**:
 * in cases like this one, enforcing a certain typescript type via `as` might be in good order depending on who renders your component;
-* you can use `ref` as a `van.state`, `class` instead of `className`, `for` instead of `htmlFor`;
+* you can use `ref` as a `van.state`, `class` attribute instead of `className`, `for` attribute instead of `htmlFor`;
 * you can use style as both an object and a string;
 * for a JSX starter template, check out the [vite-starter-vanjs-ssr-jsx](https://github.com/thednp/vite-starter-vanjs-ssr-jsx).
 * for a pure vanilla starter template, check out the [vite-starter-vanjs-ssr](https://github.com/thednp/vite-starter-vanjs-ssr).

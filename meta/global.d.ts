@@ -58,5 +58,9 @@ declare module "@vanjs/meta" {
 
   export const getTagKey: (tag: TagProps) => string;
 
-  export const extractTags: (html: string) => Promise<{ tag: TagFunc<SupportedTags>, props: PropsWithKnownKeys<SupportedTags> }[]>;
+  export const extractTags: (
+    html: string,
+  ) => Promise<
+    { tag: TagFunc<SupportedTags>; props: PropsWithKnownKeys<SupportedTags> }[]
+  >;
 }
