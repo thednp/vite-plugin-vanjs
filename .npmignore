@@ -10,5 +10,5 @@ coverage
 postcss.config.cjs
 tailwind.config.js
 tsconfig.json
-vite.env.dts
+vite-env.dts
 test

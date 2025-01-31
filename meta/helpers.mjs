@@ -1,6 +1,5 @@
 import setup from "@vanjs/setup";
-import { htmlToVanCode } from "vanjs-converter";
-import JSON5 from "json5";
+import { htmlToDOM } from "@vanjs/parser";
 import * as tagFuncs from "./tags.mjs";
 
 /** @type {typeof import('./types.d.ts').parseAttributes} */
@@ -54,31 +53,52 @@ export const getTagKey = (tag) => {
       : "");
 };
 
-/** @type {typeof import('./types.d.ts').extractTags} */
+/**
+  * Typical HTML structure
+  * ```
+  * <html>
+  *  <head>
+  *    <meta charset="UTF-8">
+  *    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  *    <link rel="icon" type="image/svg+xml" href="/vite.svg">
+  *    <title>VanJS + Vite Homepage</title>
+  *    <meta name="description" content="Home description">
+  *    <style type="text/css">@layer theme, base, components, utilities;</style>
+  *  </head>
+  *  <body>
+  *    <div id="app"></div>
+  *  </body>
+  * </html>
+  * ```
+ * @type {typeof import('./types.d.ts').extractTags}
+ */
 export const extractTags = (html = "") => {
   const output = [];
+  if (!html) return output;
 
-  const { tags, code } = htmlToVanCode(html, {
-    skipEmptyText: true,
-    indent: 0,
-  });
-  let i = 0;
-  for (const line of code) {
-    const [tag, propsStr] = line.replace(/\)\,/g, "").split("(");
-    if (tag?.length && tags.includes(tag)) {
-      const tagName = tag[0].toUpperCase() + tag.slice(1);
-      if (tagName?.length && typeof tagFuncs[tagName] === "function") {
-        const props = tag === "title"
-          ? code[i + 1].replace(/\"/g, "")
-          : JSON5.parse(propsStr || /* istanbul ignore next */ "{}");
+  const {root, tags} = htmlToDOM(html);
+  // HEAD
+  /** @type {{ tagName?: string; nodeName: string; attributes: Record<string, string>; children: DOMNode[]; }} */
+  const { tagName, children } = root.children[0].tagName === "head" ? root.children[0]
+    : root.children[0].children[0].tagName === 'head' ? root.children[0].children[0]
+    : null;
 
-        output.push({
-          tag: tagFuncs[tagName],
-          [tag === "title" ? "content" : "props"]: props,
-        });
+  if (tagName === "head") {
+    for (const child of children) {
+      const { tagName: childTagName, attributes, children: childChildren } = child;
+
+      if (childTagName?.length && tags.includes(childTagName)) {
+        /** @type {keyof typeof tagFuncs} */
+        const key = childTagName[0].toUpperCase() + childTagName.slice(1);
+        if (key?.length && typeof tagFuncs[key] === "function") {
+          output.push({
+            tag: tagFuncs[key],
+            props: attributes,
+            children: childChildren[0]?.value || childChildren,
+          });
+        }
       }
     }
-    i += 1;
   }
 
   return output;

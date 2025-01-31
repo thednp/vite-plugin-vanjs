@@ -60,8 +60,8 @@ export const initializeHeadTags = (html) => {
     return async () => {
       const { extractTags } = await import("./helpers.mjs");
       const serverTags = extractTags(html);
-      serverTags.forEach(({ tag, props, content }) => {
-        tag(content || props);
+      serverTags.forEach(({ tag, props, children }) => {
+        tag(props, children);
       });
     };
   }

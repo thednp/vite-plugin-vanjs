@@ -1,0 +1,17 @@
+{
+  "name": "parser",
+  "main": "./index.mjs",
+  "module": "./index.mjs",
+  "types": "./types.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./types.d.ts",
+      "import": "./index.mjs"
+    }
+  },
+  "peerDependencies": {
+    "vite-plugin-vanjs": "*"
+  },
+  "sideEffects": false
+}

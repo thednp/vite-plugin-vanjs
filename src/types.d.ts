@@ -4,6 +4,7 @@ export * from "../router/types";
 export * from "../meta/types";
 export * from "../server/types";
 export * from "../client/types";
+export * from "../parser/types";
 
 declare const VitePluginVanJS: () => {
   name: "string";

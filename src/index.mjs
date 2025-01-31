@@ -23,6 +23,7 @@ export default function VitePluginVanJS() {
             "@vanjs/meta": resolve(__dirname, "../meta"),
             "@vanjs/router": resolve(__dirname, "../router"),
             "@vanjs/jsx": resolve(__dirname, "../jsx"),
+            "@vanjs/parser": resolve(__dirname, "../parser"),
           },
         },
         esbuild: {

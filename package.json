@@ -18,6 +18,7 @@
     "client",
     "server",
     "jsx",
+    "parser",
     "tsconfig.json",
     "package.json",
     "jsx-runtime.d.ts",
@@ -61,6 +62,10 @@
       "types": "./client/types.d.ts",
       "import": "./client/index.mjs"
     },
+    "./parser": {
+      "types": "./parser/types.d.ts",
+      "import": "./parser/index.mjs"
+    },
     "./jsx": {
       "types": "./jsx/types.d.ts",
       "import": "./jsx/index.mjs"
@@ -92,10 +97,9 @@
     "vanjs-ext": "*"
   },
   "dependencies": {
+    "@thednp/domparser": "github:thednp/domparser",
     "csstype": "^3.1.3",
-    "json5": "^2.2.3",
     "mini-van-plate": "^0.6.3",
-    "vanjs-converter": "^0.2.1",
     "vanjs-core": "^1.5.3",
     "vanjs-ext": "^0.6.2"
   },
@@ -103,7 +107,7 @@
     "@vitest/browser": "^3.0.4",
     "@vitest/coverage-istanbul": "^3.0.4",
     "@vitest/ui": "^3.0.4",
-    "happy-dom": "^16.7.3",
+    "happy-dom": "^16.8.1",
     "typescript": "5.6.2",
     "vite": "^6.0.11",
     "vitest": "^3.0.4"
