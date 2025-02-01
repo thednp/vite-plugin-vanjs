@@ -184,6 +184,16 @@ import { list } from "vanjs-ext";`;
     // console.log(JSON.stringify(newHeadMarkup, null, 2));
     expect(newHeadMarkup.length).to.equal(8);
 
+    const head = `
+<head>
+  <title>Sample title</title>
+  <style type="text/css" id="vanjs-style">p { margin: 0 }</style>
+</head>  
+`.trim();
+
+    const headCode = extractTags(head);
+    expect(headCode.length).to.equal(2);
+
     // test extractTags
     const extractedTags = extractTags();
     expect(extractedTags.length).to.equal(0);
@@ -213,6 +223,32 @@ import { list } from "vanjs-ext";`;
 
     expect(htmlToVanCode("")).toEqual({ code: '', tags: [], components: [], attributes: {} });
 
+    const html = `
+<html lang="en">
+  <head>
+    <title>Sample title</title>
+    <meta name="description" content="Sample description">
+    <script type="module" src="/@vite/client"></script>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg">
+    <link rel="stylesheet" href="/some-url.css">
+    <style type="text/css" id="vanjs-style">p { margin: 0 }</style>
+  </head>  
+  <body>
+    <div id="app">
+      This is a text node
+    </div>
+  </body>
+</html>
+`.trim();
+
+    const htmlParsed = htmlToVanCode(html);
+    // console.log(htmlParsed.code);
+    expect(htmlParsed.code).to.contain('');
+    expect(htmlParsed.components).to.deep.equal([]);
+    expect(htmlParsed.tags).to.deep.equal(["html", "head", "title", "meta", "script", "link", "style", "body", "div"]);
+    expect(htmlToVanCode(html, "props").code).to.contain("html(props");
+
+
     const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 768 767.999994" preserveAspectRatio="xMidYMid meet" version="1.0" width="2rem" height="2rem" class="w-8 h-8">
   <defs>
@@ -223,8 +259,8 @@ import { list } from "vanjs-ext";`;
   <path fill="#f44336" d="M 192.09375 -0.09375 C 86.0625 -0.09375 0.09375 85.875 0.09375 191.90625 L 0.09375 575.90625 C 0.09375 681.9375 86.0625 767.90625 192.09375 767.90625 L 576.09375 767.90625 C 682.125 767.90625 768.09375 681.9375 768.09375 575.90625 L 768.09375 191.90625 C 768.09375 85.875 682.125 -0.09375 576.09375 -0.09375 Z M 192.09375 -0.09375 " fill-opacity="1" fill-rule="nonzero" />
 </svg>
 `.trim()
-    const vanCode = htmlToVanCode(svg);
-    expect(vanCode.attributes).toEqual({
+    const svgCode = htmlToVanCode(svg);
+    expect(svgCode.attributes).toEqual({
       "class": "w-8 h-8",
       "height": "2rem",
       "preserveAspectRatio": "xMidYMid meet",
@@ -234,6 +270,6 @@ import { list } from "vanjs-ext";`;
       "xmlns": "http://www.w3.org/2000/svg",
       "xmlns:xlink": "http://www.w3.org/1999/xlink",
     });
-    expect(vanCode.code).toContain('svg(')
+    expect(svgCode.code).toContain('svg(')
   })
 });

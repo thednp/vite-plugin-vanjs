@@ -1,5 +1,5 @@
 import { htmlToDOM } from "./htmlToDOM.mjs";
-import DOMParser from "@thednp/domparser";
+import { quoteText } from "./quoteText.mjs";
 
 /** @typedef {import("@vanjs/parser").DOMNode} DOMNode */
 /** @typedef {import("@vanjs/parser").ParseResult} ParseResult */
@@ -7,40 +7,41 @@ import DOMParser from "@thednp/domparser";
 
 /**
  * Converts a `DOMNode` to a VanJS code string
- * @param {Omit<DOMNode, "attributes"> & { attributes: string | Record<string, string> }=} input 
+ * @param {Omit<DOMNode, "attributes"> & { attributes: string | Record<string, string> }} input 
+ * @param {number=} depth 
  */
-const DOMToVan = (input) => {
-  // if (!input) return '';
-
+const DOMToVan = (input, depth = 0) => {
   const { tagName, nodeName, attributes, children, value } = input;
   const isReplacement = typeof attributes === 'string';
   const isText = nodeName === '#text';
-  const firstChildIsText = children.length && children[0].nodeName === '#text';
-
+  const firstChildIsText = children?.[0]?.nodeName === '#text';
   const attributeEntries = isReplacement ? [] : Object.entries(attributes);
+  const spaces = "  ".repeat(depth); // Calculate spaces based on depth
+  let output = isText ? '' : (spaces + `${tagName}(`);
 
-  let output = isText ? '' : `${tagName}(`;
   if (attributeEntries.length || isReplacement) {
-    const attributesHTML = isReplacement ? attributes : attributeEntries.map(([key, value]) => `${DOMParser.quoteText(key)}: "${value}"`).join(', ');
+    const attributesHTML = isReplacement ? attributes : attributeEntries.map(([key, value]) => `${quoteText(key)}: "${value}"`).join(', ');
     output += isReplacement ? attributesHTML : `{ ${attributesHTML} }`;
     output += children.length ? ',' : '';
   }
   if (children.length) {
-    const childrenHTML = children.map(child => (firstChildIsText ? "" : "\n  ") + DOMToVan(child)).join(',');
+    const childrenHTML = children
+    // Increase depth for children
+      .map(child => (firstChildIsText ? (attributeEntries.length ? " " : "") : ("\n" + "  ".repeat(depth + 1))) + DOMToVan(child, depth + 1))
+      .join(',');
     output += `${childrenHTML}`;
   }
   if (value) {
     output += `"${value}"`;
   }
-  output += isText ? '' : (children.length && children[0].tagName !== '#text' ? '\n)' : ')');
+  // Adjust newline for closing bracket
+  output += isText ? "" : (children.length && !firstChildIsText ? ("\n" + "  ".repeat(depth + 1) + ')') : (')'));
 
   return output;
 }
 
-
-
 /**
- * Converts HTML to VanJS code.
+ * Converts HTML markup to VanJS code.
  * 
  * @type {htmlToVanCode}
  */

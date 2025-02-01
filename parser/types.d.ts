@@ -1,4 +1,5 @@
 /// <reference path="global.d.ts" />
+
 // import {  DOMNode } from "@thednp/domparser";
 
 // export type DOMNode = {

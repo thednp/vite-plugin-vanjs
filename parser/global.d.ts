@@ -29,4 +29,10 @@ declare module "@vanjs/parser" {
 
     /** Converts HTML to DOMNode */
     export const htmlToDOM: (input?: string) => { root: DOMNode, components: string[], tags: string[] }
+
+    /**
+     * Returns a quoted string if the key is a valid identifier,
+     * otherwise returns the original key.
+     */
+    export const quoteText: (key: string) => string;
 }
