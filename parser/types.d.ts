@@ -1,23 +1,20 @@
 /// <reference path="global.d.ts" />
+import type { DOMNode, ParseResult } from "@thednp/domparser";
 
-// import {  DOMNode } from "@thednp/domparser";
+export type VanJSCode = { code: string, tags: string[], components: string[], attributes: Record<string, string> }
 
-// export type DOMNode = {
-//     tagName?: string;
-//     nodeName: string;
-//     attributes: Record<string, string>;
-//     children: DOMNode[];
-//     value?: string;
-//     is
-// }
+export const DOMToVan: (node: DOMNode) => string
 
-// export type ParseResult = {
-//     root: DOMNode,
-//     components: string[],
-//     tags: string[],
-// }
+/**
+ * Converts HTML to VanJS code.
+ */
+export const htmlToVanCode: (input?: string, replacement?: string) => VanJSCode
 
-// export type HTMLToken = {
-//     type: string;
-//     value: string;
-// }
+/** Converts HTML to DOMNode */
+export const htmlToDOM: (input?: string) => { root: DOMNode, components: string[], tags: string[] }
+
+/**
+ * Returns a quoted string if the key is a valid identifier,
+ * otherwise returns the original key.
+ */
+export const quoteText: (key: string) => string;

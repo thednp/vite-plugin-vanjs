@@ -9,7 +9,6 @@ export * from "../parser/types";
 declare const VitePluginVanJS: () => {
   name: "string";
   enforce: "pre" | "post" | undefined;
-  apply: "build";
   config(): {
     resolve: {
       alias: Record<string, string>;
