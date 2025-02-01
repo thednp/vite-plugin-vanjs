@@ -83,7 +83,7 @@ export const extractTags = (html = "") => {
     ? root.children[0]
     : root.children[0].children[0].tagName === "head"
     ? root.children[0].children[0]
-    : /* istanbul ignore next @preserve */ null;
+    : /* istanbul ignore next @preserve */ {};
 
   /* istanbul ignore else @preserve */
   if (tagName === "head") {
