@@ -17,12 +17,12 @@ declare module "@vanjs/parser" {
 
     export const DOMToVan: (node: DOMLike) => string
 
-    export type ConvertedOptions = ParserOptions & { replacement?: string }
+    export type ConverterOptions = ParserOptions & { replacement?: string }
 
     /**
      * Converts HTML to VanJS code.
      */
-    export const htmlToVanCode: (input?: string, converterOptions?: ConvertedOptions) => VanJSCode
+    export const htmlToVanCode: (input?: string, converterOptions?: ConverterOptions) => VanJSCode
 
     /** Converts HTML to DOMNode */
     export const htmlToDOM: (input?: string) => ParseResult

@@ -5,12 +5,12 @@ export type VanJSCode = { code: string, tags: string[], components: string[], at
 
 export const DOMToVan: (node: DOMLike) => string
 
-export type ConvertedOptions = ParserOptions & { replacement?: string }
+export type ConverterOptions = ParserOptions & { replacement?: string }
 
 /**
  * Converts HTML to VanJS code.
  */
-export const htmlToVanCode: (input?: string, converterOptions?: ConvertedOptions) => VanJSCode
+export const htmlToVanCode: (input?: string, converterOptions?: ConverterOptions) => VanJSCode
 
 /** Converts HTML to DOMLike */
 export const htmlToDOM: (input?: string, options?: Partial<ParserOptions>) => ParseResult
