@@ -1,16 +1,10 @@
 declare module "@vanjs/parser" {
-    export type DOMNode = {
-        tagName?: string;
-        nodeName: string;
-        attributes: Record<string, string>;
-        children: DOMNode[];
-        value?: string;
-    }
+    import type { DOMLike, RootNode, ParseResult } from "@thednp/domparser";
 
-    export type ParseResult = {
-        root: DOMNode,
-        components: string[],
-        tags: string[],
+    export {
+        RootNode,
+        DOMLike,
+        ParseResult,
     }
 
     export type HTMLToken = {
@@ -20,7 +14,7 @@ declare module "@vanjs/parser" {
 
     export type VanJSCode = { code: string, tags: string[], components: string[], attributes: Record<string, string> }
 
-    export const DOMToVan: (node: DOMNode) => string
+    export const DOMToVan: (node: DOMLike) => string
 
     /**
      * Converts HTML to VanJS code.
@@ -28,7 +22,7 @@ declare module "@vanjs/parser" {
     export const htmlToVanCode: (input?: string, replacement?: string) => VanJSCode
 
     /** Converts HTML to DOMNode */
-    export const htmlToDOM: (input?: string) => { root: DOMNode, components: string[], tags: string[] }
+    export const htmlToDOM: (input?: string) => ParseResult
 
     /**
      * Returns a quoted string if the key is a valid identifier,

@@ -15,7 +15,7 @@ const DOMToVan = (input, depth = 0) => {
   const isReplacement = typeof attributes === 'string';
   const isText = nodeName === '#text';
   const firstChildIsText = children?.[0]?.nodeName === '#text';
-  const attributeEntries = isReplacement ? [] : Object.entries(attributes);
+  const attributeEntries = isReplacement ? [] : Object.entries(attributes || {});
   const spaces = "  ".repeat(depth); // Calculate spaces based on depth
   let output = isText ? '' : (spaces + `${tagName}(`);
 
@@ -24,7 +24,7 @@ const DOMToVan = (input, depth = 0) => {
     output += isReplacement ? attributesHTML : `{ ${attributesHTML} }`;
     output += children.length ? ',' : '';
   }
-  if (children.length) {
+  if (children?.length) {
     const childrenHTML = children
     // Increase depth for children
       .map(child => (firstChildIsText ? (attributeEntries.length ? " " : "") : ("\n" + "  ".repeat(depth + 1))) + DOMToVan(child, depth + 1))

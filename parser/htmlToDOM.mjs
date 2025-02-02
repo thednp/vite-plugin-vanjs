@@ -1,4 +1,4 @@
-import DOMParser from "@thednp/domparser";
+import { Parser } from "@thednp/domparser";
 
 /** @typedef {typeof import("@vanjs/parser").htmlToDOM} htmlToDOM */
 
@@ -8,8 +8,8 @@ import DOMParser from "@thednp/domparser";
  * @type {htmlToDOM}
  */
 export const htmlToDOM = (input) => {
-  if (!input) return { root: { nodeName: '#document', attributes: {}, children: [] }, tags: [], components: [] };
+  if (!input) return { root: { nodeName: '#document', children: [] }, tags: [], components: [] };
   if (typeof input !== 'string') throw new TypeError('input must be a string');
-  const parser = new DOMParser();
+  const parser = Parser();
   return parser.parseFromString(input);
 }

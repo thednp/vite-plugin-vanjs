@@ -208,7 +208,7 @@ import { list } from "vanjs-ext";`;
       // @ts-expect-error
       expect(e?.message).to.equal('input must be a string');
     }
-    expect(htmlToDOM()).toEqual({  root: { nodeName: '#document', attributes: {}, children: [] }, tags: [], components: [] });
+    expect(htmlToDOM()).toEqual({  root: { nodeName: '#document', children: [] }, tags: [], components: [] });
   });
 
   test("Test htmlToVanCode", async () => {
