@@ -16,7 +16,8 @@ A mini meta-framework for [VanJS](https://vanjs.org/) developed around the aweso
 * ***@vanjs/jsx*** - enables JSX transformation;
 * ***@vanjs/setup*** - enables loading VanJS modules isomorphically;
 * ***@vanjs/server*** - provides various tools for Server Side Rendering;
-* ***@vanjs/client*** - provides various tools for Client Side Rendering.
+* ***@vanjs/client*** - provides various tools for Client Side Rendering;
+* ***@vanjs/parser*** - provides tools for parsing HTML and generate VanJS code.
 
 The plugin will automatically load the appropriate Van or VanX objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required objects in an isomorphic enviroment.
 
@@ -265,6 +266,7 @@ van.add(root, <App /> as HTMLElement);
 ### Credits
 * [van-jsx](https://github.com/herudi/van-jsx) a simple Vanilla JSX implementation;
 * [vanjs-jsx](https://github.com/vanjs-org/van/tree/main/addons/van_jsx) the official VanJS addon;
+* [vanjs-converter](https://github.com/vanjs-org/converter) the tool that inspired our parser;
 * [surplus](https://github.com/adamhaile/surplus/blob/master/index.d.ts) for Typescript definitions also used by SolidJS;
 * [inferno](https://github.com/infernojs/inferno/blob/master/packages/inferno/src/core/types.ts) also for typescript definitions.
 

@@ -246,7 +246,7 @@ import { list } from "vanjs-ext";`;
     expect(htmlParsed.code).to.contain('');
     expect(htmlParsed.components).to.deep.equal([]);
     expect(htmlParsed.tags).to.deep.equal(["html", "head", "title", "meta", "script", "link", "style", "body", "div"]);
-    expect(htmlToVanCode(html, "props").code).to.contain("html(props");
+    expect(htmlToVanCode(html, { replacement: "props" }).code).to.contain("html(props");
 
 
     const svg = `
@@ -264,7 +264,6 @@ import { list } from "vanjs-ext";`;
       "class": "w-8 h-8",
       "height": "2rem",
       "preserveAspectRatio": "xMidYMid meet",
-      "version": "1.0",
       "viewBox": "0 0 768 767.999994",
       "width": "2rem",
       "xmlns": "http://www.w3.org/2000/svg",

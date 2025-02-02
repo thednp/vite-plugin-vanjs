@@ -7,9 +7,10 @@ import { Parser } from "@thednp/domparser";
  * 
  * @type {htmlToDOM}
  */
-export const htmlToDOM = (input) => {
+export const htmlToDOM = (input, options = {}) => {
   if (!input) return { root: { nodeName: '#document', children: [] }, tags: [], components: [] };
   if (typeof input !== 'string') throw new TypeError('input must be a string');
-  const parser = Parser();
+  const parserOptions = { ...options, filterAttrs: [ ...(options.filterAttrs || []), "version"] };
+  const parser = Parser(parserOptions);
   return parser.parseFromString(input);
 }

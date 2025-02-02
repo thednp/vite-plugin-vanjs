@@ -45,8 +45,9 @@ const DOMToVan = (input, depth = 0) => {
  * 
  * @type {htmlToVanCode}
  */
-export const htmlToVanCode = (input, replacement) => {
-  const { root, components, tags } = htmlToDOM(input);
+export const htmlToVanCode = (input, options = {}) => {
+  const { replacement, ...parserOptions } = options;
+  const { root, components, tags } = htmlToDOM(input, parserOptions);
   if (!root?.children.length) return { code: '', tags: [], components: [], attributes: {} };
   const { tagName, nodeName, attributes, children } = root.children[0];
   const code = DOMToVan({ tagName, nodeName, attributes: replacement || attributes, children });
