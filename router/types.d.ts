@@ -154,3 +154,5 @@ export type LazyComponent =
   | (() => Promise<DynamicModule>);
 
 export const lazy: (importFn: () => LazyComponent) => () => ComponentModule;
+
+export const fixRouteUrl: (url: string) => string;

@@ -1,5 +1,5 @@
-import setup from "@vanjs/setup";
 import van from "vanjs-core";
+import setup from "../setup/index.mjs";
 import { routerState, setRouterState } from "./state.mjs";
 import { matchRoute } from "./routes.mjs";
 
@@ -136,6 +136,19 @@ export const extractParams = (pattern, path) => {
   }
 
   return params;
+};
+
+/**
+ * Fix the URL of a route
+ * @param {string=} url 
+ * @returns 
+ */
+export const fixRouteUrl = (url) => {
+  if (!url) return "/";
+  if (url.startsWith("/")) {
+    return url;
+  }
+  return `/${url}`;
 };
 
 /**

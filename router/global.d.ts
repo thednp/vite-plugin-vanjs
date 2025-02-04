@@ -159,4 +159,10 @@ declare module "@vanjs/router" {
    * @param importFn
    */
   export const lazy: (importFn: () => LazyComponent) => () => ComponentModule;
+
+  /**
+   * Fixes the URL of a route.
+   * @param url
+   */
+  export const fixRouteUrl: (url: string) => string;
 }

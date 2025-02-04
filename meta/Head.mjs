@@ -1,4 +1,4 @@
-import setup from "@vanjs/setup";
+import setup from "../setup/index.mjs";
 import { getTagKey } from "./helpers.mjs";
 
 /** @typedef {typeof import("./types.d.ts").getHeadTags} GetTags */

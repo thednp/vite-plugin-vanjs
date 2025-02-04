@@ -1,5 +1,5 @@
-import setup from "@vanjs/setup";
-import { htmlToDOM } from "@vanjs/parser";
+import setup from "../setup/index.mjs";
+import { htmlToDOM } from "../parser/index.mjs";
 import * as tagFuncs from "./tags.mjs";
 
 /** @type {typeof import('./types.d.ts').parseAttributes} */

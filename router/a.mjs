@@ -1,6 +1,6 @@
 // router/a.mjs
 import van from "vanjs-core";
-import setup from "@vanjs/setup";
+import setup from "../setup/index.mjs";
 import { matchRoute } from "./routes.mjs";
 import { executeLifecycle, isCurrentPage, navigate } from "./helpers.mjs";
 

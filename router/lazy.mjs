@@ -1,4 +1,4 @@
-import setup from "@vanjs/setup";
+import setup from "../setup/index.mjs";
 import van from "vanjs-core";
 import { cache, getCached } from "./cache.mjs";
 

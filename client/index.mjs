@@ -1,4 +1,4 @@
-import { unwrap } from "@vanjs/router";
+import { unwrap } from "../router/index.mjs";
 
 /**
  * @param {Element} element

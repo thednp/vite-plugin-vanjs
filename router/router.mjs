@@ -1,5 +1,5 @@
 import van from "vanjs-core";
-import setup from "@vanjs/setup";
+import setup from "../setup/index.mjs";
 import { routerState } from "./state.mjs";
 import { matchRoute } from "./routes.mjs";
 import { executeLifecycle, unwrap } from "./helpers.mjs";
