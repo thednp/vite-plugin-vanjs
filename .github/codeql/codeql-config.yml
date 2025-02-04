@@ -1,4 +1,9 @@
 paths:
   - src
   - setup
+  - meta
+  - router
   - jsx
+  - parser
+  - client
+  - server
