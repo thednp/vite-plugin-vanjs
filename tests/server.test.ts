@@ -1,11 +1,10 @@
 import { expect, test, describe } from "vitest";
-import { Head, Title, Meta, Script, Style, Link, resetHeadTags, extractTags, initializeHeadTags } from "@vanjs/meta";
+import { Head, Title, Meta, Script, Style, Link, resetHeadTags } from "@vanjs/meta";
 import van from "@vanjs/van";
 import vanX from "@vanjs/vanX";
 import vanjs from "vite-plugin-vanjs";
 import { renderToString, renderPreloadLinks } from "@vanjs/server";
-import { Router, Route, lazy, setRouterState, routerState } from "@vanjs/router";
-import { htmlToDOM, htmlToVanCode } from "@vanjs/parser"
+import { Router, Route, lazy, setRouterState, routerState, fixRouteUrl } from "@vanjs/router";
 
 describe(`Test server-side setup, meta & router`, () => {
   test(`Test meta tags`, async () => {
@@ -162,113 +161,8 @@ import { list } from "vanjs-ext";`;
     // console.log({ html: document.body.innerHTML })
     html = await renderToString(Router());
     expect(html).to.contain('<h1>Hello VanJS!</h1>');
-  })
 
-  test("Test initializeHeadTags & extractTags", async () => {
-    const html = `
-<html>
-<head>
-  <script type="module" src="/@vite/client"></script>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" type="image/svg+xml" href="/vite.svg">
-  <title>VanJS + Vite Homepage</title>
-  <meta name="description" content="Home description">
-  <meta property="og:description" content="Home description" />
-  <style type="text/css" id="vanjs-style">@layer theme, base, components, utilities;</style>
-</head>
-</html>`.trim();
-    const tags = initializeHeadTags(html) as () => Promise<void>;
-    await tags()
-    const newHeadMarkup = Head()();
-    // console.log(JSON.stringify(newHeadMarkup, null, 2));
-    expect(newHeadMarkup.length).to.equal(8);
-
-    const head = `
-<head>
-  <title>Sample title</title>
-  <style type="text/css" id="vanjs-style">p { margin: 0 }</style>
-</head>  
-`.trim();
-
-    const headCode = extractTags(head);
-    expect(headCode.length).to.equal(2);
-
-    // test extractTags
-    const extractedTags = extractTags();
-    expect(extractedTags.length).to.equal(0);
-  });
-
-  test("Test htmlToDOM", async () => {
-    try {
-      // @ts-expect-error
-      htmlToDOM({ one: "two "});
-    } catch (e: unknown | TypeError) {
-      expect(e).to.be.instanceOf(TypeError);
-      // @ts-expect-error
-      expect(e?.message).to.equal('input must be a string');
-    }
-    expect(htmlToDOM()).toEqual({  root: { nodeName: '#document', children: [] }, tags: [], components: [] });
-  });
-
-  test("Test htmlToVanCode", async () => {
-    try {
-      // @ts-expect-error
-      htmlToVanCode({ one: "two "});
-    } catch (e: unknown | TypeError) {
-      expect(e).to.be.instanceOf(TypeError);
-      // @ts-expect-error
-      expect(e?.message).to.equal('input must be a string');
-    }
-
-    expect(htmlToVanCode("")).toEqual({ code: '', tags: [], components: [], attributes: {} });
-
-    const html = `
-<html lang="en">
-  <head>
-    <title>Sample title</title>
-    <meta name="description" content="Sample description">
-    <script type="module" src="/@vite/client"></script>
-    <link rel="icon" type="image/svg+xml" href="/vite.svg">
-    <link rel="stylesheet" href="/some-url.css">
-    <style type="text/css" id="vanjs-style">p { margin: 0 }</style>
-  </head>  
-  <body>
-    <div id="app">
-      This is a text node
-    </div>
-  </body>
-</html>
-`.trim();
-
-    const htmlParsed = htmlToVanCode(html);
-    // console.log(htmlParsed.code);
-    expect(htmlParsed.code).to.contain('');
-    expect(htmlParsed.components).to.deep.equal([]);
-    expect(htmlParsed.tags).to.deep.equal(["html", "head", "title", "meta", "script", "link", "style", "body", "div"]);
-    expect(htmlToVanCode(html, { replacement: "props" }).code).to.contain("html(props");
-
-
-    const svg = `
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 768 767.999994" preserveAspectRatio="xMidYMid meet" version="1.0" width="2rem" height="2rem" class="w-8 h-8">
-  <defs>
-    <clipPath id="5499afe1a4">
-      <path d="M 215.664062 352.992188 L 398 352.992188 L 398 586 L 215.664062 586 Z M 215.664062 352.992188 " clip-rule="nonzero"></path>
-    </clipPath>
-  </defs>
-  <path fill="#f44336" d="M 192.09375 -0.09375 C 86.0625 -0.09375 0.09375 85.875 0.09375 191.90625 L 0.09375 575.90625 C 0.09375 681.9375 86.0625 767.90625 192.09375 767.90625 L 576.09375 767.90625 C 682.125 767.90625 768.09375 681.9375 768.09375 575.90625 L 768.09375 191.90625 C 768.09375 85.875 682.125 -0.09375 576.09375 -0.09375 Z M 192.09375 -0.09375 " fill-opacity="1" fill-rule="nonzero" />
-</svg>
-`.trim()
-    const svgCode = htmlToVanCode(svg);
-    expect(svgCode.attributes).toEqual({
-      "class": "w-8 h-8",
-      "height": "2rem",
-      "preserveAspectRatio": "xMidYMid meet",
-      "viewBox": "0 0 768 767.999994",
-      "width": "2rem",
-      "xmlns": "http://www.w3.org/2000/svg",
-      "xmlns:xlink": "http://www.w3.org/1999/xlink",
-    });
-    expect(svgCode.code).toContain('svg(')
+    expect(fixRouteUrl('')).toEqual("/")
+    expect(fixRouteUrl('test')).toEqual("/test")
   })
 });

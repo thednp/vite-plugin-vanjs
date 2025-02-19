@@ -55,15 +55,6 @@ export const initializeHeadTags = (html) => {
     [...document.head.children].forEach((tag) => {
       tags.set(getTagKey(tag), tag);
     });
-  } else if (setup.isServer) {
-    resetHeadTags();
-    return async () => {
-      const { extractTags } = await import("./helpers.mjs");
-      const serverTags = extractTags(html);
-      serverTags.forEach(({ tag, props, children }) => {
-        tag(props, children);
-      });
-    };
   }
 };
 

@@ -16,7 +16,7 @@ declare module "@vanjs/meta" {
   export const resetHeadTags: () => void;
   export const initializeHeadTags: (
     _html?: string,
-  ) => void | (() => Promise<void>);
+  ) => void;
 
   export type SupportedTags =
     | HTMLTitleElement

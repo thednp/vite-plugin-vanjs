@@ -4,6 +4,9 @@ import vanjs from "vite-plugin-vanjs";
 export default defineConfig({
   plugins: [vanjs()],
   test: {
+    include: [
+      "tests/**.test.?(c|m)[jt]s?(x)",
+    ],
     coverage: {
       provider: "istanbul",
       reporter: ["html", "text", "lcov"],
