@@ -140,8 +140,8 @@ export const extractParams = (pattern, path) => {
 
 /**
  * Fix the URL of a route
- * @param {string=} url 
- * @returns 
+ * @param {string=} url
+ * @returns
  */
 export const fixRouteUrl = (url) => {
   if (!url) return "/";

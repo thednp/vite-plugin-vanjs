@@ -48,7 +48,7 @@ export const resetHeadTags = () => {
  * Initialize the head tags
  * @type {InitializeTags}
  */
-export const initializeHeadTags = (html) => {
+export const initializeHeadTags = () => {
   const tags = getHeadTags();
   /* istanbul ignore else */
   if (!tags.size && !setup.isServer) {

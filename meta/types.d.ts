@@ -10,9 +10,7 @@ export const createHeadTags: () => Map<
 export const getHeadTags =
   () => (Map<string, SupportedTags | TagFunc<SupportedTags>>);
 export const resetHeadTags: () => void;
-export const initializeHeadTags: (
-  _html?: string,
-) => void | (() => Promise<void>);
+export const initializeHeadTags: () => void | (() => Promise<void>);
 
 export type SupportedTags =
   | HTMLTitleElement
