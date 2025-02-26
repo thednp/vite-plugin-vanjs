@@ -20,7 +20,7 @@ type ValidVanNode =
   | VanElement
   | TagFunc;
 
-type VanComponent = () => ValidVanNode | ValidVanNode[];
+type VanComponent = () => HTMLElement | ValidVanNode | ValidVanNode[];
 export type Source =
   | Promise<ValidVanNode>
   | VanComponent
@@ -36,3 +36,12 @@ export type Source =
  * @returns HTML string
  */
 export const renderToString: (source: Source) => Promise<string>;
+
+export type TemplateProps = {
+  lang: string;
+};
+
+/**
+ * The main HTML template for SSR
+ */
+export const Template: (props?: Partial<TemplateProps>) => VanComponent;

@@ -3,7 +3,7 @@ import van from 'vanjs-core'
 import * as vanX from 'vanjs-ext'
 import { expect, test, describe, beforeEach } from "vitest";
 import { hydrate } from "@vanjs/client";
-import { Head, Title, Meta, Script, Style, Link, addMeta, resetHeadTags, initializeHeadTags } from "@vanjs/meta";
+import { Head, Title, Meta, Script, Style, Link, addMeta, resetHeadTags, initializeHeadTags, SupportedTags } from "@vanjs/meta";
 import { Router, Route, lazy, A, setRouterState, routerState, navigate, unwrap } from "@vanjs/router";
 
 describe(`Test client-side meta`, () => {
@@ -24,7 +24,7 @@ describe(`Test client-side meta`, () => {
     ]
     defaultHead();
     const headTags = Head();
-    const allTags = headTags();
+    const allTags = headTags() as SupportedTags[];
 
     expect(allTags).to.have.length(7);
     expect(allTags[0].tagName).to.equal("TITLE");
@@ -56,7 +56,7 @@ describe(`Test client-side meta`, () => {
       return [Title('Sample title updated')];
     };
     Page();
-    const updatedTags = headTags();
+    const updatedTags = headTags() as SupportedTags[];
     expect(updatedTags[1].tagName).to.equal("TITLE");
     expect(updatedTags[1].innerText).to.equal("Sample title updated");
     // cover undefined case

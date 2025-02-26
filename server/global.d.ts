@@ -27,6 +27,7 @@ declare module "@vanjs/server" {
     | TagFunc;
 
   type VanComponent = () =>
+    | HTMLElement
     | ValidVanNode
     | ValidVanNode[]
     | SupportedTags
@@ -46,4 +47,13 @@ declare module "@vanjs/server" {
    * @returns HTML string
    */
   export const renderToString: (source: Source) => Promise<string>;
+
+  export type TemplateProps = {
+    lang: string;
+  };
+
+  /**
+   * The main HTML template for SSR
+   */
+  export const Template: (props?: Partial<TemplateProps>) => VanComponent;
 }

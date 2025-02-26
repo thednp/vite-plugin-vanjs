@@ -21,7 +21,7 @@ export type SupportedTags =
 
 export type TagProps = SupportedTags | PropsWithKnownKeys<SupportedTags>;
 
-export type HeadTags = SupportedTags[] | TagFunc<SupportedTags>[];
+export type HeadTags = SupportedTags[] | TagFunc[];
 
 export const addMeta = (_tag: string | TagProps) => null;
 

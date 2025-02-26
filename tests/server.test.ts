@@ -3,7 +3,7 @@ import { Head, Title, Meta, Script, Style, Link, resetHeadTags } from "@vanjs/me
 import van from "@vanjs/van";
 import vanX from "@vanjs/vanX";
 import vanjs from "vite-plugin-vanjs";
-import { renderToString, renderPreloadLinks } from "@vanjs/server";
+import { renderToString, renderPreloadLinks, Template } from "@vanjs/server";
 import { Router, Route, lazy, setRouterState, routerState, fixRouteUrl } from "@vanjs/router";
 
 describe(`Test server-side setup, meta & router`, () => {
@@ -91,6 +91,12 @@ import { list } from "vanjs-ext";`;
 
     expect(reactive(obj).a).to.equal(1);
     expect(reactive(obj).b).to.equal(2);
+  });
+
+  test("Test Template", async () => {
+    const template = Template();
+    console.log(template);
+    expect(template).toBeDefined();
   });
 
   test("Test router", async () => {

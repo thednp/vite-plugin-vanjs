@@ -31,7 +31,7 @@ declare module "@vanjs/meta" {
 
   export const addMeta: (tag?: TagProps) => void;
 
-  export const Head: () => () => SupportedTags[];
+  export const Head: () => () => SupportedTags[] | TagFunc[];
 
   export const Title: (
     props: PropsWithKnownKeys<HTMLTitleElement>,
