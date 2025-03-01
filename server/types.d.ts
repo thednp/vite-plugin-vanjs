@@ -13,6 +13,18 @@ export const renderPreloadLinks: (
   manifest: Record<string, string[]>,
 ) => string;
 
+/**
+ * A function that takes a list of files and a manifest and returns an array of
+ * VanJS components.
+ * @param files the list of files
+ * @param manifest the vite manifest
+ * @returns HTML string
+ */
+export const vanPreloadLinks: (
+  files: string[],
+  manifest: Record<string, string[]>,
+) => (VanElement | TagFunc)[];
+
 type ValidVanNode =
   | boolean
   | number
