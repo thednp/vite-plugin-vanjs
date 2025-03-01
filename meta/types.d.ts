@@ -34,11 +34,3 @@ export const parseAttributes: (
 export const getTagAttribute: (tag: TagProps) => string;
 
 export const getTagKey: (tag: TagProps) => string;
-
-export const extractTags: (
-  html?: string,
-) => {
-  tag: TagFunc;
-  props: PropsWithKnownKeys<SupportedTags>;
-  children: TagFunc[];
-}[];

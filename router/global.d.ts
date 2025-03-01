@@ -137,7 +137,7 @@ declare module "@vanjs/router" {
    * @param  {...VanNode[]} children
    */
   export const unwrap: (
-    source: VanNode | VanNode[] | (() => VanNode | VanNode[]),
+    source: VanNode | TagFunc | VanNode[] | TagFunc[] | (() => TagFunc | TagFunc[] | VanNode | VanNode[]),
     ...children: VanNode[]
   ) => VanNode;
 

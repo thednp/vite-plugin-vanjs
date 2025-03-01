@@ -48,12 +48,19 @@ declare module "@vanjs/server" {
    */
   export const renderToString: (source: Source) => Promise<string>;
 
-  export type TemplateProps = {
-    lang: string;
-  };
-
   /**
-   * The main HTML template for SSR
+   * A server utility to resolve files mainly in the src folder.
+   * The relative file path must not contain any extension (EG: '.ts', '.jsx', etc),
+   * this utility is meant to detect it.
+   * 
+   * @example
+   * ```ts
+   * const file = await import(resolveFile("/src/components/Header"))
+   *  .then(module => module.Header || module.default)
+   * 
+   * ```
+   * @param file the path relative to the root folder
+   * @returns the resolved path file string
    */
-  export const Template: (props?: Partial<TemplateProps>) => VanComponent;
+  export const resolveFile: (file: string) => string;
 }

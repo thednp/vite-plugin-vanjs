@@ -31,14 +31,14 @@ declare module "@vanjs/meta" {
 
   export const addMeta: (tag?: TagProps) => void;
 
-  export const Head: () => () => SupportedTags[] | TagFunc[];
+  export const Head: () => HeadTags;
 
   export const Title: (
     props: PropsWithKnownKeys<HTMLTitleElement>,
     content?: string,
   ) => null;
 
-  export const Meta: (props: PropsWithKnownKeys<HTMLMetaElement>) => null;
+  export const Meta: (props: PropsWithKnownKeys<HTMLMetaElement> & { charset?: string & "UTF-8" }) => null;
 
   export const Style: (
     props: PropsWithKnownKeys<HTMLStyleElement>,

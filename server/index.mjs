@@ -1,46 +1,16 @@
-import { basename } from "node:path";
-import van from "@vanjs/van";
-import { Link, Meta, resetHeadTags, Script, Title } from "@vanjs/meta";
+import { existsSync } from "node:fs";
+import { basename, resolve } from "node:path";
+import { cwd } from "node:process";
 
 /**
- * @type {typeof import("./types.d.ts").Template}
+ * @type {typeof import("./types.d.ts").resolveFile}
  */
-export const Template = (props = {}) => {
-  // we reset head tags here
-  resetHeadTags();
-  const { body, footer, head, header, html, main } = van.tags;
-  // HEAD TAGS
-  // REQUIRED TAGS
-  Meta({ charset: "UTF-8" });
-  Meta({ name: "viewport", content: "width=device-width, initial-scale=1.0" });
-  // DEFAULT TAGS
-  Title("VanJS Starter Template");
-  Meta({ name: "description", content: "VanJS Starter Template Description" });
-
-  return [
-    "<!doctype html>",
-    html(
-      { lang: props.lang || "en" },
-      head(
-        "{app-head}",
-        "{preload-links}",
-      ),
-      body(
-        { class: "flex flex-col min-h-screen bg-base-300" },
-        header(
-          { id: "app-header", class: "navbar bg-base-100" },
-          "{app-header}",
-        ),
-        main({ id: "app" }, "{app-html}"),
-        footer(
-          { id: "app-footer", class: "flex p-4 mt-auto bg-base-100" },
-          "{app-footer}",
-        ),
-        Script({ type: "module", src: "/src/entry-client.js" }),
-      ),
-    ),
-  ];
-};
+export const resolveFile = (file) => {
+  const toAbsolute = (p) => resolve(cwd(), p);
+  const filePath = file.startsWith('/') ? file.slice(1) : file;
+  const ext = [".ts", ".js", ".tsx", ".jsx"].find(suffix => existsSync(toAbsolute(filePath + suffix)));
+  return toAbsolute(file + ext);
+}
 
 /**
  * @type {typeof import("./types.d.ts").renderToString}
@@ -85,10 +55,10 @@ export const renderToString = async (inputSource) => {
  * @returns {string}
  */
 function renderPreloadLink(file) {
-  if (file.endsWith(".js") || file.endsWith(".mjs")) {
-    return `<link rel="modulepreload" as="script" crossorigin href="${file}">`;
+  if (file.endsWith(".js")) {
+    return `<link rel="preload" href="${file}" as="script" crossorigin>`;
   } else if (file.endsWith(".css")) {
-    return `<link rel="stylesheet" href="${file}">`;
+    return `<link rel="preload" href="${file}" as="style" crossorigin>`;
   } else if (file.endsWith(".woff")) {
     return ` <link rel="preload" href="${file}" as="font" type="font/woff" crossorigin>`;
   } else if (file.endsWith(".woff2")) {

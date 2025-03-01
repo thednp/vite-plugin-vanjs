@@ -130,11 +130,11 @@ export const setRouterState: (
 /**
  * Merge the children of an Element or an array of elements with an optional array of children
  * into the childen of a single HTMLFragmentElement element.
- * @param  source
+ * @param source
  * @param children
  */
 export const unwrap: (
-  source: VanNode | VanNode[] | (() => VanNode | VanNode[]),
+  source: VanNode | TagFunc | VanNode[] | TagFunc[] | (() => TagFunc | TagFunc[] | VanNode | VanNode[]),
   ...children: VanNode[]
 ) => VanNode;
 
