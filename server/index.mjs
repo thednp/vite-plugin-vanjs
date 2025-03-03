@@ -6,10 +6,11 @@ import van from "vanjs-core";
 /**
  * @type {typeof import("./types.d.ts").resolveFile}
  */
-export const resolveFile = (file) => {
+export const resolveFile = (file, expectedExtension) => {
   const toAbsolute = (p) => resolve(cwd(), p);
   const filePath = file.startsWith('/') ? file.slice(1) : file;
-  const ext = [".ts", ".js", ".tsx", ".jsx"].find(suffix => existsSync(toAbsolute(filePath + suffix)));
+  const ext = expectedExtension
+    || [".ts", ".js", ".tsx", ".jsx", ".css"].find(suffix => existsSync(toAbsolute(filePath + suffix)));
   return toAbsolute(file + ext);
 }
 
