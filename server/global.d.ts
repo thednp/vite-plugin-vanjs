@@ -86,5 +86,5 @@ declare module "@vanjs/server" {
    * @param file the path relative to the root folder
    * @returns the resolved path file string
    */
-  export const resolveFile: (file: string, expectedExtension: FileExt) => string;
+  export const resolveFile: (file: string, expectedExtension?: FileExt) => string;
 }
