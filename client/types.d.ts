@@ -30,5 +30,5 @@ export const styleToString: (source: string | CSS.Properties) => string;
  */
 export const hydrate: (
   target: HTMLElement,
-  content: HTMLElement | HTMLElement[],
+  content: HTMLElement | HTMLElement[] | Promise<HTMLElement | HTMLElement[]>,
 ) => HTMLElement;

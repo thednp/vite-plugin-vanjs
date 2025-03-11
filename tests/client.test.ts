@@ -23,7 +23,7 @@ describe(`Test client-side meta`, () => {
       Style("p { font-weight: normal }"),
     ]
     defaultHead();
-    const headTags = Head();
+    const headTags = Head() as unknown as (() => SupportedTags[]);
     const allTags = headTags() as SupportedTags[];
 
     expect(allTags).to.have.length(7);
@@ -56,9 +56,9 @@ describe(`Test client-side meta`, () => {
       return [Title('Sample title updated')];
     };
     Page();
-    const updatedTags = headTags() as SupportedTags[];
-    expect(updatedTags[1].tagName).to.equal("TITLE");
-    expect(updatedTags[1].innerText).to.equal("Sample title updated");
+    const updatedTags = headTags() ;
+    expect((updatedTags[1] as HTMLElement).tagName).to.equal("TITLE");
+    expect((updatedTags[1] as HTMLElement).innerText).to.equal("Sample title updated");
     // cover undefined case
     addMeta();
   });
@@ -132,7 +132,18 @@ describe(`Test client-side meta`, () => {
     setRouterState('/');
     await new Promise(res => setTimeout(res, 17));
     
-    van.hydrate(document.body, (body) => hydrate(body, Router()));
+    van.hydrate(document.body, (body) => {
+      // Router();
+      hydrate(body, Router())
+      // Router()
+      // .then(res => {
+      //   const children = Array.from((res as HTMLElement)?.children) as HTMLElement[];
+      //   console.log({children})
+      //   hydrate(dom, children);
+      //   // return children;
+      // });
+      return body;
+    });
 
     await new Promise(res => setTimeout(res, 17));
     // console.log({ html: document.body.innerHTML });
@@ -151,6 +162,8 @@ describe(`Test client-side meta`, () => {
     expect(routerState.params.val).to.deep.equal({});
 
     await new Promise(res => setTimeout(res, 17));
+    console.log({ html: document.body.innerHTML });
+
     expect(document.body.innerHTML).to.contain('<h1>Hello VanJS!</h1>');
 
     // set router state
@@ -198,11 +211,21 @@ describe(`Test client-side meta`, () => {
         div('some div 3')
       ];
     };
+    const Page4 = async () => {
+      return [
+        h1('Hello VanJS'),
+        div('some div 4')
+      ];
+    };
     // console.log(div( ...Array.from((unwrap(Page1()) as HTMLElement).children) ));
     expect(div({}, ...Array.from((unwrap(Page1()) as HTMLElement).children) ).innerHTML).to.contain('some div 1');
     expect(div({}, ...Array.from((unwrap(Page2()) as HTMLElement).children) ).innerHTML).to.contain('some div 2');
     expect(div({}, ...Array.from((unwrap(Page3()) as HTMLElement).children) ).innerHTML).to.contain('some div 3');
+    
+    const testDiv = hydrate(div(), Page4());
+    await new Promise(res => setTimeout(res, 17))
+    expect(testDiv.innerHTML).to.contain('some div 4');
 
+    expect((unwrap([h1('Hello VanJS'), div('some div 5')]) as HTMLElement).innerHTML).to.contain('some div 5');
   })
-
 })

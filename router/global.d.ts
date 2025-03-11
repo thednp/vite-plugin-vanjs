@@ -6,6 +6,8 @@ declare module "@vanjs/router" {
   type VanElement = Element & { children: VanNode[] };
   type VanNode = SVGElement | HTMLElement | VanElement;
 
+  type RouterProps = Props & PropsWithKnownKeys<HTMLElement>;
+
   // router.mjs
   /**
    * A virtual component that renders the current route
@@ -18,7 +20,7 @@ declare module "@vanjs/router" {
    *   return Router(); // or <Router /> for JSX
    * }
    */
-  export const Router: () => VanNode | VanNode[];
+  export const Router: (props?: RouterProps) => VanNode | VanNode[];
 
   // a.mjs
   /**
@@ -137,7 +139,12 @@ declare module "@vanjs/router" {
    * @param  {...VanNode[]} children
    */
   export const unwrap: (
-    source: VanNode | TagFunc | VanNode[] | TagFunc[] | (() => TagFunc | TagFunc[] | VanNode | VanNode[]),
+    source:
+      | VanNode
+      | TagFunc
+      | VanNode[]
+      | TagFunc[]
+      | (() => TagFunc | TagFunc[] | VanNode | VanNode[]),
     ...children: VanNode[]
   ) => VanNode;
 

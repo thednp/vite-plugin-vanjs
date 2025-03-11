@@ -37,9 +37,19 @@ export const styleToString = (style) => {
 
 /**
  * @param {Element} target the root element
- * @param {Element | Element[]} content the element(s) to hydrate
+ * @param {Element | Element[] | Promise<Element | Element[]>} content the element(s) to hydrate
  */
 export const hydrate = (target, content) => {
+  if (content instanceof Promise) {
+    content.then((res) => {
+      const wrapper = unwrap(res);
+      target.replaceChildren(
+        ...(Array.from(wrapper.children)),
+      );
+    });
+    return target;
+  }
+
   const wrapper = unwrap(content);
   target.replaceChildren(
     ...(Array.from(wrapper.children)),

@@ -3,7 +3,7 @@ import { Head, Title, Meta, Script, Style, Link, resetHeadTags } from "@vanjs/me
 import van from "@vanjs/van";
 import vanX from "@vanjs/vanX";
 import vanjs from "vite-plugin-vanjs";
-import { renderToString, renderPreloadLinks, Template } from "@vanjs/server";
+import { renderToString, renderPreloadLinks } from "@vanjs/server";
 import { Router, Route, lazy, setRouterState, routerState, fixRouteUrl } from "@vanjs/router";
 
 describe(`Test server-side setup, meta & router`, () => {
@@ -54,10 +54,10 @@ describe(`Test server-side setup, meta & router`, () => {
     const markup = renderPreloadLinks(Object.keys(manifest), manifest);
     // console.log(markup)
 
-    expect(markup).to.contain('<link rel="modulepreload" as="script" crossorigin href="/src/van.js">');
-    expect(markup).to.contain('<link rel="modulepreload" as="script" crossorigin href="/src/setup/van.js">');
-    expect(markup).to.contain('<link rel="stylesheet" href="/assets/app.css">');
-    expect(markup).to.contain('<link rel="modulepreload" as="script" crossorigin href="/src/app.js">');
+    expect(markup).to.contain('<link rel="preload" href="/src/van.js" as="script" crossorigin>');
+    expect(markup).to.contain('<link rel="preload" href="/src/setup/van.js" as="script" crossorigin>');
+    expect(markup).to.contain('<link rel="preload" href="/assets/app.css" as="style" crossorigin>');
+    expect(markup).to.contain('<link rel="preload" href="/src/app.js" as="script" crossorigin>');
     expect(markup).to.contain('<link rel="preload" href="/assets/img.jpg" as="image" type="image/jpeg">');
     expect(markup).to.contain('<link rel="preload" href="/assets/img-1.gif" as="image" type="image/gif">');
     expect(markup).to.contain('<link rel="preload" href="/assets/img-2.jpeg" as="image" type="image/jpeg">');
@@ -91,12 +91,6 @@ import { list } from "vanjs-ext";`;
 
     expect(reactive(obj).a).to.equal(1);
     expect(reactive(obj).b).to.equal(2);
-  });
-
-  test("Test Template", async () => {
-    const template = Template();
-    console.log(template);
-    expect(template).toBeDefined();
   });
 
   test("Test router", async () => {

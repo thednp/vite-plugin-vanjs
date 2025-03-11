@@ -52,7 +52,7 @@ export const initializeHeadTags = () => {
   const tags = getHeadTags();
   /* istanbul ignore else */
   if (!tags.size && !setup.isServer) {
-    [...document.head.children].forEach((tag) => {
+    Array.from(document.head.children).forEach((tag) => {
       tags.set(getTagKey(tag), tag);
     });
   }

@@ -19,18 +19,6 @@ declare module "@vanjs/server" {
     manifest: Record<string, string[]>,
   ) => string;
 
-  /**
- * A function that takes a list of files and a manifest and returns an array of
- * VanJS components.
- * @param files the list of files
- * @param manifest the vite manifest
- * @returns HTML string
- */
-  export const vanPreloadLinks: (
-    files: string[],
-    manifest: Record<string, string[]>,
-  ) => (VanElement | TagFunc)[];
-
   type ValidVanNode =
     | boolean
     | number
@@ -59,32 +47,4 @@ declare module "@vanjs/server" {
    * @returns HTML string
    */
   export const renderToString: (source: Source) => Promise<string>;
-
-  type FileExt =
-    | ".scss"
-    | ".css"
-    | ".ts"
-    | ".tsx"
-    | ".js"
-    | ".jsx"
-    | ".woff"
-    | ".woff2"
-    | ".otf"
-    | ".ttf";
-
-  /**
-   * A server utility to resolve files mainly in the src folder.
-   * The relative file path must not contain any extension (EG: '.ts', '.jsx', etc),
-   * this utility is meant to detect it.
-   * 
-   * @example
-   * ```ts
-   * const file = await import(resolveFile("/src/components/Header"))
-   *  .then(module => module.Header || module.default)
-   * 
-   * ```
-   * @param file the path relative to the root folder
-   * @returns the resolved path file string
-   */
-  export const resolveFile: (file: string, expectedExtension?: FileExt) => string;
 }

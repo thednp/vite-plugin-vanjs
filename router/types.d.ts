@@ -1,10 +1,12 @@
 /// <reference path="global.d.ts" />
-import type { Element } from "mini-van-plate/van-plate";
+import type { Element as VElement } from "mini-van-plate/van-plate";
 import van from "vanjs-core";
-import type { PropsWithKnownKeys } from "vanjs-core";
+import type { Props, PropsWithKnownKeys } from "vanjs-core";
 
-type VanElement = Element & { children: VanNode[] };
+type VanElement = VElement & { children: VanNode[] };
 type VanNode = SVGElement | HTMLElement | VanElement;
+
+type RouterProps = Props & PropsWithKnownKeys<HTMLElement>;
 
 // router.mjs
 /**
@@ -18,7 +20,7 @@ type VanNode = SVGElement | HTMLElement | VanElement;
  *   return Router(); // or <Router /> for JSX
  * }
  */
-export const Router: () => VanNode | VanNode[];
+export const Router: (props?: Partial<RouterProps>) => VanNode | VanNode[];
 
 // a.mjs
 /**
@@ -134,7 +136,12 @@ export const setRouterState: (
  * @param children
  */
 export const unwrap: (
-  source: VanNode | TagFunc | VanNode[] | TagFunc[] | (() => TagFunc | TagFunc[] | VanNode | VanNode[]),
+  source:
+    | VanNode
+    | TagFunc
+    | VanNode[]
+    | TagFunc[]
+    | (() => TagFunc | TagFunc[] | VanNode | VanNode[]),
   ...children: VanNode[]
 ) => VanNode;
 

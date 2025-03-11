@@ -38,7 +38,9 @@ declare module "@vanjs/meta" {
     content?: string,
   ) => null;
 
-  export const Meta: (props: PropsWithKnownKeys<HTMLMetaElement> & { charset?: string & "utf-8" }) => null;
+  export const Meta: (
+    props: PropsWithKnownKeys<HTMLMetaElement> & { charset?: string & "utf-8" },
+  ) => null;
 
   export const Style: (
     props: PropsWithKnownKeys<HTMLStyleElement>,
