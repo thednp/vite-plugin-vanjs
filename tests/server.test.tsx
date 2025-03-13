@@ -3,6 +3,7 @@ import { expect, test, describe } from "vitest";
 import { renderToString } from "@vanjs/server";
 // we need to trick typescript into thinking this is React
 import React from "@vanjs/jsx";
+// import React from "vite-plugin-vanjs";
 
 describe(`Test server-side JSX`, () => {
   test(`Test regular tags`, async () => {

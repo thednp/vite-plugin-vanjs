@@ -29,15 +29,15 @@ export const jsx = (jsxTag, { children, ref, style, ...props }) => {
       setAttribute(newElement, k, value);
     }
     /* istanbul ignore else */
-    if (style) {
-      if (typeof style === "function") {
-        van.derive(() => newElement.style.cssText = styleToString(style()));
-      } else {
-        newElement.style.cssText = styleToString(style);
+    van.derive(() => {
+      if (style) {
+        const styleProp = typeof style === "function" ? style() : style;
+        newElement.style.cssText = styleToString(styleProp);
       }
-    }
+    });
 
-    if (ref) ref.val = newElement;
+    if (ref) ref.val = { current: newElement };
+
     return newElement;
   }
 

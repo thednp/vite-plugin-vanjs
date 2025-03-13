@@ -88,11 +88,18 @@ declare namespace JSX {
 
   interface IntrinsicAttributes {
     // ref?: unknown | ((e: unknown) => void);
-    ref?: State<T>;
+    // ref?: State<T>;
+    // ref?: Element;
+    // ref?: State<Element> & State<{ current?: Element }>;
+    ref?: State<{ current?: Element }>;
   }
   interface CustomAttributes<T> {
     // ref?: State<T> | T | ((el: T) => void);
-    ref?: State<T>;
+    // ref?: State<T>;
+    // ref?: T;
+    // ref?: { current: State<T> };
+    // ref?: State<T> & State<{ current: T }>;
+    ref?: State<{ current: T }>;
   }
   interface ExplicitProperties {}
   interface ExplicitAttributes {}

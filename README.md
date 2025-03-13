@@ -243,9 +243,10 @@ import van from '@vanjs/van';
 
 const App = () => {
   const count = van.state(0);
+  const btnRef = van.state<{ current: HTMLElement }>();
 
   return (
-    <button onClick={() => count.val++}>{count}</button>
+    <button ref={btnRef} onClick={() => count.val++}>{count}</button>
   );
 }
 

@@ -1,8 +1,10 @@
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import process from "node:process";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const isProduction = process.env.NODE_ENV === "production";
 
 export default function VitePluginVanJS() {
   return {
@@ -15,8 +17,18 @@ export default function VitePluginVanJS() {
         },
         resolve: {
           alias: {
-            "@vanjs/setup": resolve(__dirname, "../setup"),
-            "@vanjs/van": resolve(__dirname, "../setup/van"),
+            "@vanjs/setup": resolve(
+              __dirname,
+              isProduction
+                ? /* istanbul ignore next */ "../setup/index"
+                : "../setup/index-debug",
+            ),
+            "@vanjs/van": resolve(
+              __dirname,
+              isProduction
+                ? /* istanbul ignore next */ "../setup/van"
+                : "../setup/van-debug",
+            ),
             "@vanjs/vanX": resolve(__dirname, "../setup/vanX"),
             "@vanjs/client": resolve(__dirname, "../client"),
             "@vanjs/server": resolve(__dirname, "../server"),

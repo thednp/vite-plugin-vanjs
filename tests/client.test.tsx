@@ -1,12 +1,14 @@
 // @vitest-environment happy-dom
-import van, { type ChildDom } from 'vanjs-core'
+import van, { type ChildDom, type State } from 'vanjs-core'
 import { expect, test, describe } from "vitest";
 // we need to trick typescript into thinking this is React
-import React from "@vanjs/jsx";
+// import React from "@vanjs/jsx";
+import * as React from "vite-plugin-vanjs/jsx";
+// import { js } from '@vanjs/jsx';
 
 describe(`Test client-side JSX`, () => {
   test(`Test regular tags`, async () => {
-    const spanRef = van.state<HTMLSpanElement>();
+    const spanRef = van.state<{ current: HTMLSpanElement }>() ;
     const className = van.state('one');
     const spanPadding = van.state('0px')
     const spanStyle = { margin: '0', padding: spanPadding } as unknown as JSX.CSSProperties;
@@ -49,6 +51,7 @@ describe(`Test client-side JSX`, () => {
     myButton.click();
     await new Promise(res => setTimeout(res, 17));
     expect(myButton.className).to.contain('two');
+    expect(spanRef?.val?.current.tagName).toEqual('SPAN');
   });
 
   test(`Test fragment`, async () => {

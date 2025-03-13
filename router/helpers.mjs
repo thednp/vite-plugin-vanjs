@@ -1,4 +1,4 @@
-import van from "vanjs-core";
+// import van from "vanjs-core";
 import setup from "../setup/index.mjs";
 import { routerState, setRouterState } from "./state.mjs";
 import { matchRoute } from "./routes.mjs";
@@ -32,14 +32,20 @@ export const unwrap = (source, ...children) => {
       ? [...source()?.children || source()]
       : typeof HTMLElement !== "undefined" && source instanceof HTMLElement
       ? [...source.children]
-      : Array.isArray(source)
+      : /* istanbul ignore next */ Array.isArray(source)
       ? source
       : [source];
 
-    return van.tags.fragment(
-      ...(children || /* istanbul ignore next */ []),
-      ...pageChildren,
-    );
+    // return van.tags.fragment(
+    // ...(children || /* istanbul ignore next */ []),
+    // ...pageChildren,
+    // );
+    return {
+      children: [
+        ...(children || /* istanbul ignore next */ []),
+        ...pageChildren,
+      ],
+    };
   };
   return layout();
 };
