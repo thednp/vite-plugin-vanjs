@@ -23,6 +23,7 @@ declare namespace JSX {
     | ChildDom
     | Node
     | DOMElement
+    | HTMLElement
     | ArrayElement
     | FunctionElement
     | (string & {})

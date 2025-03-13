@@ -37,7 +37,7 @@ export const Router = (props) => {
     // or when A component has been clicked in the client
     const module = route.component();
     const children = module.component
-      ? Array.from(module.component.children)
+      ? Array.from(unwrap(module.component).children)
       : [];
     return children.length ? van.add(wrapper, ...children) : wrapper;
   };
