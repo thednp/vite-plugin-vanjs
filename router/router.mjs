@@ -4,8 +4,12 @@ import { routerState } from "./state.mjs";
 import { matchRoute } from "./routes.mjs";
 import { executeLifecycle, unwrap } from "./helpers.mjs";
 
-export const Router = (props) => {
+export const Router = (initialProps = /* istanbul ignore next */ {}) => {
   const { div, main } = van.tags;
+  /* istanbul ignore next - try again later */
+  const props = Object.fromEntries(
+    Object.entries(initialProps).filter(([_, val]) => val),
+  );
   const wrapper = main(props);
   const mainLayout = () => {
     const route = matchRoute(routerState.pathname.val);

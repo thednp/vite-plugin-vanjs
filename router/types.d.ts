@@ -1,16 +1,28 @@
 /// <reference path="global.d.ts" />
 /// <reference path="../jsx/global.d.ts" />
 
-import type { Element as VElement } from "mini-van-plate/van-plate";
+import type {
+  Element as VElement,
+  TagFunc as IsoTagFunc,
+} from "mini-van-plate/van-plate";
 import van from "vanjs-core";
-import type { Props, PropsWithKnownKeys, TagFunc } from "vanjs-core";
+import type { Primitive, Props, PropsWithKnownKeys, TagFunc } from "vanjs-core";
 
-type VanElement = VElement & { children: VanNode[] };
-type VanNode = SVGElement | HTMLElement | VanElement;
-type AnchorProps = Props & PropsWithKnownKeys<HTMLAnchorElement> & {
-  children: VanNode[];
-};
-type RouterProps = Props & PropsWithKnownKeys<HTMLElement>;
+type VanElement = VElement | Exclude<Primitive, boolean | undefined>;
+type VanNode =
+  | (SVGElement | HTMLElement | JSX.Component | TagFunc<Element>)
+  | VanElement;
+
+type CompProps<T> =
+  & Props
+  & PropsWithKnownKeys<T>
+  & {
+    children?: VanNode | VanNode[];
+  };
+export type VanComponent<T extends Element = HTMLElement> = (
+  props?: Partial<CompProps<T>>,
+  ...childen: VanNode[]
+) => T;
 
 // router.mjs
 /**
@@ -69,7 +81,7 @@ export const reload: () => void;
  */
 export const redirect: (href?: string) => void | (() => void);
 
-export type VanComponent = () => VanNode | VanNode[];
+export type VanComponent = () => VanNode | VanNode[] | JSX.Element;
 
 // routes.mjs
 export type RouteEntry = {
@@ -139,15 +151,15 @@ export const setRouterState: (
 export const unwrap: (
   source:
     | VanNode
-    | TagFunc
+    | IsoTagFunc
     | VanNode[]
-    | TagFunc[]
-    | (() => TagFunc | TagFunc[] | VanNode | VanNode[]),
+    | IsoTagFunc[]
+    | (() => IsoTagFunc | IsoTagFunc[] | VanNode | VanNode[]),
   ...children: VanNode[]
 ) => VanNode;
 
 export type ComponentModule = {
-  component: VanComponent;
+  component: VanComponent | JSX.Element;
   route: Pick<RouteEntry, "load" | "preload">;
 };
 

@@ -4,18 +4,18 @@ import setup from "../setup/index.mjs";
 import { matchRoute } from "./routes.mjs";
 import { executeLifecycle, isCurrentPage, navigate } from "./helpers.mjs";
 
-/** @typedef {import("vanjs-core").Props} Props */
-/** @typedef {import("mini-van-plate").TagFunc} TagFunc */
-/** @typedef {import("vanjs-core").PropsWithKnownKeys} PropsWithKnownKeys */
 /** @typedef {typeof import("./types").A} A */
 
 /**
  * @type {A}
  */
-export const A = (props) => {
-  const { href, children, ...rest } = props;
+export const A = (
+  /* istanbul ignore next */ { href, children, ...rest } = {},
+  ...otherChildren
+) => {
+  /* istanbul ignore next - try again later */
   const props = Object.fromEntries(
-    Object.entries(rest).filter(([_, val]) => val),
+    Object.entries(rest || {}).filter(([_, val]) => val),
   );
   const newProps = {
     href,
@@ -28,7 +28,7 @@ export const A = (props) => {
     }
   });
 
-  const anchor = van.tags.a(newProps, children);
+  const anchor = van.tags.a(newProps, [...(children || []), ...otherChildren]);
   /* istanbul ignore else */
   if (!setup.isServer) {
     anchor.addEventListener("click", async (e) => {

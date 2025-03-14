@@ -135,7 +135,8 @@ describe(`Test client-side meta`, () => {
   });
 
   test("Test router", async () => {
-    const Anchor = A({ href: '/test/1?query=1' }, 'Go To Test Page');
+    const Anchor = A({ href: '/test/1?query=1', class: "test" }, 'Go To Test Page');
+    // const Dummy = A();
     const HomeAnchor = A({ href: '/' }, 'Go Home');
     Route({
       path: '/',
@@ -144,7 +145,8 @@ describe(`Test client-side meta`, () => {
         return div(
           h1("Hello VanJS!"),
           Anchor,
-          HomeAnchor
+          HomeAnchor,
+          // Dummy
         );
       }
     });

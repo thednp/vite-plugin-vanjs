@@ -1,14 +1,33 @@
 declare module "@vanjs/router" {
-  import type { Element as VElement, TagFunc } from "mini-van-plate/van-plate";
+  import type {
+    Element as VElement,
+    TagFunc as IsoTagFunc,
+  } from "mini-van-plate/van-plate";
   import van from "vanjs-core";
-  import type { Props, PropsWithKnownKeys } from "vanjs-core";
+  import type {
+    ChildDom,
+    Primitive,
+    Props,
+    PropsWithKnownKeys,
+    TagFunc,
+    Van,
+  } from "vanjs-core";
 
-  type VanElement = VElement & { children: VanNode[] };
-  type VanNode = SVGElement | HTMLElement | VanElement;
-  type AnchorProps = Props & PropsWithKnownKeys<HTMLAnchorElement> & {
-    children: VanNode[];
-  };
-  type RouterProps = Props & PropsWithKnownKeys<HTMLElement>;
+  type VanElement = VElement | Exclude<Primitive, boolean | undefined>;
+  type VanNode =
+    | (SVGElement | HTMLElement | JSX.Component | TagFunc<Element>)
+    | VanElement;
+
+  type CompProps<T> =
+    & Props
+    & PropsWithKnownKeys<T>
+    & {
+      children: VanNode | VanNode[];
+    };
+  export type VanComponent<T extends Element = HTMLElement> = (
+    props?: Partial<CompProps<T>>,
+    ...childen: VanNode[]
+  ) => T;
 
   // router.mjs
   /**
@@ -22,9 +41,7 @@ declare module "@vanjs/router" {
    *   return Router(); // or <Router /> for JSX
    * }
    */
-  export const Router: (
-    props?: RouterProps,
-  ) => VanNode | VanNode[] | JSX.Element;
+  export const Router: JSX.Component<HTMLElement> | VanComponent<HTMLElement>;
 
   // a.mjs
   /**
@@ -44,10 +61,15 @@ declare module "@vanjs/router" {
    *   );
    * }
    */
-  export const A: (
-    props: PropsWithKnownKeys<HTMLAnchorProps>,
-    ...children: (Element | Node | string)[]
-  ) => HTMLAnchorElement;
+  // export const A: (
+  //   // props: PropsWithKnownKeys<HTMLAnchorElement>,
+  //   props?: AnchorProps,
+  //   ...children: (Element | Node | string)[]
+  // ) => HTMLAnchorElement;
+  // export const A: VanComponent<HTMLAnchorElement>;
+  export const A:
+    | VanComponent<HTMLAnchorElement>
+    | JSX.Component<HTMLAnchorElement>;
 
   // helpers.mjs
   /**
@@ -74,8 +96,6 @@ declare module "@vanjs/router" {
    * @param {string | undefined} href the URL to redirect to
    */
   export const redirect: (href?: string) => void | (() => void);
-
-  export type VanComponent = () => VanNode | VanNode[];
 
   // routes.mjs
   export type RouteEntry = {
@@ -145,21 +165,21 @@ declare module "@vanjs/router" {
   export const unwrap: (
     source:
       | VanNode
-      | TagFunc
+      | IsoTagFunc
       | VanNode[]
-      | TagFunc[]
-      | (() => TagFunc | TagFunc[] | VanNode | VanNode[]),
+      | IsoTagFunc[]
+      | (() => IsoTagFunc | IsoTagFunc[] | VanNode | VanNode[]),
     ...children: VanNode[]
   ) => VanNode;
 
   export type ComponentModule = {
-    component: VanComponent;
+    component: VanComponent | JSX.Element;
     route: Pick<RouteEntry, "load" | "preload">;
   };
 
   export type DynamicModule = {
-    Page: VanComponent;
-    default?: VanComponent;
+    Page: VanComponent | JSX.Element;
+    default?: VanComponent | JSX.Element;
     route?: Pick<RouteEntry, "load" | "preload">;
   };
 

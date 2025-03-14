@@ -127,6 +127,7 @@ export const hydrate = (target, content) => {
       } // For style tags, add new one first
       /* istanbul ignore if - try again later */ else if (isStyle(newChild)) {
         target.appendChild(newChild);
+        /* istanbul ignore next - try again later */
         if (existing && existing.parentNode === target) {
           // Remove old one in next frame
           requestAnimationFrame(() => existing.remove());

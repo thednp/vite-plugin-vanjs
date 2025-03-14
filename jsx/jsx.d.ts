@@ -1,7 +1,14 @@
 // deno-lint-ignore-file no-empty-interface ban-types
 
 import * as csstype from "csstype";
-import type { ChildDom, State } from "vanjs-core";
+import type {
+  ChildDom,
+  Primitive,
+  Props,
+  PropsWithKnownKeys,
+  State,
+  TagFunc,
+} from "vanjs-core";
 
 /**
  * Based on JSX types for Surplus and Inferno and adapted for `dom-expressions`.
@@ -20,17 +27,26 @@ declare namespace JSX {
   // type FunctionMaybe<T = unknown> = { (): T } | T;
   type FunctionMaybe<T = unknown> = (() => T) | State<T> | T;
   type Element =
-    | ChildDom
+    | State<Primitive | null | undefined>
     | Node
     | DOMElement
     | HTMLElement
     | ArrayElement
+    | Component
     | FunctionElement
     | (string & {})
-    | number
-    | boolean
+    | Primitive
     | null
     | undefined;
+  type ComponentProps<T> =
+    & Props
+    & PropsWithKnownKeys<T>
+    & {
+      children?: Element;
+    };
+  type Component<T extends DOMElement = HTMLElement> = (
+    props?: CompProps<T>,
+  ) => ReturnType<TagFunc<T>>;
   interface ArrayElement extends Array<Element> {}
   interface FunctionElement {
     (): Element;

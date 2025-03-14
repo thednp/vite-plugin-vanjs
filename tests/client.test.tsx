@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import van, { type ChildDom, type State } from 'vanjs-core'
 import { expect, test, describe } from "vitest";
+import { A } from "vite-plugin-vanjs/router"
 // we need to trick typescript into thinking this is React
 // import React from "@vanjs/jsx";
 import * as React from "vite-plugin-vanjs/jsx";
@@ -34,6 +35,7 @@ describe(`Test client-side JSX`, () => {
         class={className}
         >
           <span ref={spanRef} style={spanStyle}>Hi</span> VanJS
+          <A href="/">Test Link</A>
       </div>
     );
 
