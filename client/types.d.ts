@@ -30,5 +30,9 @@ export const styleToString: (source: string | CSS.Properties) => string;
  */
 export const hydrate: (
   target: HTMLElement,
-  content: HTMLElement | HTMLElement[] | Promise<HTMLElement | HTMLElement[]>,
+  content:
+    | HTMLElement
+    | HTMLElement[]
+    | JSX.Element
+    | Promise<HTMLElement | HTMLElement[] | JSX.Element>,
 ) => HTMLElement;

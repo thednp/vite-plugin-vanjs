@@ -39,6 +39,7 @@ declare module "@vanjs/client" {
     content:
       | ChildElement
       | ChildElement[]
-      | Promise<ChildElement | ChildElement[]>,
+      | JSX.Element
+      | Promise<ChildElement | ChildElement[] | JSX.Element>,
   ) => HTMLElement;
 }

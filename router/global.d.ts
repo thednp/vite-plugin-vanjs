@@ -1,11 +1,13 @@
 declare module "@vanjs/router" {
-  import type { Element } from "mini-van-plate/van-plate";
+  import type { Element as VElement, TagFunc } from "mini-van-plate/van-plate";
   import van from "vanjs-core";
-  import type { PropsWithKnownKeys } from "vanjs-core";
+  import type { Props, PropsWithKnownKeys } from "vanjs-core";
 
-  type VanElement = Element & { children: VanNode[] };
+  type VanElement = VElement & { children: VanNode[] };
   type VanNode = SVGElement | HTMLElement | VanElement;
-
+  type AnchorProps = Props & PropsWithKnownKeys<HTMLAnchorElement> & {
+    children: VanNode[];
+  };
   type RouterProps = Props & PropsWithKnownKeys<HTMLElement>;
 
   // router.mjs
@@ -20,7 +22,9 @@ declare module "@vanjs/router" {
    *   return Router(); // or <Router /> for JSX
    * }
    */
-  export const Router: (props?: RouterProps) => VanNode | VanNode[];
+  export const Router: (
+    props?: RouterProps,
+  ) => VanNode | VanNode[] | JSX.Element;
 
   // a.mjs
   /**

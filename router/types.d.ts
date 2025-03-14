@@ -1,11 +1,15 @@
 /// <reference path="global.d.ts" />
+/// <reference path="../jsx/global.d.ts" />
+
 import type { Element as VElement } from "mini-van-plate/van-plate";
 import van from "vanjs-core";
-import type { Props, PropsWithKnownKeys } from "vanjs-core";
+import type { Props, PropsWithKnownKeys, TagFunc } from "vanjs-core";
 
 type VanElement = VElement & { children: VanNode[] };
 type VanNode = SVGElement | HTMLElement | VanElement;
-
+type AnchorProps = Props & PropsWithKnownKeys<HTMLAnchorElement> & {
+  children: VanNode[];
+};
 type RouterProps = Props & PropsWithKnownKeys<HTMLElement>;
 
 // router.mjs
@@ -20,7 +24,7 @@ type RouterProps = Props & PropsWithKnownKeys<HTMLElement>;
  *   return Router(); // or <Router /> for JSX
  * }
  */
-export const Router: (props?: Partial<RouterProps>) => VanNode | VanNode[];
+export const Router: (props?: RouterProps) => VanNode | VanNode[] | JSX.Element;
 
 // a.mjs
 /**
@@ -40,10 +44,7 @@ export const Router: (props?: Partial<RouterProps>) => VanNode | VanNode[];
  *   );
  * }
  */
-export const A: (
-  props: PropsWithKnownKeys<HTMLAnchorProps>,
-  ...children: (Element | Node | string)[]
-) => HTMLAnchorElement;
+export const A: (props: Partial<AnchorProps>) => HTMLAnchorElement;
 
 // helpers.mjs
 /**
@@ -151,8 +152,8 @@ export type ComponentModule = {
 };
 
 export type DynamicModule = {
-  Page: VanComponent;
-  default?: VanComponent;
+  Page: VanComponent | JSX.Element;
+  default?: VanComponent | JSX.Element;
   route?: Pick<RouteEntry, "load" | "preload">;
 };
 
