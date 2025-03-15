@@ -45,7 +45,7 @@ declare namespace JSX {
       children?: Element;
     };
   type Component<T extends DOMElement = HTMLElement> = (
-    props?: CompProps<T>,
+    props?: ComponentProps<T>,
   ) => ReturnType<TagFunc<T>>;
   interface ArrayElement extends Array<Element> {}
   interface FunctionElement {
