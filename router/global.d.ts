@@ -3,6 +3,7 @@ declare module "@vanjs/router" {
     Element as VElement,
     TagFunc as IsoTagFunc,
   } from "mini-van-plate/van-plate";
+  // import { JSX } from "@vanjs/jsx"
   import van from "vanjs-core";
   import type {
     ChildDom,
@@ -26,7 +27,7 @@ declare module "@vanjs/router" {
     };
   export type VanComponent<T extends Element = HTMLElement> = (
     props?: Partial<CompProps<T>>,
-    ...childen: VanNode[]
+    ...children: VanNode[]
   ) => T;
 
   // router.mjs
@@ -41,7 +42,7 @@ declare module "@vanjs/router" {
    *   return Router(); // or <Router /> for JSX
    * }
    */
-  export const Router: JSX.Component<HTMLElement> | VanComponent<HTMLElement>;
+  export const Router: JSX.Component<HTMLElement> & VanComponent<HTMLElement>;
 
   // a.mjs
   /**
@@ -68,8 +69,8 @@ declare module "@vanjs/router" {
   // ) => HTMLAnchorElement;
   // export const A: VanComponent<HTMLAnchorElement>;
   export const A:
-    | VanComponent<HTMLAnchorElement>
-    | JSX.Component<HTMLAnchorElement>;
+    & VanComponent<HTMLAnchorElement>
+    & JSX.Component<HTMLAnchorElement>;
 
   // helpers.mjs
   /**

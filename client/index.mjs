@@ -125,7 +125,7 @@ export const hydrate = (target, content) => {
 
         target.appendChild(temp);
       } // For style tags, add new one first
-      /* istanbul ignore if - try again later */ else if (isStyle(newChild)) {
+        else /* istanbul ignore if - try again later */ if (isStyle(newChild)) {
         target.appendChild(newChild);
         /* istanbul ignore next - try again later */
         if (existing && existing.parentNode === target) {

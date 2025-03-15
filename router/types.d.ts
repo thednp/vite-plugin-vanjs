@@ -1,10 +1,9 @@
 /// <reference path="global.d.ts" />
-/// <reference path="../jsx/global.d.ts" />
-
 import type {
   Element as VElement,
   TagFunc as IsoTagFunc,
 } from "mini-van-plate/van-plate";
+import type { JSX } from "@vanjs/jsx";
 import van from "vanjs-core";
 import type { Primitive, Props, PropsWithKnownKeys, TagFunc } from "vanjs-core";
 
@@ -21,7 +20,7 @@ type CompProps<T> =
   };
 export type VanComponent<T extends Element = HTMLElement> = (
   props?: Partial<CompProps<T>>,
-  ...childen: VanNode[]
+  ...children: VanNode[]
 ) => T;
 
 // router.mjs
