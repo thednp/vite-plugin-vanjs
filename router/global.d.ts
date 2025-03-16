@@ -3,32 +3,43 @@ declare module "@vanjs/router" {
     Element as VElement,
     TagFunc as IsoTagFunc,
   } from "mini-van-plate/van-plate";
-  // import { JSX } from "@vanjs/jsx"
   import van from "vanjs-core";
   import type {
     ChildDom,
     Primitive,
     Props,
     PropsWithKnownKeys,
-    TagFunc,
-    Van,
+    State,
   } from "vanjs-core";
 
-  type VanElement = VElement | Exclude<Primitive, boolean | undefined>;
-  type VanNode =
-    | (SVGElement | HTMLElement | JSX.Component | TagFunc<Element>)
-    | VanElement;
+  // type VanElement = VElement | Exclude<Primitive, boolean | undefined>;
+  type DOMElement = globalThis.Element;
+  type PrimitiveChild = Primitive | State<Primitive | undefined | null>;
 
-  type CompProps<T> =
+  type VanElement =
+    | SVGElement
+    | HTMLElement
+    | DOMElement
+    | Node
+    | VElement
+    | PrimitiveChild;
+  export type VanNode =
+    | VanElement
+    | VanNode[]
+    | (() => VanNode)
+    | null
+    | undefined;
+
+  type ComponentProps<T> =
     & Props
-    & PropsWithKnownKeys<T>
-    & {
-      children: VanNode | VanNode[];
-    };
-  export type VanComponent<T extends Element = HTMLElement> = (
-    props?: Partial<CompProps<T>>,
-    ...children: VanNode[]
-  ) => T;
+    & PropsWithKnownKeys<T>;
+
+  export type VanComponent<T extends Element = HTMLElement> = { // Added {
+    (
+      props?: Record<string, unknown>,
+      ...children: ChildDom[]
+    ): T;
+  }; // Added }
 
   // router.mjs
   /**
@@ -42,7 +53,11 @@ declare module "@vanjs/router" {
    *   return Router(); // or <Router /> for JSX
    * }
    */
-  export const Router: JSX.Component<HTMLElement> & VanComponent<HTMLElement>;
+  // export const Router: JSX.Component<HTMLElement> & VanComponent<HTMLElement>;
+  export function Router(props?: ComponentProps<HTMLElement>): HTMLElement;
+  export function Router(
+    props?: JSX.IntrinsicElements["main"] & { children: null },
+  ): HTMLElement;
 
   // a.mjs
   /**
@@ -62,15 +77,14 @@ declare module "@vanjs/router" {
    *   );
    * }
    */
-  // export const A: (
-  //   // props: PropsWithKnownKeys<HTMLAnchorElement>,
-  //   props?: AnchorProps,
-  //   ...children: (Element | Node | string)[]
-  // ) => HTMLAnchorElement;
-  // export const A: VanComponent<HTMLAnchorElement>;
-  export const A:
-    & VanComponent<HTMLAnchorElement>
-    & JSX.Component<HTMLAnchorElement>;
+
+  export function A(
+    props?: ComponentProps<HTMLAnchorElement>,
+    ...children: VanNode[]
+  ): HTMLAnchorElement;
+  export function A(
+    props?: JSX.IntrinsicElements["a"] & { children: VanNode[] },
+  ): HTMLAnchorElement;
 
   // helpers.mjs
   /**

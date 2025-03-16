@@ -2,13 +2,14 @@
 
 import * as csstype from "csstype";
 import type {
-  ChildDom,
   Primitive,
   Props,
   PropsWithKnownKeys,
   State,
+  StateView,
   TagFunc,
 } from "vanjs-core";
+import { Element as VElement } from "mini-van-plate/van-plate";
 
 /**
  * Based on JSX types for Surplus and Inferno and adapted for `dom-expressions`.
@@ -16,8 +17,17 @@ import type {
  * https://github.com/adamhaile/surplus/blob/master/index.d.ts
  * https://github.com/infernojs/inferno/blob/master/packages/inferno/src/core/types.ts
  */
-type DOMElement = Element;
-export type VanNode = DOMElement | ChildDom | null;
+type DOMElement = globalThis.Element;
+type PrimitiveChild = Primitive | State<Primitive | null | undefined>;
+type VanElement = SVGElement | HTMLElement | DOMElement | Node | VElement;
+export type VanNode =
+  | VanElement
+  | PrimitiveChild
+  | VanNode[]
+  | (() => VanNode)
+  | null
+  | undefined;
+
 export type { Fragment } from "./fragment";
 
 export as namespace JSX;
@@ -25,8 +35,9 @@ export = JSX;
 
 declare namespace JSX {
   // type FunctionMaybe<T = unknown> = { (): T } | T;
-  type FunctionMaybe<T = unknown> = (() => T) | State<T> | T;
-  type Element =
+  type FunctionMaybe<T = unknown> = (() => T) | StateView<T> | T;
+  type Element = VanNode;
+  type JSXElement =
     | State<Primitive | null | undefined>
     | Node
     | DOMElement

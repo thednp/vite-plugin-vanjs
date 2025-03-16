@@ -3,25 +3,43 @@ import type {
   Element as VElement,
   TagFunc as IsoTagFunc,
 } from "mini-van-plate/van-plate";
-import type { JSX } from "@vanjs/jsx";
 import van from "vanjs-core";
-import type { Primitive, Props, PropsWithKnownKeys, TagFunc } from "vanjs-core";
+import type {
+  ChildDom,
+  Primitive,
+  Props,
+  PropsWithKnownKeys,
+  State,
+} from "vanjs-core";
 
-type VanElement = VElement | Exclude<Primitive, boolean | undefined>;
-type VanNode =
-  | (SVGElement | HTMLElement | JSX.Component | TagFunc<Element>)
-  | VanElement;
+// type VanElement = VElement | Exclude<Primitive, boolean | undefined>;
+type DOMElement = globalThis.Element;
+type PrimitiveChild = Primitive | State<Primitive | undefined | null>;
 
-type CompProps<T> =
+type VanElement =
+  | SVGElement
+  | HTMLElement
+  | DOMElement
+  | Node
+  | VElement
+  | PrimitiveChild;
+export type VanNode =
+  | VanElement
+  | VanNode[]
+  | (() => VanNode)
+  | null
+  | undefined;
+
+type ComponentProps<T> =
   & Props
-  & PropsWithKnownKeys<T>
-  & {
-    children?: VanNode | VanNode[];
-  };
-export type VanComponent<T extends Element = HTMLElement> = (
-  props?: Partial<CompProps<T>>,
-  ...children: VanNode[]
-) => T;
+  & PropsWithKnownKeys<T>;
+
+export type VanComponent<T extends Element = HTMLElement> = { // Added {
+  (
+    props?: Record<string, unknown>,
+    ...children: ChildDom[]
+  ): T;
+}; // Added }
 
 // router.mjs
 /**
@@ -35,7 +53,11 @@ export type VanComponent<T extends Element = HTMLElement> = (
  *   return Router(); // or <Router /> for JSX
  * }
  */
-export const Router: (props?: RouterProps) => VanNode | VanNode[] | JSX.Element;
+// export const Router: JSX.Component<HTMLElement> & VanComponent<HTMLElement>;
+export function Router(props?: ComponentProps<HTMLElement>): HTMLElement;
+export function Router(
+  props?: JSX.IntrinsicElements["main"] & { children: null },
+): HTMLElement;
 
 // a.mjs
 /**
@@ -55,7 +77,20 @@ export const Router: (props?: RouterProps) => VanNode | VanNode[] | JSX.Element;
  *   );
  * }
  */
-export const A: (props: Partial<AnchorProps>) => HTMLAnchorElement;
+// export const A: (
+//   // props: PropsWithKnownKeys<HTMLAnchorElement>,
+//   props?: AnchorProps,
+//   ...children: (Element | Node | string)[]
+// ) => HTMLAnchorElement;
+// export const A: VanComponent<HTMLAnchorElement>;
+// export const A: JSX.IntrinsicElements['a'];
+export function A(
+  props?: ComponentProps<HTMLAnchorElement>,
+  ...children: VanNode[]
+): HTMLAnchorElement;
+export function A(
+  props?: JSX.IntrinsicElements["a"] & { children: VanNode[] },
+): HTMLAnchorElement;
 
 // helpers.mjs
 /**
@@ -65,7 +100,10 @@ export const A: (props: Partial<AnchorProps>) => HTMLAnchorElement;
  * @param href the URL to navigate to
  * @param options when true, will replace the current history entry
  */
-export const navigate: (href: string, options?: { replace?: boolean }) => void;
+export const navigate: (
+  href: string,
+  options?: { replace?: boolean },
+) => void;
 
 /**
  * A client only helper function that reloads the current page.
@@ -79,8 +117,6 @@ export const reload: () => void;
  * @param {string | undefined} href the URL to redirect to
  */
 export const redirect: (href?: string) => void | (() => void);
-
-export type VanComponent = () => VanNode | VanNode[] | JSX.Element;
 
 // routes.mjs
 export type RouteEntry = {
@@ -117,7 +153,7 @@ export const Route: (route: RouteProps) => void;
 export type RouterState = {
   pathname: string;
   searchParams: URLSearchParams;
-  params?: Record<string, string>;
+  params: Record<string, string>;
 };
 /**
  * A reactive object that holds the current router state.
@@ -144,8 +180,8 @@ export const setRouterState: (
 /**
  * Merge the children of an Element or an array of elements with an optional array of children
  * into the childen of a single HTMLFragmentElement element.
- * @param source
- * @param children
+ * @param  source
+ * @param  {...VanNode[]} children
  */
 export const unwrap: (
   source:
@@ -168,10 +204,16 @@ export type DynamicModule = {
   route?: Pick<RouteEntry, "load" | "preload">;
 };
 
-export type LazyComponent =
-  | Promise<DynamicModule>
-  | (() => Promise<DynamicModule>);
+export type LazyComponent = Promise<DynamicModule>;
 
+/**
+ * Registers a lazy component.
+ * @param importFn
+ */
 export const lazy: (importFn: () => LazyComponent) => () => ComponentModule;
 
+/**
+ * Fixes the URL of a route.
+ * @param url
+ */
 export const fixRouteUrl: (url: string) => string;
