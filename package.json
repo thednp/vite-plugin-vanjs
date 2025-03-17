@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-vanjs",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "author": "thednp",
   "license": "MIT",
   "description": "A mini meta-framework for VanJS powered by Vite",
@@ -98,13 +98,14 @@
     "vanjs-ext": "^0.6.2"
   },
   "devDependencies": {
-    "@vitest/browser": "^3.0.8",
-    "@vitest/coverage-istanbul": "^3.0.8",
-    "@vitest/ui": "^3.0.8",
+    "@types/node": "^22.13.10",
+    "@vitest/browser": "^3.0.9",
+    "@vitest/coverage-istanbul": "^3.0.9",
+    "@vitest/ui": "^3.0.9",
     "happy-dom": "^16.8.1",
     "typescript": "5.6.2",
     "vite": "^6.2.2",
-    "vitest": "^3.0.8"
+    "vitest": "^3.0.9"
   },
   "packageManager": "pnpm@8.6.12",
   "engines": {

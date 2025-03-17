@@ -7,7 +7,7 @@
 [![typescript version](https://img.shields.io/badge/typescript-5.6.2-brightgreen)](https://www.typescriptlang.org/)
 [![vanjs-core version](https://img.shields.io/badge/vanjs--core-1.5.3-brightgreen)](https://github.com/vanjs-org/van)
 [![mini-van-plate version](https://img.shields.io/badge/mini--van--plate-0.6.3-brightgreen)](https://github.com/vanjs-org/mini-van-plate)
-[![vitest version](https://img.shields.io/badge/vitest-3.0.8-brightgreen)](https://www.vitest.dev/)
+[![vitest version](https://img.shields.io/badge/vitest-3.0.9-brightgreen)](https://www.vitest.dev/)
 [![vite version](https://img.shields.io/badge/vite-6.2.2-brightgreen)](https://vite.dev)
 
 A mini meta-framework for [VanJS](https://vanjs.org/) developed around the awesome [Vite](https://vite.dev). The plugin comes with a set of modules to simplify your workflow:
@@ -23,9 +23,7 @@ The plugin will automatically load the appropriate Van or VanX objects depending
 ### Notes 
 * The plugin uses `van-ext` along with `mini-van-plate` so you can have everything ready from the start.
 
-* The recommended starter templates for you are the [vite-starter-vanjs-ssr](https://github.com/thednp/vite-starter-vanjs-ssr) and [vite-starter-vanjs-ssr-jsx](https://github.com/thednp/vite-starter-vanjs-ssr-jsx) which already include this plugin.
-
-* In the near future we're going to have a `npm create-vanjs` CLI so stick around!
+* Kickstart your VanJS project with `npm create vanjs@latest`. Some starter templates feature this plugin and most essential tools.
 
 
 ### Install
@@ -48,9 +46,6 @@ deno add npm:vite-plugin-vanjs
 bun install vite-plugin-vanjs
 ```
 
-```bash
-yarn add vite-plugin-vanjs
-```
 
 2) To add Typescript support, edit your `src/vite-env.d.ts` (or any global types you have set in your app) as follows:
 
