@@ -11,7 +11,7 @@ on:
       - server
       - client
       - src
-      - test
+      - tests
       - package.json
       - .github/workflows/ci.yml
 
