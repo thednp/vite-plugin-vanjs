@@ -1,1 +1,3 @@
-console.log("Test script");
+export function foo() {
+  console.log("Test script");
+}

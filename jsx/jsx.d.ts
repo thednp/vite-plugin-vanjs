@@ -1,14 +1,7 @@
 // deno-lint-ignore-file no-empty-interface ban-types
 
 import * as csstype from "csstype";
-import type {
-  Primitive,
-  Props,
-  PropsWithKnownKeys,
-  State,
-  StateView,
-  TagFunc,
-} from "vanjs-core";
+import type { Primitive, State, StateView } from "vanjs-core";
 import { Element as VElement } from "mini-van-plate/van-plate";
 
 /**
@@ -35,29 +28,34 @@ export = JSX;
 
 declare namespace JSX {
   // type FunctionMaybe<T = unknown> = { (): T } | T;
+  // type Element = VanNode;
   type FunctionMaybe<T = unknown> = (() => T) | StateView<T> | T;
-  type Element = VanNode;
-  type JSXElement =
+  type Element =
     | State<Primitive | null | undefined>
     | Node
     | DOMElement
     | HTMLElement
     | ArrayElement
-    | Component
+    // | TagComponent<any>
+    // | Component
     | FunctionElement
     | (string & {})
     | Primitive
     | null
     | undefined;
-  type ComponentProps<T> =
-    & Props
-    & PropsWithKnownKeys<T>
-    & {
-      children?: Element;
-    };
-  type Component<T extends DOMElement = HTMLElement> = (
-    props?: ComponentProps<T>,
-  ) => ReturnType<TagFunc<T>>;
+
+  type ComponentProps<K> = Omit<IntrinsicElements[K], "children">;
+  type Component<
+    K extends keyof IntrinsicElements,
+    O extends (Record<string, PropValueOrDerived> | undefined) = undefined,
+  > = (
+    props?:
+      & (O extends object ? ComponentProps<K> & Partial<O> : ComponentProps<K>)
+      & {
+        children?: Element;
+      },
+  ) => HTMLElementTagNameMap[T];
+
   interface ArrayElement extends Array<Element> {}
   interface FunctionElement {
     (): Element;

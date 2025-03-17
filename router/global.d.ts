@@ -9,6 +9,7 @@ declare module "@vanjs/router" {
     Primitive,
     Props,
     PropsWithKnownKeys,
+    PropValueOrDerived,
     State,
   } from "vanjs-core";
 
@@ -30,16 +31,24 @@ declare module "@vanjs/router" {
     | null
     | undefined;
 
-  type ComponentProps<T> =
+  type ComponentProps1<T> =
     & Props
     & PropsWithKnownKeys<T>;
 
-  export type VanComponent<T extends Element = HTMLElement> = { // Added {
+  type ComponentProps<K extends keyof HTMLElementTagNameMap> =
+    & Props
+    & PropsWithKnownKeys<HTMLElementTagNameMap[K]>;
+
+  export type VanComponent<
+    K extends keyof HTMLElementTagNameMap = "div",
+    O extends (Record<string, PropValueOrDerived> | undefined) = undefined,
+  > = {
     (
-      props?: Record<string, unknown>,
+      props?: O extends object ? ComponentProps<K> & Partial<O>
+        : ComponentProps<K>,
       ...children: ChildDom[]
-    ): T;
-  }; // Added }
+    ): HTMLElementTagNameMap[K];
+  };
 
   // router.mjs
   /**
@@ -54,10 +63,13 @@ declare module "@vanjs/router" {
    * }
    */
   // export const Router: JSX.Component<HTMLElement> & VanComponent<HTMLElement>;
-  export function Router(props?: ComponentProps<HTMLElement>): HTMLElement;
-  export function Router(
-    props?: JSX.IntrinsicElements["main"] & { children: null },
-  ): HTMLElement;
+  // export function Router(props?: ComponentProps<HTMLElement>): HTMLElement;
+  // export function Router(
+  //   props?: JSX.IntrinsicElements["main"] & { children: null },
+  // ): HTMLElement;
+  export const Router:
+    & VanComponent<"main">
+    & JSX.Component<"main">;
 
   // a.mjs
   /**
@@ -77,14 +89,9 @@ declare module "@vanjs/router" {
    *   );
    * }
    */
-
-  export function A(
-    props?: ComponentProps<HTMLAnchorElement>,
-    ...children: VanNode[]
-  ): HTMLAnchorElement;
-  export function A(
-    props?: JSX.IntrinsicElements["a"] & { children: VanNode[] },
-  ): HTMLAnchorElement;
+  export const A:
+    & VanComponent<"a">
+    & JSX.Component<"a">;
 
   // helpers.mjs
   /**

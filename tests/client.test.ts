@@ -1,14 +1,16 @@
 // @vitest-environment happy-dom
+import Path from "node:path";
+import process from "node:process";
 import van from 'vanjs-core'
 import * as vanX from 'vanjs-ext'
 import { expect, test, describe, beforeEach } from "vitest";
 import { hydrate } from "@vanjs/client";
 import { Head, Title, Meta, Script, Style, Link, addMeta, resetHeadTags, initializeHeadTags, SupportedTags } from "@vanjs/meta";
 import { Router, Route, lazy, A, setRouterState, routerState, navigate, unwrap } from "@vanjs/router";
-import styleUrl from './test-style.css?url';
-import scriptUrl from './test-script.js?url';
-import script1Url from './test-script-1.js?url';
 
+const styleUrl = Path.resolve(process.cwd(), "tests", 'test-style.css');
+const scriptUrl = Path.resolve(process.cwd(), "tests", 'test-script.js');
+const script1Url = Path.resolve(process.cwd(), "tests", 'test-script-1.js');
 
 describe(`Test client-side meta`, () => {
   beforeEach(() => {
@@ -76,8 +78,11 @@ describe(`Test client-side meta`, () => {
   })
 
   test("Test hydrate", async () => {
-    const { div, h1, style, script, link, title } = van.tags;
-    document.head.replaceChildren();
+    const { head, body, div, h1, style, script, link, title } = van.tags;
+    const docHead = head();
+    const docBody = body();
+
+    // document.head.replaceChildren();
     const Page = () => {
       return div(
         h1('Hello VanJS')
@@ -94,7 +99,7 @@ describe(`Test client-side meta`, () => {
         title("Sample Title"),
         link({rel: "stylesheet", href: styleUrl}),
         style({id: "test-style"}, "p {margin: 0}"),
-        script({src: scriptUrl}),
+        script({src: scriptUrl, type: "module"}),
       ]
     }
     const Head1 = () => {
@@ -103,26 +108,26 @@ describe(`Test client-side meta`, () => {
         link({rel: "stylesheet", href: styleUrl}),
         style({id: "test-style"}, "p {margin: 0}"),
         style({id: "test-style1"}, "ul {margin: 0}"),
-        script({src: script1Url}),
+        script({src: script1Url, type: "module"}),
       ]
     }
     const testDiv = hydrate(div(), PageAsync());
     await new Promise(res => setTimeout(res, 17))
     expect(testDiv.innerHTML).to.contain('some div 4');
 
-    van.hydrate(document.body, body => hydrate(body, Page()));
-    expect(document.body.innerText).to.contain('Hello VanJS');
+    van.hydrate(docBody as HTMLElement, body => hydrate(body, Page()));
+    expect(docBody.innerText).to.contain('Hello VanJS');
 
-    van.hydrate(document.head, head => hydrate(head, Head()));
-    expect(document.head.children.length).toEqual(4);
+    van.hydrate(docHead, head => hydrate(head, Head()));
+    expect(docHead.children.length).toEqual(4);
 
-    van.hydrate(document.head, head => hydrate(head, Head1()));
-    expect(document.head.children.length).toEqual(7);
+    van.hydrate(docHead, head => hydrate(head, Head1()));
+    expect(docHead.children.length).toEqual(7);
 
-    van.hydrate(document.head, head => hydrate(head, Head()));
-    expect(document.head.children.length).toEqual(8);
+    van.hydrate(docHead, head => hydrate(head, Head()));
+    expect(docHead.children.length).toEqual(8);
 
-    document.head.replaceChildren();
+    // document.head.replaceChildren();
   })
 
   test("Test router no route set", async () => {
