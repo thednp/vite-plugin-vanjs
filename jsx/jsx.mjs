@@ -2,7 +2,12 @@ import van from "../setup/van.mjs";
 import setup from "../setup/index.mjs";
 import { setAttribute, styleToString } from "../client/index.mjs";
 
-export const jsx = (jsxTag, { children, ref, style, ...props }) => {
+export const jsx = (jsxTag, { children, ref, style, ...rest }) => {
+  // filter props with undefined values
+  const props = Object.fromEntries(
+    Object.entries(rest).filter(([_, val]) => val !== undefined),
+  );
+
   if (typeof jsxTag === "string") {
     const newElement = van.tags[jsxTag](props, children);
 

@@ -8,10 +8,11 @@ import React from "@vanjs/jsx";
 describe(`Test server-side JSX`, () => {
   test(`Test regular tags`, async () => {
     const Component = () => {
-      return <div>Hi</div>
+      return <div style={{ margin: 0 }}>Hi</div>
     }
     const html = await renderToString(<Component />);
 
     expect(html).to.contain('Hi');
+    expect(html).to.contain('style="margin:0;"');
   });
 });

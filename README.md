@@ -20,6 +20,9 @@ A mini meta-framework for [VanJS](https://vanjs.org/) developed around the aweso
 
 The plugin will automatically load the appropriate Van or VanX objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required objects in an isomorphic enviroment.
 
+Also in _development_ mode, the plugin will load the `van.debug.js` module to help you better troubleshoot your VanJS application.
+
+
 ### Notes 
 * The plugin uses `van-ext` along with `mini-van-plate` so you can have everything ready from the start.
 
