@@ -6,6 +6,20 @@ export const jsx = (jsxTag, { children, ref, style, ...props }) => {
   if (typeof jsxTag === "string") {
     const newElement = van.tags[jsxTag](props, children);
 
+    van.derive(() => {
+      /* istanbul ignore else */
+      if (style) {
+        const styleProp = typeof style === "function" ? style() : style;
+        const styleValue = styleToString(styleProp);
+
+        if (setup.isServer) {
+          newElement.propsStr += ` style="${styleValue}"`;
+        } else {
+          newElement.style.cssText = styleValue;
+        }
+      }
+    });
+
     // on server it's good enough to return here
     if (setup.isServer) return newElement;
 
@@ -28,13 +42,6 @@ export const jsx = (jsxTag, { children, ref, style, ...props }) => {
 
       setAttribute(newElement, k, value);
     }
-    /* istanbul ignore else */
-    van.derive(() => {
-      if (style) {
-        const styleProp = typeof style === "function" ? style() : style;
-        newElement.style.cssText = styleToString(styleProp);
-      }
-    });
 
     if (ref) ref.val = { current: newElement };
 
