@@ -34,19 +34,19 @@ Also in _development_ mode, the plugin will load the `van.debug.js` module to he
 1) Install the plugin:
 
 ```bash
-npm install vite-plugin-vanjs
+npm install vite-plugin-vanjs@latest
 ```
 
 ```bash
-pnpm add vite-plugin-vanjs
+pnpm add vite-plugin-vanjs@latest
 ```
 
 ```bash
-deno add npm:vite-plugin-vanjs
+deno add npm:vite-plugin-vanjs@latest
 ```
 
 ```bash
-bun install vite-plugin-vanjs
+bun add vite-plugin-vanjs@latest
 ```
 
 
@@ -130,7 +130,7 @@ Route({ path: '*', component: () => van.tags.div('404 - Page Not Found') });
 
 function App() {
   // the Router is only an outlet
-  export default Route();
+  export default Router();
 }
 
 // render or hydrate the app
