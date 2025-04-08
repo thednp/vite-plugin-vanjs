@@ -179,18 +179,19 @@ describe(`Test client-side meta`, () => {
     setRouterState('/');
     await new Promise(res => setTimeout(res, 17));
     
-    van.hydrate(document.body, (body) => {
-      // Router();
-      hydrate(body, Router())
-      // Router()
-      // .then(res => {
-      //   const children = Array.from((res as HTMLElement)?.children) as HTMLElement[];
-      //   console.log({children})
-      //   hydrate(dom, children);
-      //   // return children;
-      // });
-      return body;
-    });
+    // van.hydrate(document.body, (body) => {
+    //   // Router();
+    //   hydrate(body, Router())
+    //   // Router()
+    //   // .then(res => {
+    //   //   const children = Array.from((res as HTMLElement)?.children) as HTMLElement[];
+    //   //   console.log({children})
+    //   //   hydrate(dom, children);
+    //   //   // return children;
+    //   // });
+    //   return body;
+    // });
+    van.add(document.body, () => Router())
 
     await new Promise(res => setTimeout(res, 17));
     // console.log({ html: document.body.innerHTML });
@@ -210,7 +211,8 @@ describe(`Test client-side meta`, () => {
 
     await new Promise(res => setTimeout(res, 17));
     console.log({ html: document.body.innerHTML });
-
+    
+    await new Promise(res => setTimeout(res, 170));
     expect(document.body.innerHTML).to.contain('<h1>Hello VanJS!</h1>');
 
     // set router state

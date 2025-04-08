@@ -28,7 +28,7 @@ export const lazy = (importFn) => {
   }
 
   let initialized = false;
-  const component = van.state(() => "");
+  const component = van.state(() => "Loading..");
   const route = van.state({});
 
   const load = () => {
