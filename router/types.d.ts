@@ -129,7 +129,7 @@ export type RouteEntry = {
 
 export type RouteProps = {
   path: string;
-  component: VanComponent | (() => ComponentModule);
+  component: (() => HTMLElementTagNameMap[unknown] | HTMLElementTagNameMap[unknown][]) | VanComponent | (() => ComponentModule);
   preload?: (params?: Record<string, string>) => void;
   load?: (params?: Record<string, string>) => void;
 };

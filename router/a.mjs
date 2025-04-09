@@ -15,7 +15,7 @@ export const A = (
 ) => {
   /* istanbul ignore next - try again later */
   const props = Object.fromEntries(
-    Object.entries(rest || {}).filter(([_, val]) => val),
+    Object.entries(rest || {}).filter(([_, val]) => val !== undefined),
   );
   const newProps = {
     href,

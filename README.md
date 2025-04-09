@@ -130,12 +130,14 @@ Route({ path: '*', component: () => van.tags.div('404 - Page Not Found') });
 
 function App() {
   // the Router is only an outlet
-  export default Router();
+  return Router();
 }
 
-// render or hydrate the app
+// render the app
 van.add(document.body, App());
 ```
+**IMPORTANT** - using lazy components for the main route (`"/"`) is not allowed. This is to prevent hydration waterfalls, especially for SSR apps.
+
 
 Here's how a page should look like, pay attention to the comments:
 ```ts
@@ -179,22 +181,16 @@ The **vite-plugin-vanjs** plugin provides metadata management via the exported `
 
 Depending on the type of application, it's generally very easy to setup the system to work properly, we only need to make sure that we execute functions in a specific order:
 
-* first we call the `initializeHeadTags` which allows the module to store the current tags that come from either a Vite starter template `index.html` or the server (SSR); if we don't call this function, the existing tags will be removed and some of them are very important (especially `charset` and `viewport`);
-* then we define a set of default tags to be used by both client and server (if using an SSR template) on all pages that don't come with any metadata tags;
-* lastly, on other pages, we define tags that override both the existing and the default tags.
+* first we define a set of default tags to be used by both client and server (if using an SSR template) on all pages that don't come with any metadata tags;
+* next, on other pages, we define tags that override both the existing and the default tags.
 
 Here's a quick example, first let's start again with the `app.ts`:
 ```ts
 import van from 'vanjs-core'
-import { Style, Title, Meta, initializeHeadTags } from '@vanjs/meta'
+import { Style, Title, Link, Meta } from '@vanjs/meta'
 
 function App() {
   const { div, h1, p } van.tags;
-
-  // when app is first time executed
-  // we need to register tags coming
-  // from the index.html template
-  initializeHeadTags();
 
   // a good practice is to define some default tags
   // they are used on pages where no tags are set

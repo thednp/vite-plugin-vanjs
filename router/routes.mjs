@@ -12,17 +12,22 @@ export const routes = [];
  * @param {RouteProps} routeProps
  */
 export const Route = (routeProps) => {
-  const { component, preload, load, ...rest } = routeProps;
+  const { path, component, preload, load, ...rest } = routeProps;
+
+  // istanbul ignore next - no point testing this error
+  if (path === "/" && isLazyComponent(component)) {
+    throw new Error("Home component must not be a lazy component");
+  }
 
   // If component has lifecycle methods but isn't lazy, make it lazy
-  if (!isLazyComponent(component)) {
+  if (!isLazyComponent(component) && path !== "/") {
     const wrappedComponent = lazy(() =>
       Promise.resolve({
         default: component,
         route: { preload, load },
       })
     );
-    routes.push({ ...rest, component: wrappedComponent });
+    routes.push({ ...rest, path, component: wrappedComponent });
     return;
   }
 
