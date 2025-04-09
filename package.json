@@ -98,14 +98,14 @@
     "vanjs-ext": "^0.6.2"
   },
   "devDependencies": {
-    "@types/node": "^22.13.10",
-    "@vitest/browser": "^3.0.9",
-    "@vitest/coverage-istanbul": "^3.0.9",
-    "@vitest/ui": "^3.0.9",
+    "@types/node": "^22.14.0",
+    "@vitest/browser": "^3.1.1",
+    "@vitest/coverage-istanbul": "^3.1.1",
+    "@vitest/ui": "^3.1.1",
     "happy-dom": "^16.8.1",
     "typescript": "5.6.2",
-    "vite": "^6.2.2",
-    "vitest": "^3.0.9"
+    "vite": "^6.2.5",
+    "vitest": "^3.1.1"
   },
   "packageManager": "pnpm@8.6.12",
   "engines": {

@@ -16,7 +16,7 @@ const popHandler = (e) => {
   if (location.pathname !== oldPath) {
     setRouterState(location.pathname, location.search);
   }
-}
+};
 
 export const Router = (initialProps = /* istanbul ignore next */ {}) => {
   const { div, main } = van.tags;
@@ -27,7 +27,7 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
   );
   const wrapper = main({ ...props, "data-root": true });
   const mainLayout = () => {
-    const route = matchRoute(routerState.pathname.val)
+    const route = matchRoute(routerState.pathname.val);
     /* istanbul ignore else */
     if (!route) return van.add(wrapper, div("404 - Not Found"));
 
@@ -37,7 +37,9 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
       const renderComponent = async () => {
         try {
           const module = await route.component();
-          const component = typeof module.component === "function" ? module.component() : /* istanbul ignore next */module.component;
+          const component = typeof module.component === "function"
+            ? module.component()
+            : /* istanbul ignore next */ module.component;
 
           await executeLifecycle(module, route.params);
           return van.add(wrapper, unwrap(component).children);
@@ -56,9 +58,9 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
     // istanbul ignore else - cannot test unmount
     if (isConnected || !root) {
       initializeHeadTags();
-      window.addEventListener("popstate", popHandler);
+      globalThis.addEventListener("popstate", popHandler);
     } else {
-      window.removeEventListener("popstate", popHandler);
+      globalThis.removeEventListener("popstate", popHandler);
     }
 
     // Client-side lazy component, lifeCycle is already executed on the server
@@ -68,20 +70,19 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
       const module = route.component();
       const children = () => {
         // istanbul ignore next - cannot test
-        const cp = (Array.isArray(module) || module instanceof Element) ? module
+        const cp = (Array.isArray(module) || module instanceof Element)
+          ? module
           : typeof module.component === "function"
-            ? module.component()
-            : module.component;
+          ? module.component()
+          : module.component;
         // istanbul ignore next - cannot test
-        const kids = () => cp
-          ? Array.from(unwrap(cp).children)
-          : []
+        const kids = () => cp ? Array.from(unwrap(cp).children) : [];
         const kudos = kids();
 
         // istanbul ignore else
         if (document.head) {
           isConnected = true;
-          van.hydrate(document.head, head => hydrate(head, Head()));
+          van.hydrate(document.head, (head) => hydrate(head, Head()));
         }
 
         return kudos;
@@ -93,37 +94,42 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
     const csrRoute = van.derive(() => {
       const p = routerState.pathname.val;
       return matchRoute(p);
-    })
+    });
 
     const children = van.derive(() => {
       const md = csrRoute.val.component();
       // istanbul ignore next - cannot test all cases
-      const cp = (Array.isArray(md) || md instanceof Element) ? md
+      const cp = (Array.isArray(md) || md instanceof Element)
+        ? md
         : typeof md.component === "function"
-          ? md.component()
-          : md.component;
+        ? md.component()
+        : md.component;
       return cp
         ? Array.from(unwrap(cp).children)
-        : /* istanbul ignore next */[]
+        : /* istanbul ignore next */ [];
     });
 
     const component = () => {
       const kids = () => children.val;
       const result = () => {
-        return van.derive(() => van.hydrate(wrapper, (el) => {
-          const kudos = kids();
-          isConnected = true;
-          // istanbul ignore else
-          if (document.head) {
-            van.hydrate(document.head, head => hydrate(head, Head()));
-          }
-          return hydrate(el, kudos);
-        })).val;
-      }
+        return van.derive(() =>
+          van.hydrate(wrapper, (el) => {
+            const kudos = kids();
+            isConnected = true;
+            // istanbul ignore else
+            if (document.head) {
+              van.hydrate(document.head, (head) => hydrate(head, Head()));
+            }
+            return hydrate(el, kudos);
+          })
+        ).val;
+      };
       return result();
-    }
+    };
     const finalResult = component();
-    return finalResult ? /* istanbul ignore next*/ van.add(wrapper, finalResult) : wrapper;
+    return finalResult
+      ? /* istanbul ignore next*/ van.add(wrapper, finalResult)
+      : wrapper;
   };
 
   return mainLayout();
