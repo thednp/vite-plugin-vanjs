@@ -32,7 +32,7 @@
   "include": [
     "./tests/*.ts",
     "./tests/*.tsx",
-    "./src/*.ts",
+    "plugin/*.ts",
     "./jsx/*.ts",
     "./setup/*.ts",
     "./router/*.ts",

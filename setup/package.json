@@ -9,13 +9,29 @@
       "types": "./types.d.ts",
       "import": "./index.mjs"
     },
+    "./debug": {
+      "types": "./types.d.ts",
+      "import": "./index-debug.mjs"
+    },
     "./van": {
       "types": "./van.d.ts",
       "import": "./van.mjs"
     },
+    "./van-ssr": {
+      "types": "./van.d.ts",
+      "import": "./van-ssr.mjs"
+    },
+    "./van-debug": {
+      "types": "./van.d.ts",
+      "import": "./van-debug.mjs"
+    },
     "./vanX": {
       "types": "./vanX.d.ts",
       "import": "./vanX.mjs"
+    },
+    "./vanX-ssr": {
+      "types": "./vanX.d.ts",
+      "import": "./vanX-ssr.mjs"
     }
   },
   "peerDependencies": {

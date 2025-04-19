@@ -36,6 +36,113 @@ export const styleToString = (style) => {
     : /* istanbul ignore next */ "";
 };
 
+/** @type {(el1: HTMLElement, el2: HTMLElement | HTMLElement[]) => boolean} */
+export function elementsMatch(el1, el2) {
+  // Quick initial checks before recursing
+  if (
+    !(el2 instanceof HTMLElement) ||
+    el1.tagName !== el2.tagName ||
+    el1.id !== el2.id ||
+    el1.className !== el2.className
+  ) {
+    return false;
+  }
+
+  const childNodes1 = Array.from(el1.childNodes);
+  const childNodes2 = Array.from(el2.childNodes);
+
+  if (childNodes1.length !== childNodes2.length) {
+    return false;
+  }
+
+  // Only recurse if necessary (has childNodes with data-hk)
+  const hasHydratedChildren = childNodes1.some((child) =>
+    child instanceof HTMLElement && (child.hasAttribute("data-hk") ||
+      child.querySelector("[data-hk]"))
+  );
+
+  if (!hasHydratedChildren) {
+    return true; // If no hydrated children, elements match based on initial checks
+  }
+
+  return childNodes1.every((child, idx) =>
+    elementsMatch(child, childNodes2[idx])
+  );
+}
+
+function createHydrationContext() {
+  /** @type {WeakMap<Element, Element>} */
+  const parentCache = new WeakMap();
+
+  /** @type {(oldDom: HTMLElement, newDom: HTMLElement) => HTMLElement | null} */
+  function getParent(element, root) {
+    const cacheKey = element;
+    if (parentCache.has(cacheKey)) {
+      const cached = parentCache.get(cacheKey);
+      // Verify the cached parent is still valid for this root
+      if (cached && cached.isConnected && root.contains(cached)) {
+        return cached;
+      }
+      // If not valid, remove from cache
+      parentCache.delete(cacheKey);
+    }
+
+    const chain = [];
+    let current = element;
+
+    while (current !== root && current) {
+      chain.push(current);
+      current = current.parentElement;
+    }
+
+    const parent = chain.slice(-1)[0];
+    if (parent) {
+      parentCache.set(cacheKey, parent);
+    }
+    return parent;
+  }
+
+  /** @type {(oldDom: HTMLElement, newDom: HTMLElement) => HTMLElement} */
+  function diffAndHydrate(oldDom, newDom) {
+    // SPA mode
+    if (!elementsMatch(oldDom, newDom)) {
+      return oldDom.replaceChildren(...unwrap(newDom).children);
+    }
+    // SSR Mode
+    /** @type {Set<HTMLElement>} */
+    const oldSet = new Set();
+    /** @type {Set<HTMLElement>} */
+    const newSet = new Set();
+
+    const processElements = (root, set) => {
+      const elements = root.querySelectorAll("[data-hk]");
+      let lastParent = null;
+
+      elements.forEach((el) => {
+        const parent = getParent(el, root);
+        if (parent && parent !== lastParent) {
+          set.add(parent);
+          lastParent = parent;
+        }
+      });
+    };
+
+    processElements(oldDom, oldSet);
+    processElements(newDom, newSet);
+
+    if (newSet.size > 0) {
+      const newArray = Array.from(newSet);
+      oldSet.forEach((el) => {
+        const match = newArray.find((m) => elementsMatch(m, el));
+        if (match) {
+          el.replaceWith(match);
+        }
+      });
+    }
+  }
+
+  return { diffAndHydrate };
+}
 /**
  * @param {Element} target the root element
  * @param {Element | Element[] | Promise<Element | Element[]>} content the element(s) to hydrate
@@ -43,10 +150,17 @@ export const styleToString = (style) => {
 export const hydrate = (target, content) => {
   if (content instanceof Promise) {
     content.then((res) => {
-      const wrapper = unwrap(res);
-      target.replaceChildren(
-        ...(Array.from(wrapper.children)),
-      );
+      if (!target.hasAttribute("data-h")) {
+        const { diffAndHydrate } = createHydrationContext();
+        diffAndHydrate(target, content);
+        target.setAttribute("data-h", "");
+        parentCache = new WeakMap();
+      } else {
+        const wrapper = unwrap(res).children;
+        target.replaceChildren(
+          ...(Array.from(wrapper.children)),
+        );
+      }
     });
     return target;
   }
@@ -60,6 +174,12 @@ export const hydrate = (target, content) => {
   const isLink = (tag) => tag instanceof HTMLLinkElement;
 
   if (target.tagName.toLowerCase() === "head") {
+    // Keep current tags on first hydration
+    if (!target.hasAttribute("data-h")) {
+      target.setAttribute("data-h", "");
+      return target;
+    }
+
     // Handle non-style/link tags first
     const regularTags = newChildren.filter((child) => !isStyleLink(child));
 
@@ -135,7 +255,13 @@ export const hydrate = (target, content) => {
       }
     });
   } else {
-    target.replaceChildren(...newChildren);
+    if (!target.hasAttribute("data-h")) {
+      const { diffAndHydrate } = createHydrationContext();
+      diffAndHydrate(target, content);
+      target.setAttribute("data-h", "");
+    } else {
+      target.replaceChildren(...newChildren);
+    }
   }
 
   return target;

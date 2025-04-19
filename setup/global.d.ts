@@ -38,6 +38,8 @@ declare module "@vanjs/vanX" {
   };
 }
 
+declare module "virtual:@vanjs/hydration" {
+}
 declare module "@vanjs/setup" {
   import type { Van } from "vanjs-core";
   import type * as vanX from "vanjs-ext";

@@ -1,9 +1,10 @@
-// setup/van.mjs
-import van from "vanjs-core";
+// van-ssr.mjs
+import { registerEnv } from "mini-van-plate/shared";
+import van from "mini-van-plate/van-plate";
 
 // Create our own tag function that wraps the original
 function tagWithHydration(ns, name, ...args) {
-  // Get the correct tag function based on namespace
+  // Get original tag function
   const originalTag = ns ? van.tags(ns)[name] : van.tags[name];
 
   let [{ is: _is, ...props }, ...children] =
@@ -24,7 +25,7 @@ function tagWithHydration(ns, name, ...args) {
     props = { ...props, "data-hk": "" };
   }
 
-  // Call the original tag function
+  // Call the original tag function directly
   return originalTag(props, ...children);
 }
 
@@ -39,10 +40,10 @@ const tagsProxy = new Proxy(
   },
 );
 
-// Export modified van instance with only tags overridden
-const vanClient = {
+const vanSSR = {
   ...van,
   tags: tagsProxy,
 };
+registerEnv({ van: vanSSR });
 
-export default vanClient;
+export default vanSSR;

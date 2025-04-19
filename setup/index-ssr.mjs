@@ -1,5 +1,5 @@
-import van from "./van-debug.mjs";
-import vanX from "./vanX.mjs";
+import van from "./van-ssr.mjs";
+import vanX from "./vanX-ssr.mjs";
 import isServer from "./isServer.mjs";
 
 export default {

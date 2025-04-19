@@ -1,7 +1,16 @@
-import setup from "./index.mjs";
-const vanX = setup.vanX;
+// setup/vanX.mjs
+import {
+  calc,
+  compact,
+  list,
+  noreactive,
+  raw,
+  reactive,
+  replace,
+  stateFields,
+} from "vanjs-ext";
 
-export const {
+const vanX = {
   calc,
   reactive,
   noreactive,
@@ -10,5 +19,7 @@ export const {
   list,
   replace,
   compact,
-} = "default" in vanX ? vanX.default : /* istanbul ignore next */ vanX;
+};
+vanX.default = vanX;
+
 export default vanX;

@@ -1,6 +1,5 @@
 // router/a.mjs
 import van from "vanjs-core";
-import setup from "../setup/index.mjs";
 import { matchRoute } from "./routes.mjs";
 import { executeLifecycle, isCurrentPage, navigate } from "./helpers.mjs";
 
@@ -20,6 +19,29 @@ export const A = (
   const newProps = {
     href,
     ...props,
+    onclick: async (e) => {
+      e.preventDefault();
+      /* istanbul ignore next */
+      if (isCurrentPage(href)) return;
+
+      if (props.onclick) {
+        await props.onclick(e);
+      }
+
+      const route = matchRoute(href);
+      const module = await route.component();
+      await executeLifecycle(module, route.params);
+
+      navigate(href);
+    },
+    onmouseenter: () => {
+      const route = matchRoute(href);
+
+      /* istanbul ignore else */
+      if (route?.component) {
+        route.component();
+      }
+    },
   };
 
   van.derive(() => {
@@ -28,29 +50,5 @@ export const A = (
     }
   });
 
-  const anchor = van.tags.a(newProps, [...(children || []), ...otherChildren]);
-  /* istanbul ignore else */
-  if (!setup.isServer) {
-    anchor.addEventListener("click", async (e) => {
-      e.preventDefault();
-      /* istanbul ignore next */
-      if (isCurrentPage(href)) return;
-
-      const route = matchRoute(href);
-      const module = await route.component();
-      await executeLifecycle(module, route.params);
-
-      navigate(href);
-    });
-
-    anchor.addEventListener("mouseenter", () => {
-      const route = matchRoute(href);
-
-      /* istanbul ignore else */
-      if (route?.component) {
-        route.component();
-      }
-    });
-  }
-  return anchor;
+  return van.tags.a(newProps, [...(children || []), ...otherChildren]);
 };

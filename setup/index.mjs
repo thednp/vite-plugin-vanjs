@@ -1,21 +1,9 @@
-import { dummyVanX, registerEnv } from "mini-van-plate/shared";
-import vanPlate from "mini-van-plate/van-plate";
-import vanCore from "vanjs-core";
-import * as vanX from "vanjs-ext";
+import van from "./van.mjs";
+import vanX from "./vanX.mjs";
+import isServer from "./isServer.mjs";
 
-const vanXObject = { ...vanX, default: vanX };
-const dummyObject = { ...dummyVanX, default: dummyVanX };
-
-const setup = {
-  isServer: typeof window === "undefined",
-  get van() {
-    return this.isServer ? vanPlate : vanCore;
-  },
-  get vanX() {
-    return this.isServer ? dummyObject : vanXObject;
-  },
+export default {
+  isServer,
+  van,
+  vanX,
 };
-
-registerEnv(setup);
-
-export default setup;

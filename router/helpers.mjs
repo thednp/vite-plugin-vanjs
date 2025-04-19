@@ -1,7 +1,8 @@
 // import van from "vanjs-core";
-import setup from "../setup/index.mjs";
+import isServer from "../setup/isServer.mjs";
 import { routerState, setRouterState } from "./state.mjs";
 import { matchRoute } from "./routes.mjs";
+export * from "../plugin/helpers.mjs";
 
 /** @typedef {import("./types.d.ts").Route} Route */
 /** @typedef {import("./types.d.ts").VanNode} VanNode */
@@ -57,7 +58,7 @@ export const unwrap = (source, ...children) => {
  */
 export const isLazyComponent = (component) => {
   // Server: Check if it's an async function
-  if (setup.isServer) {
+  if (isServer) {
     return component.constructor.name.includes("AsyncFunction");
   }
 
@@ -69,7 +70,7 @@ export const isLazyComponent = (component) => {
  * Execute lifecycle methods preload and / or load
  * @param {ComponentModule} param0
  * @param {Record<string, string> | undefined} params
- * @returns
+ * @returns {Promise<boolean>}
  */
 export const executeLifecycle = async ({ route }, params) => {
   // istanbul ignore next
@@ -97,7 +98,7 @@ export const navigate = (path, options = {}) => {
   const { replace = false } = options;
 
   // istanbul ignore else
-  if (!setup.isServer) {
+  if (!isServer) {
     // Client-side navigation
     const url = new URL(path, globalThis.location.origin);
     const route = matchRoute(url.pathname);
@@ -164,7 +165,7 @@ export const fixRouteUrl = (url) => {
  * @returns {void}
  */
 // export const reload = (forceFetch = false) => {
-//   if (!setup.isServer) {
+//   if (!isServer) {
 //     // Client-side reload
 //     if (forceFetch) {
 //       window.location.reload();
@@ -191,7 +192,7 @@ export const fixRouteUrl = (url) => {
 // export const redirect = (path, options = {}) => {
 //   const { status = 302, replace = true } = options;
 
-//   if (!setup.isServer) {
+//   if (!isServer) {
 //     // Client-side redirect
 //     navigate(path, { replace });
 //   } else {

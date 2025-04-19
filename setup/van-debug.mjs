@@ -1,2 +1,2 @@
-import setup from "./index-debug.mjs";
-export default setup.van;
+import van from "vanjs-core/debug";
+export default van;

@@ -1,4 +1,5 @@
 import { basename } from "node:path";
+export * from "../plugin/helpers.mjs";
 
 /**
  * @type {typeof import("./types.d.ts").renderToString}
@@ -72,20 +73,26 @@ function renderPreloadLink(file) {
 export function renderPreloadLinks(modules, manifest) {
   let links = "";
   const seen = new Set();
+  const ignored = new Set();
   modules.forEach((id) => {
     const files = manifest[id];
+    const ignoredId = ["src/pages", "src/routes"].every((l) => !id.includes(l));
+    if (ignoredId) files.forEach((f) => ignored.add(f));
+
     /* istanbul ignore else */
-    if (files?.length) {
+    if (files?.length && ignoredId) {
       files.forEach((file) => {
         /* istanbul ignore else */
-        if (!seen.has(file)) {
+        if (!seen.has(file) && !ignored.has(file)) {
           seen.add(file);
           const filename = basename(file);
           /* istanbul ignore next - impossible to test */
           if (manifest[filename]) {
             for (const depFile of manifest[filename]) {
-              links += renderPreloadLink(depFile);
-              seen.add(depFile);
+              if (!ignored.has(depFile)) {
+                links += renderPreloadLink(depFile);
+                seen.add(depFile);
+              }
             }
           }
           links += renderPreloadLink(file);

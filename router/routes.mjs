@@ -15,12 +15,13 @@ export const Route = (routeProps) => {
   const { path, component, preload, load, ...rest } = routeProps;
 
   // istanbul ignore next - no point testing this error
-  if (path === "/" && isLazyComponent(component)) {
-    throw new Error("Home component must not be a lazy component");
+  if (routes.some((r) => r.path === path)) {
+    console.error(`🍦 @vanjs/router: duplicated route for "${path}".`);
+    return;
   }
 
-  // If component has lifecycle methods but isn't lazy, make it lazy
-  if (!isLazyComponent(component) && path !== "/") {
+  // If component isn't lazy, make it lazy
+  if (!isLazyComponent(component)) {
     const wrappedComponent = lazy(() =>
       Promise.resolve({
         default: component,
@@ -37,20 +38,36 @@ export const Route = (routeProps) => {
 
 /**
  * Find a registered route that matches the given path
- * @param {string} path
+ * @param {string} initialPath
  * @returns {RouteEntry | null}
  */
-export const matchRoute = (path) => {
-  const exactMatch = routes.find((r) => r.path === path);
-  if (exactMatch) return { ...exactMatch, params: {} };
+export const matchRoute = (initialPath) => {
+  const path = initialPath !== "/" && initialPath.endsWith("/")
+    ? initialPath.slice(0, -1)
+    : initialPath;
+  // identify a nested not-found route
+  const nestedNotFound = path.split("/").slice(0, -1).join("/") + "/*";
+  const exactMatch = routes.find((r) =>
+    r.path === nestedNotFound || r.path === path
+  );
 
+  if (exactMatch) {
+    return {
+      ...exactMatch,
+      params: extractParams(exactMatch.path, path),
+    };
+  }
+
+  // identify any other route
   for (const route of routes) {
     if (route.path === "*") continue;
     const params = extractParams(route.path, path);
+
     if (params) {
       return { ...route, params };
     }
   }
 
+  // fallback to default not-found route
   return routes.find((r) => r.path === "*") || null;
 };

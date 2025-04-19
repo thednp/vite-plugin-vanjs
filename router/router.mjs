@@ -1,22 +1,14 @@
 import van from "vanjs-core";
-import setup from "../setup/index.mjs";
+import isServer from "../setup/isServer.mjs";
 import { routerState, setRouterState } from "./state.mjs";
 import { matchRoute } from "./routes.mjs";
 import { executeLifecycle, unwrap } from "./helpers.mjs";
 import { hydrate } from "../client/index.mjs";
-import { Head, initializeHeadTags } from "@vanjs/meta";
+import { Head, initializeHeadTags } from "../meta/index.mjs";
+
+import "virtual:@vanjs/routes";
 
 let isConnected = false;
-/** @param {Event & {target: globalThis}} e */
-// istanbul ignore next - cannot test
-const popHandler = (e) => {
-  const location = e.target.location;
-  const oldPath = routerState.pathname._oldVal;
-  // istanbul ignore next - cannot test
-  if (location.pathname !== oldPath) {
-    setRouterState(location.pathname, location.search);
-  }
-};
 
 export const Router = (initialProps = /* istanbul ignore next */ {}) => {
   const { div, main } = van.tags;
@@ -29,11 +21,11 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
   const mainLayout = () => {
     const route = matchRoute(routerState.pathname.val);
     /* istanbul ignore else */
-    if (!route) return van.add(wrapper, div("404 - Not Found"));
+    if (!route) return van.add(wrapper, div("No Route Found"));
 
     routerState.params.val = route.params || {};
     // Server-side or async component: use renderComponent
-    if (setup.isServer) {
+    if (isServer) {
       const renderComponent = async () => {
         try {
           const module = await route.component();
@@ -56,19 +48,30 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
 
     const root = document.querySelector("[data-root]");
     // istanbul ignore else - cannot test unmount
-    if (isConnected || !root) {
+    if (!isConnected || !root) {
       initializeHeadTags();
-      globalThis.addEventListener("popstate", popHandler);
-    } else {
-      globalThis.removeEventListener("popstate", popHandler);
+      globalThis.addEventListener(
+        "popstate",
+        /** @param {Event & {target: globalThis}} e */
+        // istanbul ignore next - cannot test
+        (e) => {
+          const location = e.target.location;
+          const oldPath = routerState.pathname._oldVal;
+          // istanbul ignore next - cannot test
+          if (location.pathname !== oldPath) {
+            setRouterState(location.pathname, location.search);
+          }
+        },
+      );
     }
 
     // Client-side lazy component, lifeCycle is already executed on the server
     // or when A component has been clicked in the client
     if (root) {
       // this case is when root is server side rendered
-      const module = route.component();
       const children = () => {
+        const module = route.component();
+        executeLifecycle(module, route.params);
         // istanbul ignore next - cannot test
         const cp = (Array.isArray(module) || module instanceof Element)
           ? module
@@ -79,9 +82,9 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
         const kids = () => cp ? Array.from(unwrap(cp).children) : [];
         const kudos = kids();
 
+        isConnected = true;
         // istanbul ignore else
         if (document.head) {
-          isConnected = true;
           van.hydrate(document.head, (head) => hydrate(head, Head()));
         }
 
@@ -97,7 +100,9 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
     });
 
     const children = van.derive(() => {
-      const md = csrRoute.val.component();
+      const route = csrRoute.val;
+      const md = route.component();
+      executeLifecycle(md, route.params);
       // istanbul ignore next - cannot test all cases
       const cp = (Array.isArray(md) || md instanceof Element)
         ? md

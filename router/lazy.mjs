@@ -1,4 +1,4 @@
-import setup from "../setup/index.mjs";
+import isServer from "../setup/isServer.mjs";
 import van from "vanjs-core";
 import { cache, getCached } from "./cache.mjs";
 
@@ -11,13 +11,14 @@ import { cache, getCached } from "./cache.mjs";
  * @returns {ComponentModule | Promise<ComponentModule>}
  */
 export const lazy = (importFn) => {
-  if (setup.isServer) {
+  if (isServer) {
     return async () => {
       const cached = getCached(importFn);
       /* istanbul ignore next */
       if (cached) {
         return cached;
       }
+      // console.log("lazy.importFn", importFn.toString())
       const module = await importFn();
       const component = module.Page || module.default;
       const result = { component, route: module.route };

@@ -12,6 +12,7 @@ import type {
   PropValueOrDerived,
   State,
 } from "vanjs-core";
+import { ResolvedConfig } from "vite";
 
 // type VanElement = VElement | Exclude<Primitive, boolean | undefined>;
 type DOMElement = globalThis.Element;
@@ -70,6 +71,9 @@ export type VanComponent<
 export const Router:
   & VanComponent<"main">
   & JSX.Component<"main">;
+export const FileSystemRouter:
+  & VanComponent<"main">
+  & JSX.Component<"main">;
 
 // a.mjs
 /**
@@ -123,8 +127,12 @@ export const redirect: (href?: string) => void | (() => void);
 export type RouteEntry = {
   path: string;
   component: Promise<ComponentModule>;
-  preload?: (params?: Record<string, string>) => void;
-  load?: (params?: Record<string, string>) => void;
+  preload?: (
+    params?: Record<string, string>,
+  ) => boolean | void | Promise<boolean | void>;
+  load?: (
+    params?: Record<string, string>,
+  ) => boolean | void | Promise<boolean | void>;
 };
 
 export type RouteProps = {
@@ -136,6 +144,13 @@ export type RouteProps = {
   preload?: (params?: Record<string, string>) => void;
   load?: (params?: Record<string, string>) => void;
 };
+
+export type RouteConfig = {
+  routePath: string;
+  path: string;
+  layouts?: LayoutFile[];
+};
+
 export const routes: RouteEntry[];
 
 /**
@@ -221,3 +236,71 @@ export const lazy: (importFn: () => LazyComponent) => () => ComponentModule;
  * @param url
  */
 export const fixRouteUrl: (url: string) => string;
+
+/**
+ * Cache a route.
+ * @param key the cache route key
+ * @param value the cache route
+ */
+export const cache: (key: string, value: () => LazyComponent) => void;
+
+/**
+ * Return a route cache.
+ * @param key the cache route key
+ */
+export const getCached: (key) => ComponentModule;
+
+/**
+ * Execute lifecycle methods preload and / or load
+ */
+export const executeLifecycle: (
+  { route }: ComponentModule,
+  params: Record<string, string> | undefined,
+) => Promise<boolean>;
+
+/**
+ * Find a registered route that matches the given path
+ */
+export const matchRoute: (path: string) => RouteEntry | null;
+
+// FILE SYSTEM ROUTER
+/**
+ * Get the file most probable route path for a given potential route.
+ */
+export const fileToRoute: (file: string, routesDir: string) => string;
+
+export type PageFile = { path: string; routePath: string };
+export type LayoutFile = { id: string; path: string };
+export type PluginConfig = { routesDir: string; extensions: string[] };
+/**
+ * Find all layout files for a given route.
+ */
+
+export const findLayouts: (routePath: string) => Array<LayoutFile>;
+
+/**
+ * Identify all files in a folder.
+ */
+export const globFiles: (
+  dir: string,
+  extensions: string[],
+) => Promise<Array<string>>;
+
+/**
+ * Scan routes directory and generate routes.
+ */
+export const scanRoutes: (
+  config: ResolvedConfig,
+  pluginConfig: PluginConfig,
+) => Promise<
+  Array<{ path: string; routePath: string }>
+>;
+
+/**
+ * Process routes and identify their layouts
+ */
+export const processLayoutRoutes: (
+  routes: Array<PageFile>,
+  config: ResolvedConfig,
+  pluginConfig: PluginConfig,
+) => Promise<Array<PageFile & { layouts: Array<LayoutFile> }>>;

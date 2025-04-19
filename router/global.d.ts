@@ -70,6 +70,9 @@ declare module "@vanjs/router" {
   export const Router:
     & VanComponent<"main">
     & JSX.Component<"main">;
+  export const FileSystemRouter:
+    & VanComponent<"main">
+    & JSX.Component<"main">;
 
   // a.mjs
   /**
@@ -123,8 +126,12 @@ declare module "@vanjs/router" {
   export type RouteEntry = {
     path: string;
     component: Promise<ComponentModule>;
-    preload?: (params?: Record<string, string>) => void;
-    load?: (params?: Record<string, string>) => void;
+    preload?: (
+      params?: Record<string, string>,
+    ) => boolean | void | Promise<boolean | void>;
+    load?: (
+      params?: Record<string, string>,
+    ) => boolean | void | Promise<boolean | void>;
   };
 
   export type RouteProps = {
@@ -223,4 +230,17 @@ declare module "@vanjs/router" {
    * @param url
    */
   export const fixRouteUrl: (url: string) => string;
+
+  /**
+   * Execute lifecycle methods preload and / or load
+   */
+  export const executeLifecycle: (
+    { route }: ComponentModule,
+    params: Record<string, string> | undefined,
+  ) => Promise<boolean>;
+
+  /**
+   * Find a registered route that matches the given path
+   */
+  export const matchRoute: (path: string) => RouteEntry | null;
 }

@@ -1,6 +1,6 @@
 /** @typedef {import("./types").ComponentModule} ComponentModule */
-/** @typedef {import("./types").GetCachedRoute} GetCachedRoute */
-/** @typedef {import("./types").CacheRoute} CacheRoute */
+/** @typedef {typeof import("./types").getCached} GetCachedRoute */
+/** @typedef {typeof import("./types").cache} CacheRoute */
 
 /** @type {Map<string, ComponentModule>} */
 const routeCache = new Map();

@@ -1,17 +1,17 @@
 {
   "name": "vite-plugin-vanjs",
-  "version": "0.0.10",
+  "version": "0.1.0",
   "author": "thednp",
   "license": "MIT",
   "description": "A mini meta-framework for VanJS powered by Vite",
   "repository": "https://github.com/thednp/vite-plugin-vanjs",
   "type": "module",
   "sideEffects": false,
-  "main": "./src/index.mjs",
-  "module": "./src/index.mjs",
-  "types": "./src/types.d.ts",
+  "main": "./plugin/index.mjs",
+  "module": "./plugin/index.mjs",
+  "types": "./plugin/types.d.ts",
   "files": [
-    "src",
+    "plugin",
     "setup",
     "router",
     "meta",
@@ -37,9 +37,9 @@
   ],
   "exports": {
     ".": {
-      "types": "./src/types.d.ts",
-      "import": "./src/index.mjs",
-      "default": "./src/index.mjs"
+      "types": "./plugin/types.d.ts",
+      "import": "./plugin/index.mjs",
+      "default": "./plugin/index.mjs"
     },
     "./setup": {
       "types": "./setup/types.d.ts",
@@ -79,10 +79,10 @@
     "test-ui": "vitest --config vitest.config.mts --ui=true",
     "prepublishOnly": "pnpm up && pnpm lint && pnpm format && pnpm badges",
     "badges": "npx -p dependency-version-badge update-badge vanjs-core mini-van-plate typescript vitest vite",
-    "format": "deno fmt src meta router setup client server jsx",
+    "format": "deno fmt plugin meta router setup client server jsx",
     "lint": "pnpm lint:ts && pnpm check:ts",
-    "lint:ts": "deno lint src meta router setup client server jsx",
-    "fix:ts": "deno lint src meta router setup client server jsx --fix",
+    "lint:ts": "deno lint plugin meta router setup client server jsx",
+    "fix:ts": "deno lint plugin meta router setup client server jsx --fix",
     "check:ts": "tsc -noEmit"
   },
   "peerDependencies": {
@@ -98,13 +98,13 @@
     "vanjs-ext": "^0.6.2"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0",
+    "@types/node": "^22.14.1",
     "@vitest/browser": "^3.1.1",
     "@vitest/coverage-istanbul": "^3.1.1",
     "@vitest/ui": "^3.1.1",
     "happy-dom": "^16.8.1",
     "typescript": "5.6.2",
-    "vite": "^6.2.5",
+    "vite": "^6.3.2",
     "vitest": "^3.1.1"
   },
   "packageManager": "pnpm@8.6.12",
