@@ -12,7 +12,6 @@ import type {
   PropValueOrDerived,
   State,
 } from "vanjs-core";
-import { ResolvedConfig } from "vite";
 
 // type VanElement = VElement | Exclude<Primitive, boolean | undefined>;
 type DOMElement = globalThis.Element;
