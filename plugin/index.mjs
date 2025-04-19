@@ -23,7 +23,10 @@ export default function VitePluginVanJS(options = {}) {
   /** @type {ResolvedConfig} */
   let config;
   /** @type {PageFile[] | null} */
-  // let routeCache = null;
+  let routeCache = null;
+
+  const virtualModuleId = "virtual:@vanjs/routes";
+  const resolvedVirtualModuleId = "\0" + virtualModuleId;
 
   return {
     name: "vanjs",
@@ -64,7 +67,13 @@ export default function VitePluginVanJS(options = {}) {
         if (file.startsWith(pagesPath)) {
           routes.length = 0;
           routeCache = null;
-          server.ws.send({ type: "full-reload" });
+          const module = server.moduleGraph.getModuleById(
+            resolvedVirtualModuleId,
+          );
+          if (module) {
+            server.moduleGraph.invalidateModule(module);
+          }
+          server.hot.send({ type: "full-reload" });
         }
       };
       server.watcher.add(pagesPath);
@@ -112,13 +121,14 @@ export default function VitePluginVanJS(options = {}) {
           );
         }
       }
-      if (source === "virtual:@vanjs/routes") {
-        return "\0virtual:@vanjs/routes";
+      if (source === virtualModuleId) {
+        return resolvedVirtualModuleId;
       }
     },
     async load(id, ops) {
-      if (id === "\0virtual:@vanjs/routes") {
-        const currentRoutes = await getRoutes(config, pluginConfig);
+      if (id === resolvedVirtualModuleId) {
+        const currentRoutes = routeCache ||
+          await getRoutes(config, pluginConfig);
         if (!currentRoutes || !currentRoutes.length) {
           // don't crash the server if no routes are found
           // devs might not use file system router
