@@ -140,7 +140,6 @@ import { Route, routes } from "@vanjs/router/routes.mjs";
 import { lazy } from "@vanjs/router/lazy.mjs";
 
 // Reset current routes
-console.log('routesScript', routes);
 routes.length = 0;
 
 // Register routes
