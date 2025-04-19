@@ -3,9 +3,7 @@ import van, { type ChildDom, type State } from 'vanjs-core'
 import { expect, test, describe } from "vitest";
 import { A } from "vite-plugin-vanjs/router"
 // we need to trick typescript into thinking this is React
-// import React from "@vanjs/jsx";
-import * as React from "vite-plugin-vanjs/jsx";
-// import { js } from '@vanjs/jsx';
+import React from "@vanjs/jsx";
 
 describe(`Test client-side JSX`, () => {
   test(`Test regular tags`, async () => {

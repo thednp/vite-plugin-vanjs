@@ -7,14 +7,14 @@ import { expect, test, describe, beforeEach } from "vitest";
 import { hydrate } from "@vanjs/client";
 import { Head, Title, Meta, Script, Style, Link, addMeta, resetHeadTags, initializeHeadTags, SupportedTags } from "@vanjs/meta";
 import { Router, Route, lazy, A, setRouterState, routerState, navigate, unwrap } from "@vanjs/router";
-
 const styleUrl = Path.resolve(process.cwd(), "tests", 'test-style.css');
 const scriptUrl = Path.resolve(process.cwd(), "tests", 'test-script.js');
 const script1Url = Path.resolve(process.cwd(), "tests", 'test-script-1.js');
 
-describe(`Test client-side meta`, () => {
+describe(`Test client-side`, () => {
   beforeEach(() => {
     document.body.innerHTML = "";
+    document.head.innerHTML = "";
   })
 
   test(`Test meta tags`, () => {
@@ -79,7 +79,7 @@ describe(`Test client-side meta`, () => {
 
   test("Test hydrate", async () => {
     const { head, body, div, h1, style, script, link, title } = van.tags;
-    const docHead = head();
+    const docHead = head({ "data-h": "" });
     const docBody = body();
 
     // document.head.replaceChildren();
@@ -111,7 +111,7 @@ describe(`Test client-side meta`, () => {
         script({src: script1Url, type: "module"}),
       ]
     }
-    const testDiv = hydrate(div(), PageAsync());
+    const testDiv = hydrate(div(), await PageAsync());
     await new Promise(res => setTimeout(res, 17))
     expect(testDiv.innerHTML).to.contain('some div 4');
 
@@ -136,7 +136,7 @@ describe(`Test client-side meta`, () => {
     // set router state
     navigate('/nowhere', { replace: true });
 
-    expect(document.body.innerText).to.contain('404');
+    expect(document.body.innerText).to.contain('No Route Found');
   });
 
   test("Test router", async () => {

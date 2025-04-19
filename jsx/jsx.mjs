@@ -1,5 +1,5 @@
-import van from "../setup/van.mjs";
-import setup from "../setup/index.mjs";
+import van from "vanjs-core";
+import isServer from "../setup/isServer.mjs";
 import { setAttribute, styleToString } from "../client/index.mjs";
 
 export const jsx = (jsxTag, { children, ref, style, ...rest }) => {
@@ -17,7 +17,7 @@ export const jsx = (jsxTag, { children, ref, style, ...rest }) => {
         const styleProp = typeof style === "function" ? style() : style;
         const styleValue = styleToString(styleProp);
 
-        if (setup.isServer) {
+        if (isServer) {
           newElement.propsStr += ` style="${styleValue}"`;
         } else {
           newElement.style.cssText = styleValue;
@@ -26,7 +26,7 @@ export const jsx = (jsxTag, { children, ref, style, ...rest }) => {
     });
 
     // on server it's good enough to return here
-    if (setup.isServer) return newElement;
+    if (isServer) return newElement;
 
     // on the client, we sure do need to set the attributes
     for (const [k, value] of Object.entries(props)) {

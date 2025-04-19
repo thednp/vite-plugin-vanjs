@@ -10,6 +10,7 @@ import {
   stateFields,
 } from "vanjs-ext";
 
+// Create the namespace object first
 const vanX = {
   calc,
   reactive,
@@ -19,7 +20,14 @@ const vanX = {
   list,
   replace,
   compact,
+  // Define default as part of the initial object
+  get default() {
+    return vanX;
+  },
 };
-vanX.default = vanX;
 
+// Export named exports
+export { calc, compact, list, noreactive, raw, reactive, replace, stateFields };
+
+// Export as default
 export default vanX;

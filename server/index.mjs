@@ -76,11 +76,11 @@ export function renderPreloadLinks(modules, manifest) {
   const ignored = new Set();
   modules.forEach((id) => {
     const files = manifest[id];
-    const ignoredId = ["src/pages", "src/routes"].every((l) => !id.includes(l));
+    const ignoredId = ["src/pages", "src/routes"].some((l) => id.includes(l));
     if (ignoredId) files.forEach((f) => ignored.add(f));
 
     /* istanbul ignore else */
-    if (files?.length && ignoredId) {
+    if (files?.length && !ignoredId) {
       files.forEach((file) => {
         /* istanbul ignore else */
         if (!seen.has(file) && !ignored.has(file)) {

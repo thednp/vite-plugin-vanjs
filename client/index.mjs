@@ -155,7 +155,6 @@ export const hydrate = (target, content) => {
         const { diffAndHydrate } = createHydrationContext();
         diffAndHydrate(target, content);
         target.setAttribute("data-h", "");
-        parentCache = new WeakMap();
       } else {
         const wrapper = unwrap(res).children;
         target.replaceChildren(

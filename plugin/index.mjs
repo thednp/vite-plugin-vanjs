@@ -109,7 +109,7 @@ export default function VitePluginVanJS(options = {}) {
             __dirname,
             ops.ssr
               ? "../setup/van-ssr.mjs"
-              : isProduction
+              : (importer.endsWith("jsx/jsx.mjs") || isProduction)
               ? "../setup/van.mjs"
               : "../setup/van-debug.mjs",
           );

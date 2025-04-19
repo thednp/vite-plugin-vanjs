@@ -6,7 +6,7 @@ import vanjs from "vite-plugin-vanjs";
 import { renderToString, renderPreloadLinks } from "@vanjs/server";
 import { Router, Route, lazy, setRouterState, routerState, fixRouteUrl } from "@vanjs/router";
 
-describe(`Test server-side setup, meta & router`, () => {
+describe(`Test SSR`, () => {
   test(`Test meta tags`, async () => {
     resetHeadTags();
     const defaultHead = () => [
@@ -52,7 +52,6 @@ describe(`Test server-side setup, meta & router`, () => {
       'src/assets/Mona-sans-2.woff2': ['/assets/mona-sans-2.woff2'],
     };
     const markup = renderPreloadLinks(Object.keys(manifest), manifest);
-    // console.log(markup)
 
     expect(markup).to.contain('<link rel="preload" href="/src/van.js" as="script" crossorigin>');
     expect(markup).to.contain('<link rel="preload" href="/src/setup/van.js" as="script" crossorigin>');
@@ -93,7 +92,7 @@ describe(`Test server-side setup, meta & router`, () => {
     expect(reactive(obj).b).to.equal(2);
   });
 
-  test.only("Test router", async () => {
+  test("Test router", async () => {
     Route({
       path: '/',
       component: () => {
@@ -146,7 +145,7 @@ describe(`Test server-side setup, meta & router`, () => {
     await new Promise(res => setTimeout(res, 17));
     html = await renderToString(Router());
     console.log({ html })
-    expect(html).to.contain('Not found!');
+    expect(html).to.contain('Error loading page');
 
     // set router state
     setRouterState('/test/1?query=1', undefined, { someParam: '1' });

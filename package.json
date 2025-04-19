@@ -75,8 +75,8 @@
     }
   },
   "scripts": {
-    "test": "vitest --config vitest.config.mts",
-    "test-ui": "vitest --config vitest.config.mts --ui=true",
+    "test": "vitest --config vitest.config.ts",
+    "test-ui": "vitest --config vitest.config.ts --ui=true",
     "prepublishOnly": "pnpm up && pnpm lint && pnpm format && pnpm badges",
     "badges": "npx -p dependency-version-badge update-badge vanjs-core mini-van-plate typescript vitest vite",
     "format": "deno fmt plugin meta router setup client server jsx",

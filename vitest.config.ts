@@ -2,8 +2,9 @@ import { defineConfig } from "vitest/config";
 import vanjs from "vite-plugin-vanjs";
 
 export default defineConfig({
-  plugins: [vanjs()],
+  plugins: [vanjs({ routesDir: "tests/routes" })],
   test: {
+    // globals: true,
     include: [
       "tests/**.test.?(c|m)[jt]s?(x)",
     ],
@@ -12,7 +13,7 @@ export default defineConfig({
       reporter: ["html", "text", "lcov"],
       enabled: true,
       include: [
-        "src/*",
+        "plugin/*",
         "meta/*",
         "router/*",
         "setup/*",
