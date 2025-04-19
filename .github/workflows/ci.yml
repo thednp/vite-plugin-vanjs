@@ -5,19 +5,19 @@ on:
     branches:
       - master
     paths:
+      - plugin
       - jsx
       - router
       - meta
       - server
       - client
-      - src
       - tests
       - package.json
       - .github/workflows/ci.yml
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     name: Test on Node
 
     steps:

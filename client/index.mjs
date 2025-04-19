@@ -105,9 +105,10 @@ function createHydrationContext() {
   /** @type {(oldDom: HTMLElement, newDom: HTMLElement) => HTMLElement} */
   function diffAndHydrate(oldDom, newDom) {
     // SPA mode
-    if (!elementsMatch(oldDom, newDom)) {
+    if (!oldDom.children.length && !elementsMatch(oldDom, newDom)) {
       return oldDom.replaceChildren(...unwrap(newDom).children);
     }
+
     // SSR Mode
     /** @type {Set<HTMLElement>} */
     const oldSet = new Set();
