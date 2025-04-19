@@ -77,6 +77,10 @@ export const scanRoutes = async (config, pluginConfig) => {
   const routesPath = join(config.root, routesDir);
   const files = await globFiles(routesPath, extensions);
 
+  if (!files?.length) {
+    return [];
+  }
+
   // Filter out duplicate routes and layout files that are already used
   const routes = files.map((file) => ({
     path: normalizePath(file),
@@ -151,6 +155,8 @@ export const findLayouts = (routePath, config, pluginConfig) => {
  * @type {typeof import("./types").processLayoutRoutes}
  */
 export const processLayoutRoutes = (routes, config, pluginConfig) => {
+  if (!routes.length) return [];
+
   return routes.map((route) => {
     const layouts = findLayouts(route.path, config, pluginConfig);
     return {
@@ -158,6 +164,16 @@ export const processLayoutRoutes = (routes, config, pluginConfig) => {
       layouts,
     };
   });
+};
+
+/**
+ * Scan and process routes and return them
+ * @type {typeof import("./types").getRoutes}
+ */
+// export const scanRoutes = async (config, pluginConfig) => {}
+export const getRoutes = async (config, pluginConfig) => {
+  const routes = await scanRoutes(config, pluginConfig);
+  return processLayoutRoutes(routes, config, pluginConfig);
 };
 
 /** @type {(route: RouteConfig) => string} */

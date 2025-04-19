@@ -3,7 +3,7 @@ import { dirname, join, resolve } from "node:path";
 import process from "node:process";
 import { transformWithEsbuild } from "vite";
 import { routes } from "../router/routes.mjs";
-import { generateRoute, processLayoutRoutes, scanRoutes } from "./helpers.mjs";
+import { generateRoute, getRoutes } from "./helpers.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -118,27 +118,22 @@ export default function VitePluginVanJS(options = {}) {
     },
     async load(id, ops) {
       if (id === "\0virtual:@vanjs/routes") {
-        const currentRoutes = await scanRoutes(config, pluginConfig);
+        const currentRoutes = await getRoutes(config, pluginConfig);
         if (!currentRoutes || !currentRoutes.length) {
           // don't crash the server if no routes are found
           // devs might not use file system router
           return "";
         }
 
-        const routesWithLayouts = processLayoutRoutes(
-          currentRoutes,
-          config,
-          pluginConfig,
-        );
         const routesScript = `
 import { Route } from "@vanjs/router/routes.mjs";
 import { lazy } from "@vanjs/router/lazy.mjs";
 
 // Register routes
-${routesWithLayouts.map(generateRoute).join("\n")}
+${currentRoutes.map(generateRoute).join("\n")}
 ${
           ops.ssr
-            ? `console.log(\`🍦 @vanjs/router registered ${routesWithLayouts.length} routes.\`)`
+            ? `console.log(\`🍦 @vanjs/router registered ${currentRoutes.length} routes.\`)`
             : ""
         }
 `;

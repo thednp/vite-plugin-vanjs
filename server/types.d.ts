@@ -78,3 +78,11 @@ export const processLayoutRoutes: (
   config: ResolvedConfig,
   pluginConfig: PluginConfig,
 ) => Promise<Array<PageFile & { layouts: Array<LayoutFile> }>>;
+
+/**
+ * Scan and process layouts and return them.
+ */
+export const getRoutes: (
+  config: ResolvedConfig,
+  pluginConfig: PluginConfig,
+) => Promise<Array<PageFile & { layouts: Array<LayoutFile> }>>;

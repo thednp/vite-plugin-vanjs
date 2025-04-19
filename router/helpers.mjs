@@ -2,7 +2,6 @@
 import isServer from "../setup/isServer.mjs";
 import { routerState, setRouterState } from "./state.mjs";
 import { matchRoute } from "./routes.mjs";
-export * from "../plugin/helpers.mjs";
 
 /** @typedef {import("./types.d.ts").Route} Route */
 /** @typedef {import("./types.d.ts").VanNode} VanNode */
