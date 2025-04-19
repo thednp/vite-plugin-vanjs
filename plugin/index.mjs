@@ -61,7 +61,7 @@ export default function VitePluginVanJS(options = {}) {
     },
     /** @param {import("vite").ViteDevServer} server */
     configureServer(server) {
-      // Watch pages directory
+      // Watch routes directory
       const pagesPath = join(config.root, routesDir);
       const changeHandler = (file) => {
         if (file.startsWith(pagesPath)) {
@@ -136,8 +136,12 @@ export default function VitePluginVanJS(options = {}) {
         }
 
         const routesScript = `
-import { Route } from "@vanjs/router/routes.mjs";
+import { Route, routes } from "@vanjs/router/routes.mjs";
 import { lazy } from "@vanjs/router/lazy.mjs";
+
+// Reset current routes
+console.log('routesScript', routes);
+routes.length = 0;
 
 // Register routes
 ${currentRoutes.map(generateRoute).join("\n")}
