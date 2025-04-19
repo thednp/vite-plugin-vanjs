@@ -48,12 +48,12 @@ bun add vite-plugin-vanjs@latest
 ### Wiki
 
 For a complete guide on how to use the plugin, be sure to check the wiki:
-* [Quick Start](/thednp/vite-plugin-vanjs/wiki/Quick-Start): the right place to get started;
-* [Routing](/thednp/vite-plugin-vanjs/wiki/Routing): a complete guide on how to configure routing;
-* [Metadata](/thednp/vite-plugin-vanjs/wiki/Metadata): the quick guide to help you manage your app meta tags;
+* [Quick Start](https://github.com/thednp/vite-plugin-vanjs/wiki/Quick-Start): the right place to get started;
+* [Routing](https://github.com/thednp/vite-plugin-vanjs/wiki/Routing): a complete guide on how to configure routing;
+* [Metadata](https://github.com/thednp/vite-plugin-vanjs/wiki/Metadata): the quick guide to help you manage your app meta tags;
 * [JSX](https://github.com/thednp/vite-plugin-vanjs/wiki/JSX): a complete guide on how to use JSX transformation;
 * [Isomorphic](https://github.com/thednp/vite-plugin-vanjs/wiki/Isomorphic): a quick guide on isomorphism in VanJS;
-* [About](/thednp/vite-plugin-vanjs/wiki/About): some note on the project.
+* [About](https://github.com/thednp/vite-plugin-vanjs/wiki/About): some note on the project.
 
 
 ### Credits
