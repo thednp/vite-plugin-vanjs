@@ -5,13 +5,13 @@ on:
     branches:
       - master
     paths:
-      - plugin
-      - jsx
-      - router
-      - meta
-      - server
-      - client
-      - tests
+      - plugin/*
+      - jsx/*
+      - router/*
+      - meta/*
+      - server/*
+      - client/*
+      - tests/*
       - package.json
       - .github/workflows/ci.yml
 

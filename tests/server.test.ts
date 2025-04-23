@@ -230,11 +230,11 @@ describe(`Test SSR`, () => {
     routes.length = 0;
     const plugin2 = vanjs({ routesDir: "tests/not-exist" });
     plugin2.configResolved({ mode: "development", root: toAbsolute("..") } as any);
-    expect((await plugin2.load("\0virtual:@vanjs/routes", { ssr: false }))).toBeNull();
+    expect((await plugin2.load("\0virtual:@vanjs/routes", { ssr: false }))).toEqual({ code: "", map: null});
     expect(routes.length).toEqual(0);
     const plugin3 = vanjs({ routesDir: "tests/routes/empty" });
     plugin3.configResolved({ mode: "development", root: toAbsolute("..") } as any);
-    expect((await plugin2.load("\0virtual:@vanjs/routes", { ssr: false }))).toBeNull();
+    expect((await plugin2.load("\0virtual:@vanjs/routes", { ssr: false }))).toEqual({ code: "", map: null});
     const plugin4 = vanjs();
     expect((await plugin4.load("not-exist", { ssr: false }))).toBeNull();
   });

@@ -101,6 +101,8 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
 
     const children = van.derive(() => {
       const route = csrRoute.val;
+      // istanbul ignore if - can only be tested in client
+      if (!route) return [div("No Route Found")];
       const md = route.component();
       executeLifecycle(md, route.params);
       // istanbul ignore next - cannot test all cases

@@ -39,9 +39,9 @@ declare const VitePluginVanJS: (options?: Partial<VitePluginVanJSOptions>) => {
     id: string,
     ops?: { ssr?: boolean | undefined },
   ):
-    | string
+    | null
     | { code: string; map: string | null }
-    | Promise<string | { code: string; map: string | null }>;
+    | Promise<null | { code: string; map: string | null }>;
 };
 export default VitePluginVanJS;
 

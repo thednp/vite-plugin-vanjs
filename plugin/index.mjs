@@ -158,7 +158,7 @@ export default function VitePluginVanJS(options = {}) {
         if (!currentRoutes || !currentRoutes.length) {
           // don't crash the server if no routes are found
           // devs might not use file system router
-          return null;
+          return { code: "", map: null };
         }
 
         const routesScript = `
