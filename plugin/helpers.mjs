@@ -3,8 +3,8 @@
 /** @typedef {import("./types").LayoutFile} LayoutFile */
 /** @typedef {import("./types").RouteFile} RouteFile */
 
-import { normalizePath } from "vite";
-import { dirname, join } from "node:path";
+// import { normalizePath } from "vite";
+import { dirname, join, posix, win32 } from "node:path";
 import { existsSync } from "node:fs";
 import { readdir } from "node:fs/promises";
 
@@ -72,6 +72,12 @@ export const globFiles = async (dir, extensions) => {
   await scan(dir);
   return files;
 };
+
+const normalizePathRegExp = new RegExp(`\\${win32.sep}`, "g");
+/** @param {string} filename */
+function normalizePath(filename) {
+  return filename.replace(normalizePathRegExp, posix.sep);
+}
 
 /**
  * Scan routes directory and generate routes.
