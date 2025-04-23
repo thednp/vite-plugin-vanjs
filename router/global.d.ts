@@ -14,20 +14,30 @@ declare module "@vanjs/router" {
   } from "vanjs-core";
 
   // type VanElement = VElement | Exclude<Primitive, boolean | undefined>;
-  type DOMElement = globalThis.Element;
+  // type DOMElement = globalThis.Element;
   type PrimitiveChild = Primitive | State<Primitive | undefined | null>;
 
-  type VanElement =
+  type DOMElement<T extends keyof HTMLElementTagNameMap = "div"> =
     | SVGElement
     | HTMLElement
-    | DOMElement
     | Node
+    | HTMLElementTagNameMap[T];
+
+  export type VanElement =
+    | DOMElement
     | VElement
     | PrimitiveChild;
+  // type VanElement =
+  //   | SVGElement
+  //   | HTMLElement
+  //   | DOMElement
+  //   | Node
+  //   | VElement
+  //   | PrimitiveChild;
   export type VanNode =
     | VanElement
-    | VanNode[]
-    | (() => VanNode)
+    | VanElement[]
+    | (() => VanElement | VanElement[])
     | null
     | undefined;
 
@@ -126,6 +136,7 @@ declare module "@vanjs/router" {
   export type RouteEntry = {
     path: string;
     component: Promise<ComponentModule>;
+    params?: Record<string, string>;
     preload?: (
       params?: Record<string, string>,
     ) => boolean | void | Promise<boolean | void>;
@@ -141,9 +152,16 @@ declare module "@vanjs/router" {
         | HTMLElementTagNameMap[unknown]
         | HTMLElementTagNameMap[unknown][])
       | VanComponent
-      | (() => ComponentModule);
-    preload?: (params?: Record<string, string>) => void;
-    load?: (params?: Record<string, string>) => void;
+      | ComponentFn
+      | (() => Promise<DynamicModule>);
+    //   | ComponentModule["component"];
+    // component: ComponentFn | (() => Promise<ComponentModule>);
+    preload?: (
+      params?: Record<string, string>,
+    ) => boolean | void | Promise<boolean | void>;
+    load?: (
+      params?: Record<string, string>,
+    ) => boolean | void | Promise<boolean | void>;
   };
   export const routes: RouteEntry[];
 
@@ -192,38 +210,50 @@ declare module "@vanjs/router" {
 
   /**
    * Merge the children of an Element or an array of elements with an optional array of children
-   * into the childen of a single HTMLFragmentElement element.
-   * @param  source
-   * @param  {...VanNode[]} children
+   * into the childen prperty of a simple object.
+   * @param source
+   * @param children
    */
   export const unwrap: (
     source:
       | VanNode
-      | IsoTagFunc
       | VanNode[]
-      | IsoTagFunc[]
-      | (() => IsoTagFunc | IsoTagFunc[] | VanNode | VanNode[]),
-    ...children: VanNode[]
-  ) => VanNode;
+      | VanComponent
+      | { children: VanNode[] }
+      | ComponentFn
+      | ReturnType<IsoTagFunc>
+      | ReturnType<IsoTagFunc>[]
+      | (() =>
+        | ReturnType<IsoTagFunc>
+        | ReturnType<IsoTagFunc>[]
+        | VanNode
+        | VanNode[]),
+    ...children: ChildDom[]
+  ) => { children: ChildDom[] };
+
+  export type JSXComponentFn = () => JSX.Element;
+  export type ComponentFn = VanComponent | JSXComponentFn;
 
   export type ComponentModule = {
-    component: VanComponent | JSX.Element;
-    route: Pick<RouteEntry, "load" | "preload">;
+    component: ComponentFn;
+    route?: Pick<RouteEntry, "load" | "preload">;
   };
 
   export type DynamicModule = {
-    Page: VanComponent | JSX.Element;
-    default?: VanComponent | JSX.Element;
+    Page: ComponentFn;
+    default?: ComponentFn;
     route?: Pick<RouteEntry, "load" | "preload">;
   };
 
   export type LazyComponent = Promise<DynamicModule>;
 
+  export type ImportFn = () => LazyComponent;
+
   /**
    * Registers a lazy component.
    * @param importFn
    */
-  export const lazy: (importFn: () => LazyComponent) => () => ComponentModule;
+  export const lazy: (importFn: ImportFn) => () => Promise<ComponentModule>;
 
   /**
    * Fixes the URL of a route.
@@ -236,8 +266,8 @@ declare module "@vanjs/router" {
    */
   export const executeLifecycle: (
     { route }: ComponentModule,
-    params: Record<string, string> | undefined,
-  ) => Promise<boolean>;
+    params?: Record<string, string> | undefined,
+  ) => Promise<boolean | void>;
 
   /**
    * Find a registered route that matches the given path

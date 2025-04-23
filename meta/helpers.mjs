@@ -1,5 +1,4 @@
-import setup from "../setup/index.mjs";
-// import { getAttributes } from "@thednp/domparser/parser";
+import isServer from "../setup/isServer.mjs";
 
 /** @type {typeof import('./types.d.ts').parseAttributes} */
 export const parseAttributes = (attributeString) => {
@@ -33,7 +32,7 @@ const getTagAttribute = (tag) => {
   ];
 
   for (const attr of attributes) {
-    const value = setup.isServer ? tag[attr] : tag.getAttribute(attr);
+    const value = isServer ? tag[attr] : tag.getAttribute(attr);
 
     if (value) return value;
   }
@@ -42,9 +41,8 @@ const getTagAttribute = (tag) => {
 
 /** @type {typeof import('./types.d.ts').getTagKey} */
 export const getTagKey = (tag) => {
-  const normalizedTag = setup.isServer
+  const normalizedTag = isServer
     ? { tagName: tag.name.toUpperCase(), ...parseAttributes(tag.propsStr) }
-    // ? { tagName: tag.name.toUpperCase(), ...getAttributes(tag.propsStr) }
     : tag;
 
   return normalizedTag.tagName +

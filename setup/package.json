@@ -18,7 +18,7 @@
       "import": "./van.mjs"
     },
     "./van-ssr": {
-      "types": "./van.d.ts",
+      "types": "./van-ssr.d.ts",
       "import": "./van-ssr.mjs"
     },
     "./van-debug": {

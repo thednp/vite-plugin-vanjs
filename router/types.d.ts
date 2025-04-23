@@ -12,22 +12,26 @@ import type {
   PropValueOrDerived,
   State,
 } from "vanjs-core";
+import { LayoutFile } from "../plugin/types";
 
 // type VanElement = VElement | Exclude<Primitive, boolean | undefined>;
-type DOMElement = globalThis.Element;
+// type DOMElement = globalThis.Element;
 type PrimitiveChild = Primitive | State<Primitive | undefined | null>;
 
-type VanElement =
+type DOMElement<T extends keyof HTMLElementTagNameMap = "div"> =
   | SVGElement
   | HTMLElement
-  | DOMElement
   | Node
+  | HTMLElementTagNameMap[T];
+
+export type VanElement =
+  | DOMElement
   | VElement
   | PrimitiveChild;
 export type VanNode =
   | VanElement
-  | VanNode[]
-  | (() => VanNode)
+  | VanElement[]
+  | (() => VanElement | VanElement[])
   | null
   | undefined;
 
@@ -125,7 +129,9 @@ export const redirect: (href?: string) => void | (() => void);
 // routes.mjs
 export type RouteEntry = {
   path: string;
-  component: Promise<ComponentModule>;
+  component: () => Promise<ComponentModule>;
+  // component: () => Promise<DynamicModule>;
+  params?: Record<string, string>;
   preload?: (
     params?: Record<string, string>,
   ) => boolean | void | Promise<boolean | void>;
@@ -134,14 +140,32 @@ export type RouteEntry = {
   ) => boolean | void | Promise<boolean | void>;
 };
 
+export type ImportFn = () => LazyComponent;
+
+/**
+ * Registers a lazy component.
+ * @param importFn
+ */
+export const lazy: (importFn: ImportFn) => () => Promise<ComponentModule>;
+
 export type RouteProps = {
   path: string;
+  params?: Record<string, string>;
   component:
-    | (() => HTMLElementTagNameMap[unknown] | HTMLElementTagNameMap[unknown][])
+    // | (() => HTMLElementTagNameMap[unknown] | HTMLElementTagNameMap[unknown][])
+    // | VanNode
+    | (() => DOMElement)
     | VanComponent
-    | (() => ComponentModule);
-  preload?: (params?: Record<string, string>) => void;
-  load?: (params?: Record<string, string>) => void;
+    | ComponentFn
+    | (() => Promise<DynamicModule>);
+  //   | ComponentModule["component"];
+  // component: ComponentFn | (() => Promise<ComponentModule>);
+  preload?: (
+    params?: Record<string, string>,
+  ) => boolean | void | Promise<boolean | void>;
+  load?: (
+    params?: Record<string, string>,
+  ) => boolean | void | Promise<boolean | void>;
 };
 
 export type RouteConfig = {
@@ -195,40 +219,49 @@ export const setRouterState: (
   params?: Record<string, string>,
 ) => void;
 
+export type UnwrapResult = {
+  children: VanNode[];
+};
+
 /**
  * Merge the children of an Element or an array of elements with an optional array of children
- * into the childen of a single HTMLFragmentElement element.
- * @param  source
- * @param  {...VanNode[]} children
+ * into the childen prperty of a simple object.
+ * @param source
+ * @param children
  */
+
 export const unwrap: (
   source:
     | VanNode
-    | IsoTagFunc
     | VanNode[]
-    | IsoTagFunc[]
-    | (() => IsoTagFunc | IsoTagFunc[] | VanNode | VanNode[]),
+    | VanComponent
+    | { children: VanNode[] }
+    | ComponentFn
+    | ReturnType<IsoTagFunc>
+    | ReturnType<IsoTagFunc>[]
+    | (() =>
+      | ReturnType<IsoTagFunc>
+      | ReturnType<IsoTagFunc>[]
+      | VanNode
+      | VanNode[]),
   ...children: VanNode[]
-) => VanNode;
+) => UnwrapResult;
+
+export type JSXComponentFn = () => JSX.Element;
+export type ComponentFn = VanComponent | JSXComponentFn;
 
 export type ComponentModule = {
-  component: VanComponent | JSX.Element;
-  route: Pick<RouteEntry, "load" | "preload">;
+  component: ComponentFn;
+  route?: Pick<RouteEntry, "load" | "preload">;
 };
 
 export type DynamicModule = {
-  Page: VanComponent | JSX.Element;
-  default?: VanComponent | JSX.Element;
+  Page: ComponentFn;
+  default?: ComponentFn;
   route?: Pick<RouteEntry, "load" | "preload">;
 };
 
 export type LazyComponent = Promise<DynamicModule>;
-
-/**
- * Registers a lazy component.
- * @param importFn
- */
-export const lazy: (importFn: () => LazyComponent) => () => ComponentModule;
 
 /**
  * Fixes the URL of a route.
@@ -241,13 +274,13 @@ export const fixRouteUrl: (url: string) => string;
  * @param key the cache route key
  * @param value the cache route
  */
-export const cache: (key: string, value: () => LazyComponent) => void;
+export const cache: (key: ImportFn, value: ComponentModule) => void;
 
 /**
  * Return a route cache.
  * @param key the cache route key
  */
-export const getCached: (key) => ComponentModule;
+export const getCached: (key: typeof importFn) => ComponentModule | undefined;
 
 /**
  * Execute lifecycle methods preload and / or load

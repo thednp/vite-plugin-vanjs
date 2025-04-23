@@ -3,10 +3,14 @@ import isServer from "../setup/isServer.mjs";
 import { routerState, setRouterState } from "./state.mjs";
 import { matchRoute } from "./routes.mjs";
 
+/** @typedef {typeof import("./types.d.ts").unwrap} Unwrap */
+/** @typedef {typeof import("./types.d.ts").navigate} Navigate */
 /** @typedef {import("./types.d.ts").Route} Route */
 /** @typedef {import("./types.d.ts").VanNode} VanNode */
 /** @typedef {import("./types.d.ts").ComponentModule} ComponentModule */
-/** @typedef {import('vanjs-core').TagFunc} TagFunc */
+/** @typedef {import("./types.d.ts").DynamicModule} DynamicModule */
+/** @typedef {import("./types.d.ts").ComponentFn} ComponentFn */
+/** @typedef {import("./types.d.ts").LazyComponent} LazyComponent */
 
 /**
  * Check if selected page is the current page;
@@ -19,22 +23,24 @@ export const isCurrentPage = (pageName) => {
 
 /**
  * Merge the children of an Element or an array of elements with an optional array of children
- * into the childen of a single HTMLFragmentElement element.
- * @param {Element | () => Element | Element[]} source
- * @param  {...Element[]} children
- * @returns {TagFunc<HTMLFragmentElement> | HTMLElement}
+ * into the childen prperty of a simple object.
+ * @type {Unwrap}
  */
 export const unwrap = (source, ...children) => {
   const layout = () => {
-    const pageChildren = Array.isArray(source?.children)
-      ? source.children
-      : typeof source === "function"
-      ? [...source()?.children || source()]
-      : typeof HTMLElement !== "undefined" && source instanceof HTMLElement
-      ? [...source.children]
-      : /* istanbul ignore next */ Array.isArray(source)
-      ? source
-      : [source];
+    /** @type {VanNode[]} */
+    const pageChildren =
+      source && typeof source === "object" && "children" in source &&
+        Array.isArray(source?.children)
+        ? source.children
+        : typeof source === "function"
+        // @ts-expect-error - this case is specific to VanJS components in SSR
+        ? [...source()?.children || source()]
+        : typeof HTMLElement !== "undefined" && source instanceof HTMLElement
+        ? [...source.children]
+        : /* istanbul ignore next */ Array.isArray(source)
+        ? source
+        : [source];
 
     // return van.tags.fragment(
     // ...(children || /* istanbul ignore next */ []),
@@ -52,16 +58,17 @@ export const unwrap = (source, ...children) => {
 
 /**
  * Check if component is a lazy component
- * @param {unknown} component
- * @returns {component is (() => Promise<VanNode | VanNode[]>)}
+ * @param {ComponentFn | (() => LazyComponent)} component
+ * @returns {component is (() => LazyComponent)}
  */
 export const isLazyComponent = (component) => {
   // Server: Check if it's an async function
-  if (isServer) {
+  if (isServer && typeof component === "function") {
     return component.constructor.name.includes("AsyncFunction");
   }
 
   // Client: Check if it's designated as lazy
+  // @ts-expect-error - this property is optional and on purpose
   return component?.isLazy === true;
 };
 
@@ -88,10 +95,7 @@ export const executeLifecycle = async ({ route }, params) => {
 
 /**
  * Client only navigation utility.
- * @param {string} path - The path to navigate to
- * @param {{ replace: boolean } | undefined} options - Navigation options
- * @param {boolean} options.replace - Whether to replace current history entry
- * @returns {void}
+ * @type {Navigate}
  */
 export const navigate = (path, options = {}) => {
   const { replace = false } = options;
@@ -121,9 +125,10 @@ export const navigate = (path, options = {}) => {
  * Extract route params
  * @param {string} pattern
  * @param {string} path
- * @returns {Record<string, string>}
+ * @returns {Record<string, string> | null}
  */
 export const extractParams = (pattern, path) => {
+  /** @type {Record<string, string>} */
   const params = {};
   const patternParts = pattern.split("/");
   const pathParts = path.split("/");

@@ -1,10 +1,10 @@
 // router/state.js
 import van from "vanjs-core";
-import setup from "../setup/index.mjs";
+import isServer from "../setup/isServer.mjs";
 import { fixRouteUrl } from "./helpers.mjs";
 
-const initialPath = !setup.isServer ? globalThis.location.pathname : "/";
-const initialSearch = !setup.isServer ? globalThis.location.search : "";
+const initialPath = !isServer ? globalThis.location.pathname : "/";
+const initialSearch = !isServer ? globalThis.location.search : "";
 
 /**
  * @type {typeof import("./types.d.ts").routerState}

@@ -4,6 +4,8 @@ import { lazy } from "./lazy.mjs";
 
 /** @typedef {import("./types.d.ts").RouteEntry} RouteEntry */
 /** @typedef {import("./types.d.ts").RouteProps} RouteProps */
+/** @typedef {import("./types.d.ts").DynamicModule} DynamicModule */
+/** @typedef {import("./types.d.ts").ComponentModule} ComponentModule */
 
 /** @type {RouteEntry[]} */
 export const routes = [];
@@ -22,17 +24,21 @@ export const Route = (routeProps) => {
 
   // If component isn't lazy, make it lazy
   if (!isLazyComponent(component)) {
+    /** @type {() => Promise<ComponentModule>} */
     const wrappedComponent = lazy(() =>
-      Promise.resolve({
-        default: component,
-        route: { preload, load },
-      })
+      new Promise((resolve) =>
+        resolve({
+          Page: component,
+          route: { preload, load },
+        })
+      )
     );
     routes.push({ ...rest, path, component: wrappedComponent });
     return;
   }
 
   // Otherwise keep original component
+  // @ts-expect-error - RouteProps and RouteEntry are now equivalent
   routes.push(routeProps);
 };
 
@@ -54,7 +60,8 @@ export const matchRoute = (initialPath) => {
   if (exactMatch) {
     return {
       ...exactMatch,
-      params: extractParams(exactMatch.path, path),
+      params: extractParams(exactMatch.path, path) ?? /* istanbul ignore next */
+        undefined,
     };
   }
 

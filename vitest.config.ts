@@ -1,10 +1,10 @@
-import { defineConfig } from "vitest/config";
+import { defineConfig, Plugin } from "vitest/config";
 import vanjs from "vite-plugin-vanjs";
 
 export default defineConfig({
-  plugins: [vanjs({ routesDir: "tests/routes" })],
+  plugins: [vanjs({ routesDir: "tests/routes" }) ],
   test: {
-    // globals: true,
+    globals: true,
     include: [
       "tests/**.test.?(c|m)[jt]s?(x)",
     ],

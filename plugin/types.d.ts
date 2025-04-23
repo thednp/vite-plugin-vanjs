@@ -26,10 +26,18 @@ declare const VitePluginVanJS: (options?: Partial<VitePluginVanJSOptions>) => {
   };
   configResolved(resolvedConfig: ResolvedConfig): void;
   configureServer(server: ViteDevServer): void;
-  resolveId(id: string): string;
+  resolveId(
+    source: string,
+    importer?: string,
+    options?: {
+      attributes: Record<string, string>;
+      ssr?: boolean | undefined;
+      isEntry: boolean;
+    },
+  ): string;
   load(
     id: string,
-    ops,
+    ops?: { ssr?: boolean | undefined },
   ):
     | string
     | { code: string; map: string | null }

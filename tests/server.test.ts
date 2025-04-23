@@ -1,12 +1,40 @@
-import { expect, test, describe } from "vitest";
+// @vitest-environment node
+import process from "node:process";
+import { fileURLToPath } from "node:url";
+import { dirname, resolve, join } from "node:path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const toAbsolute = (p:string) => resolve(__dirname, p);
+
+import { expect, test, describe, vi, afterEach } from "vitest";
 import { Head, Title, Meta, Script, Style, Link, resetHeadTags } from "@vanjs/meta";
 import van from "@vanjs/van";
 import vanX from "@vanjs/vanX";
-import vanjs from "vite-plugin-vanjs";
+import { type Element as VanElement } from "mini-van-plate/van-plate";
+import vanjs from "../plugin/index.mjs";
 import { renderToString, renderPreloadLinks } from "@vanjs/server";
-import { Router, Route, lazy, setRouterState, routerState, fixRouteUrl } from "@vanjs/router";
+import { Router, Route, lazy, setRouterState, routerState, fixRouteUrl, routes } from "@vanjs/router";
+
+// import "virtual:@vanjs/routes";
 
 describe(`Test SSR`, () => {
+
+  // Mock Vite's internals
+  vi.mock('vite', () => ({
+    normalizePath: (path: string) => path.replace(/\\/g, '/'),
+    transformWithEsbuild: vi.fn().mockImplementation((code) => 
+      Promise.resolve({ 
+        code,  // return the same code that was passed
+        map: null 
+      })
+    ),
+  }));
+
+  afterEach(async () => {
+    process.env.NODE_ENV = "test";
+  });
+
   test(`Test meta tags`, async () => {
     resetHeadTags();
     const defaultHead = () => [
@@ -39,6 +67,8 @@ describe(`Test SSR`, () => {
   test('Test prerendering assets', async () => {
     const manifest = {
       'src/van.js': ['/src/van.js'],
+      'src/pages/layout.js': [],
+      'src/pages/home.js': ['src/pages/layout.js'],
       'setup/van.mjs': ['/src/setup/van.js'],
       'src/app.css': ['/assets/app.css'],
       'src/app.ts': ['/src/app.js'],
@@ -70,29 +100,200 @@ describe(`Test SSR`, () => {
     expect(mk).to.equal("");
   });
 
-  test('Test plugin', async () => {
-    const plugin = vanjs();
-    expect(plugin.name).to.equal('vanjs');
-    expect(typeof plugin.config()?.resolve?.alias["@vanjs/setup"]).to.not.equal('undefined');
-//     const sampleCode = `// test code
-// import van from "vanjs-core";
-// import { reactive } from "vanjs-ext";
-// import { list } from "vanjs-ext";`;
-//     const transformed = plugin.transform(sampleCode, '/modules/some-path.js');
-
-//     expect(transformed.code).to.include('@vanjs/van')
-//     expect(transformed.code).to.include('@vanjs/vanX')
-  });
-
   test("Test setup", async () => {
     const { reactive } = vanX;
-    const obj = { a: 1, b: 2 }
+    const { div, a } = van.tags;
+    const classString = van.state("sample-class");
+    const { svg, path } = van.tags("http://www.w3.org/2000/svg");
+    const obj = { a: 1, b: 2 };
+    const Div = div("Sample div") as unknown as VanElement;
+    const Anchor = a({ href: "/contact", onclick: () => console.log("clicked") }, "Click me") as unknown as VanElement;
+    const Anchor1 = a({ href: "/contact", class: classString }, "Click me") as unknown as VanElement;
+    const Icon = svg({
+        xmlns: "http://www.w3.org/2000/svg",
+        viewBox: "0 0 24 24",
+        fill: "none",
+        width: "32", height: "32",
+        stroke: "currentColor", "stroke-width": "1", "stroke-linecap": "round", "stroke-linejoin": "round",
+        class: "text-stone-500 mb-4"
+      },
+      path({"d": "M5 12h14"}),
+      path({"d": "m12 5 7 7-7 7"}),
+    ) as unknown as VanElement;
 
+    // console.log({Anchor1: Anchor1.render()})
     expect(reactive(obj).a).to.equal(1);
     expect(reactive(obj).b).to.equal(2);
+    expect((vanX as typeof vanX & { default: typeof vanX}).default).toBeDefined();
+
+    expect(Div.render()).toContain("Sample div");
+    expect(Anchor.render()).not.toContain("onclick");
+    expect(Anchor.render()).toContain("data-hk");
+    expect(Anchor1.render()).toContain("class");
+    expect(Anchor1.render()).toContain("data-hk");
+    expect(Icon.render()).toContain("http://www.w3.org/2000/svg");
+  });
+
+  test('Test plugin', async () => {
+    const plugin = vanjs({
+      routesDir: "tests/routes"
+    });
+    const config = plugin.config();
+
+    // expect(typeof plugin.config()?.resolve?.alias["@vanjs/setup"]).to.not.equal('undefined');
+    expect(plugin).toEqual(expect.objectContaining({
+      name: 'vanjs',
+      enforce: 'pre',
+      config: expect.any(Function),
+      configResolved: expect.any(Function),
+      configureServer: expect.any(Function),
+      resolveId: expect.any(Function),
+      load: expect.any(Function),
+    }));
+
+    // coverage
+    plugin.configResolved({ mode: "development", root: toAbsolute("..") } as any);
+    // virtual:module 
+    expect(plugin.resolveId('virtual:@vanjs/routes', undefined, { ssr: false })).toEqual('\0virtual:@vanjs/routes');
+    // resolve modules development
+    process.env.NODE_ENV = 'development';
+    const resolvedSetupSSR = plugin.resolveId('@vanjs/setup', undefined, { ssr: true });
+    let resolvedSetup = plugin.resolveId('@vanjs/setup', undefined, { ssr: false });
+    let resolvedVan = plugin.resolveId('@vanjs/van', undefined, { ssr: false });
+    let resolvedVanSSR = plugin.resolveId('@vanjs/van', undefined, { ssr: true });
+    let resolvedVanX = plugin.resolveId('@vanjs/vanX', undefined, { ssr: false });
+    let resolvedVanXSSR = plugin.resolveId('@vanjs/vanX', undefined, { ssr: true });
+    expect(plugin.resolveId(resolvedSetupSSR!, undefined, {ssr: true})).toEqual(toAbsolute('../setup/index-ssr.mjs'));
+    expect(plugin.resolveId(resolvedSetup!, undefined, { ssr: false })).toEqual(toAbsolute('../setup/index-debug.mjs'));
+    expect(plugin.resolveId(resolvedVanSSR!, undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
+    expect(plugin.resolveId(resolvedVan!, undefined, { ssr: false })).toEqual(toAbsolute('../setup/van-debug.mjs'));
+    expect(plugin.resolveId(resolvedVanXSSR!, undefined, { ssr: true } )).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect(plugin.resolveId(resolvedVanX!, undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
+    expect(resolvedSetupSSR).toEqual(toAbsolute('../setup/index-ssr.mjs'));
+    expect(resolvedSetup).toEqual(toAbsolute('../setup/index-debug.mjs'));
+    expect(resolvedVanSSR).toEqual(toAbsolute('../setup/van-ssr.mjs'));
+    expect(resolvedVan).toEqual(toAbsolute('../setup/van-debug.mjs'));
+    expect(resolvedVanXSSR).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect(resolvedVanX).toEqual(toAbsolute('../setup/vanX.mjs'));
+    // resolve modules production
+    process.env.NODE_ENV = 'production';
+    resolvedSetup = plugin.resolveId('@vanjs/setup', undefined, { ssr: false });
+    resolvedVan = plugin.resolveId('@vanjs/van', undefined, { ssr: false });
+    resolvedVanSSR = plugin.resolveId('@vanjs/van', undefined, { ssr: true });
+    resolvedVanX = plugin.resolveId('@vanjs/vanX', undefined, { ssr: false });
+    resolvedVanXSSR = plugin.resolveId('@vanjs/vanX', undefined, { ssr: true });
+    expect(resolvedSetupSSR).toEqual(toAbsolute('../setup/index-ssr.mjs'));
+    expect(resolvedSetup).toEqual(toAbsolute('../setup/index.mjs'));
+    expect(resolvedVanSSR).toEqual(toAbsolute('../setup/van-ssr.mjs'));
+    expect(resolvedVan).toEqual(toAbsolute('../setup/van.mjs'));
+    expect(resolvedVanXSSR).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect(resolvedVanX).toEqual(toAbsolute('../setup/vanX.mjs'));
+
+    // edge cases
+    expect(plugin.resolveId("src/van.js", "src/van-debug.js", { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
+    expect(plugin.resolveId("src/some-plugin-dont-exist", "another-importer", { ssr: true })).toEqual(null);
+
+    process.env.NODE_ENV = 'development';
+
+    // console.log("toAbsolute(\"..\")", toAbsolute(".."));
+    // console.log("resolveSomeID", toAbsolute('../tests/routes/admin.ts'));
+
+    expect(config).toEqual({
+      ssr: {
+        noExternal: ['vanjs-*', '*-vanjs', '@vanjs/*'],
+      },
+      resolve: {
+        alias: {
+          '@vanjs/setup': expect.any(String),
+          '@vanjs/van': expect.any(String),
+          '@vanjs/vanX': expect.any(String),
+          '@vanjs/client': expect.any(String),
+          '@vanjs/server': expect.any(String),
+          '@vanjs/meta': expect.any(String),
+          '@vanjs/router': expect.any(String),
+          '@vanjs/jsx': expect.any(String),
+        },
+      },
+      esbuild: {
+        jsx: 'automatic',
+        jsxImportSource: '@vanjs/jsx',
+      },
+    });
+  });
+
+  test("Test filesystem router", async () => {
+    const plugin1 = vanjs({ routesDir: "tests/routes" });
+    plugin1.configResolved({ mode: "development", root: toAbsolute("..") } as any);
+    expect((await plugin1.load("\0virtual:@vanjs/routes", { ssr: true }))?.code.length).toBeGreaterThan(0);
+    // console.log(routes);
+    expect(routes.length).toEqual(7);
+    routes.length = 0;
+    const plugin2 = vanjs({ routesDir: "tests/not-exist" });
+    plugin2.configResolved({ mode: "development", root: toAbsolute("..") } as any);
+    expect((await plugin2.load("\0virtual:@vanjs/routes", { ssr: false }))).toBeNull();
+    expect(routes.length).toEqual(0);
+    const plugin3 = vanjs({ routesDir: "tests/routes/empty" });
+    plugin3.configResolved({ mode: "development", root: toAbsolute("..") } as any);
+    expect((await plugin2.load("\0virtual:@vanjs/routes", { ssr: false }))).toBeNull();
+    const plugin4 = vanjs();
+    expect((await plugin4.load("not-exist", { ssr: false }))).toBeNull();
+  });
+
+  test('Should set up file watchers correctly', () => {
+    const plugin = vanjs();
+  
+    // Store handlers in an object
+    const handlers: Record<string, (file: string) => void> = {};
+    
+    const mockServer = {
+      watcher: {
+        add: vi.fn(),
+        on: vi.fn().mockImplementation((event: string, handler: (file: string) => void) => {
+          // Store the handler when it's registered
+          handlers[event] = handler;
+        }),
+      },
+      moduleGraph: {
+        getModuleById: vi.fn(() => ({
+          // mock module if needed
+        })),
+        invalidateModule: vi.fn(),
+      },
+      hot: {
+        send: vi.fn(),
+      },
+    };
+
+    // Initialize plugin with config
+    plugin.configResolved({ 
+      root: '/mock/root',
+      mode: 'development'
+    } as any);
+
+    // Set up server
+    plugin.configureServer(mockServer as any);
+
+    // Verify watcher was set up
+    expect(mockServer.watcher.add).toHaveBeenCalledWith(join('/mock/root', 'src/routes'));
+    expect(mockServer.watcher.on).toHaveBeenCalledWith('add', expect.any(Function));
+    expect(mockServer.watcher.on).toHaveBeenCalledWith('change', expect.any(Function));
+    expect(mockServer.watcher.on).toHaveBeenCalledWith('unlink', expect.any(Function));
+
+    // Now we can trigger events using the stored handlers
+    handlers.add('/mock/root/src/routes/new-page.tsx');
+
+    // Verify the handler triggered appropriate actions
+    expect(mockServer.moduleGraph.getModuleById).toHaveBeenCalled();
+    expect(mockServer.hot.send).toHaveBeenCalledWith({ type: 'full-reload' });
+
+    // Test other events
+    handlers.change('/mock/root/src/routes/existing-page.tsx');
+    handlers.unlink('/mock/root/src/routes/deleted-page.tsx');
   });
 
   test("Test router", async () => {
+    // reset routes from file-system router
+    routes.length = 0;
     Route({
       path: '/',
       component: () => {
@@ -113,12 +314,12 @@ describe(`Test SSR`, () => {
     });
     Route({
       path: '/test',
-      component: lazy(() => import('./TestPage.ts'))
+      component: lazy(() => import('./routes/(root)/index.ts'))
     });
   
     Route({
       path: '/test/:someParam',
-      component: lazy(() => import('./TestPage.ts'))
+      component: lazy(() => import('./routes/(root)/index.ts'))
     });
 
     // set router state
@@ -130,9 +331,8 @@ describe(`Test SSR`, () => {
     expect(routerState.params.val).to.deep.equal({});
 
     await new Promise(res => setTimeout(res, 17));
-    // console.log({ html: document.body.innerHTML })
     let html = await renderToString(Router());
-    expect(html).to.contain('<h1>Hello VanJS!</h1>');
+    expect(html).to.contain('Hello VanJS!');
 
     // set router state
     setRouterState('/not-there');
@@ -144,8 +344,9 @@ describe(`Test SSR`, () => {
 
     await new Promise(res => setTimeout(res, 17));
     html = await renderToString(Router());
-    console.log({ html })
-    expect(html).to.contain('Error loading page');
+    // console.log({ html })
+    // expect(html).to.contain('Error loading page');
+    expect(html).to.contain('Not found');
 
     // set router state
     setRouterState('/test/1?query=1', undefined, { someParam: '1' });
@@ -159,9 +360,9 @@ describe(`Test SSR`, () => {
     await new Promise(res => setTimeout(res, 17));
     // console.log({ html: document.body.innerHTML })
     html = await renderToString(Router());
-    expect(html).to.contain('<h1>Hello VanJS!</h1>');
+    expect(html).to.contain('Hello VanJS!');
 
     expect(fixRouteUrl('')).toEqual("/")
     expect(fixRouteUrl('test')).toEqual("/test")
-  })
+  });
 });

@@ -16,7 +16,7 @@ function tagWithHydration(ns, name, ...args) {
     props && (
       Object.keys(props).some((k) => k.startsWith("on")) || // has events
       Object.values(props).some((v) =>
-        v && typeof v === "function" && "val" in v
+        v && typeof v === "object" && "val" in v
       ) || // has state
       typeof args[0] === "function" // is component
     )

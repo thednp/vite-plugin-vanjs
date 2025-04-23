@@ -1,3 +1,7 @@
+/** @typedef {import("vite").ResolvedConfig} ResolvedConfig */
+/** @typedef {import("./types").PageFile} PageFile */
+/** @typedef {import("./types").RouteFile} RouteFile */
+
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import process from "node:process";
@@ -7,9 +11,8 @@ import { generateRoute, getRoutes } from "./helpers.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const isProduction = process.env.NODE_ENV === "production";
-
-/** @typedef {import("vite").ResolvedConfig} ResolvedConfig */
+/** @param {string} p */
+const toAbsolute = (p) => resolve(__dirname, p);
 
 const pluginDefaults = {
   routesDir: "src/routes",
@@ -22,7 +25,7 @@ export default function VitePluginVanJS(options = {}) {
 
   /** @type {ResolvedConfig} */
   let config;
-  /** @type {PageFile[] | null} */
+  /** @type {RouteFile[] | null} */
   let routeCache = null;
 
   const virtualModuleId = "virtual:@vanjs/routes";
@@ -38,15 +41,14 @@ export default function VitePluginVanJS(options = {}) {
         },
         resolve: {
           alias: {
-            "@vanjs/setup": resolve(__dirname, "../setup/index"),
-            "@vanjs/van": resolve(__dirname, "../setup/van"),
-            "@vanjs/vanX": resolve(__dirname, "../setup/vanX"),
-            "@vanjs/client": resolve(__dirname, "../client"),
-            "@vanjs/server": resolve(__dirname, "../server"),
-            "@vanjs/meta": resolve(__dirname, "../meta"),
-            "@vanjs/router": resolve(__dirname, "../router"),
-            "@vanjs/jsx": resolve(__dirname, "../jsx"),
-            "@vanjs/parser": resolve(__dirname, "../parser"),
+            "@vanjs/setup": toAbsolute("../setup/index"),
+            "@vanjs/van": toAbsolute("../setup/van"),
+            "@vanjs/vanX": toAbsolute("../setup/vanX"),
+            "@vanjs/client": toAbsolute("../client"),
+            "@vanjs/server": toAbsolute("../server"),
+            "@vanjs/meta": toAbsolute("../meta"),
+            "@vanjs/router": toAbsolute("../router"),
+            "@vanjs/jsx": toAbsolute("../jsx"),
           },
         },
         esbuild: {
@@ -63,13 +65,16 @@ export default function VitePluginVanJS(options = {}) {
     configureServer(server) {
       // Watch routes directory
       const pagesPath = join(config.root, routesDir);
+      /** @param {string} file */
       const changeHandler = (file) => {
+        // istanbul ignore else
         if (file.startsWith(pagesPath)) {
           routes.length = 0;
           routeCache = null;
           const module = server.moduleGraph.getModuleById(
             resolvedVirtualModuleId,
           );
+          // istanbul ignore else
           if (module) {
             server.moduleGraph.invalidateModule(module);
           }
@@ -86,53 +91,74 @@ export default function VitePluginVanJS(options = {}) {
       server.watcher.on("unlinkDir", changeHandler);
       server.watcher.on("change", changeHandler);
     },
+    /** @type {(source: string, importer: string | undefined, ops: { ssr: boolean }) => string | null} */
     resolveId(source, importer, ops) {
-      const isVanXFile = /vanjs-ext[\/\\]src[\/\\]van-x/.test(importer);
-      const isSetupFile = /vite-plugin-vanjs[\/\\]setup/.test(importer);
+      const isVanXFile = importer &&
+        /vanjs-ext[\/\\]src[\/\\]van-x/.test(importer);
+      const isSetupFile = importer &&
+        /vite-plugin-vanjs[\/\\]setup/.test(importer);
+      const isProduction = process.env.NODE_ENV === "production";
+      const resolvedVan = toAbsolute(
+        ops.ssr
+          ? "../setup/van-ssr.mjs"
+          : (importer?.endsWith("jsx/jsx.mjs") || isProduction ||
+              config.mode === "test")
+          ? "../setup/van.mjs"
+          : "../setup/van-debug.mjs",
+      );
+      const resolvedVanX = toAbsolute(
+        ops.ssr ? "../setup/vanX-ssr.mjs" : "../setup/vanX.mjs",
+      );
+      const setupResolved = toAbsolute(
+        ops.ssr
+          ? "../setup/index-ssr.mjs"
+          : (isProduction || config.mode === "test")
+          ? "../setup/index.mjs"
+          : "../setup/index-debug.mjs",
+      );
 
+      // Resolve early when source already resolved. EG: @vanjs/van
+      if (source === setupResolved || setupResolved.includes(source)) {
+        return setupResolved;
+      }
+      if (source === resolvedVan || resolvedVan.includes(source)) {
+        return resolvedVan;
+      }
+      if (source === resolvedVanX || resolvedVanX.includes(source)) {
+        return resolvedVanX;
+      }
+
+      // istanbul ignore else
       if (!isSetupFile && !isVanXFile) {
         if (source === "@vanjs/setup") {
-          return resolve(
-            __dirname,
-            ops.ssr
-              ? "../setup/index-ssr.mjs"
-              : isProduction
-              ? "../setup/index.mjs"
-              : "../setup/index-debug.mjs",
-          );
+          return setupResolved;
         }
         if (importer?.endsWith("debug.js") && source.endsWith("/van.js")) {
-          return resolve(__dirname, "../setup/van.mjs");
+          return toAbsolute("../setup/van.mjs");
         }
         if (source === "vanjs-core" || source === "@vanjs/van") {
-          return resolve(
-            __dirname,
-            ops.ssr
-              ? "../setup/van-ssr.mjs"
-              : (importer.endsWith("jsx/jsx.mjs") || isProduction)
-              ? "../setup/van.mjs"
-              : "../setup/van-debug.mjs",
-          );
+          return resolvedVan;
         }
-        if ((source === "vanjs-ext" || source === "@vanjs/vanX")) {
-          return resolve(
-            __dirname,
-            ops.ssr ? "../setup/vanX-ssr.mjs" : "../setup/vanX.mjs",
-          );
+        if (source === "vanjs-ext" || source === "@vanjs/vanX") {
+          return resolvedVanX;
         }
       }
+      // istanbul ignore else
       if (source === virtualModuleId) {
         return resolvedVirtualModuleId;
       }
+      return null;
     },
+    /** @type {(id: string, ops: { ssr: boolean }) => Promise<({ code: string, map: null } | null)>} */
     async load(id, ops) {
+      // istanbul ignore else
       if (id === resolvedVirtualModuleId) {
         const currentRoutes = routeCache ||
           await getRoutes(config, pluginConfig);
         if (!currentRoutes || !currentRoutes.length) {
           // don't crash the server if no routes are found
           // devs might not use file system router
-          return "";
+          return null;
         }
 
         const routesScript = `
@@ -145,9 +171,9 @@ routes.length = 0;
 // Register routes
 ${currentRoutes.map(generateRoute).join("\n")}
 ${
-          ops.ssr
+          ops.ssr && currentRoutes.length
             ? `console.log(\`🍦 @vanjs/router registered ${currentRoutes.length} routes.\`)`
-            : ""
+            : /* istanbul ignore next - satisfied */ ""
         }
 `;
 

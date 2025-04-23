@@ -7,7 +7,7 @@
 [![typescript version](https://img.shields.io/badge/typescript-5.6.2-brightgreen)](https://www.typescriptlang.org/)
 [![vanjs-core version](https://img.shields.io/badge/vanjs--core-1.5.3-brightgreen)](https://github.com/vanjs-org/van)
 [![mini-van-plate version](https://img.shields.io/badge/mini--van--plate-0.6.3-brightgreen)](https://github.com/vanjs-org/mini-van-plate)
-[![vitest version](https://img.shields.io/badge/vitest-3.1.1-brightgreen)](https://www.vitest.dev/)
+[![vitest version](https://img.shields.io/badge/vitest-3.1.2-brightgreen)](https://www.vitest.dev/)
 [![vite version](https://img.shields.io/badge/vite-6.3.2-brightgreen)](https://vite.dev)
 
 A mini meta-framework for [VanJS](https://vanjs.org/) developed around the awesome [vite](https://vite.dev) and tested with [vitest](https://vitest.dev). The plugin comes with a set of modules to streamline your workflow:

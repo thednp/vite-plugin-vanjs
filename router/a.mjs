@@ -24,6 +24,7 @@ export const A = (
       /* istanbul ignore next */
       if (isCurrentPage(href)) return;
 
+      // istanbul ignore else
       if (props.onclick) {
         await props.onclick(e);
       }

@@ -28,11 +28,11 @@ export const styleToString: (source: string | CSS.Properties) => string;
  * @param target the root element
  * @param content the element(s) to hydrate
  */
-export const hydrate: (
-  target: HTMLElement,
+export const hydrate: <T = HTMLElement>(
+  target: T,
   content:
     | HTMLElement
     | HTMLElement[]
     | JSX.Element
     | Promise<HTMLElement | HTMLElement[] | JSX.Element>,
-) => HTMLElement;
+) => T;

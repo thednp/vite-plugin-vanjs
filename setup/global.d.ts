@@ -5,51 +5,62 @@ declare module "@vanjs/van" {
 }
 
 declare module "@vanjs/vanX" {
-  import {
-    calc,
-    compact,
-    list,
-    noreactive,
-    raw,
-    reactive,
-    replace,
-    stateFields,
+  import type {
+    CalcFunction,
+    CompactFunction,
+    ListFunction,
+    NoreactiveFunction,
+    RawFunction,
+    ReactiveFunction,
+    ReplaceFunction,
+    StateFieldsFunction,
   } from "vanjs-ext";
-  const vanX: {
-    calc: typeof calc;
-    reactive: typeof reactive;
-    noreactive: typeof noreactive;
-    stateFields: typeof stateFields;
-    raw: typeof raw;
-    list: typeof list;
-    replace: typeof replace;
-    compact: typeof compact;
-  };
-  export default vanX;
-  export {
-    calc,
-    compact,
-    list,
-    noreactive,
-    raw,
-    reactive,
-    replace,
-    stateFields,
-  };
-}
+  import type { VanXObj } from "mini-van-plate/shared";
 
-declare module "virtual:@vanjs/hydration" {
-}
-declare module "@vanjs/setup" {
-  import type { Van } from "vanjs-core";
-  import type * as vanX from "vanjs-ext";
-  import type { dummyVanX } from "mini-van-plate/shared";
+  export const calc: CalcFunction;
+  export const compact: CompactFunction;
+  export const list: ListFunction;
+  export const noreactive: NoreactiveFunction;
+  export const raw: RawFunction;
+  export const reactive: ReactiveFunction;
+  export const replace: ReplaceFunction;
+  export const stateFields: StateFieldsFunction;
 
-  interface Setup {
-    isServer: boolean;
-    van: Van;
-    vanX: typeof vanX | typeof dummyVanX;
+  // Define the vanX object type
+  interface VanXObject {
+    calc: CalcFunction;
+    reactive: ReactiveFunction;
+    noreactive: NoreactiveFunction;
+    stateFields: StateFieldsFunction;
+    raw: RawFunction;
+    list: ListFunction;
+    replace: ReplaceFunction;
+    compact: CompactFunction;
+    readonly default: VanXObject;
   }
-  const setup: Setup;
-  export default setup;
+  interface VanXPlate extends VanXObj {
+    readonly default: VanXObj;
+  }
+
+  const vanX: VanXObject | VanXPlate;
+  export default vanX;
+}
+
+declare module "virtual:@vanjs/hydration" {}
+
+declare module "@vanjs/setup" {
+  import van from "@vanjs/van";
+  import vanX from "@vanjs/vanX";
+  // import type { Van } from "vanjs-core";
+  // import type * as vanX from "vanjs-ext";
+  // import type { dummyVanX } from "mini-van-plate/shared";
+
+  // interface Setup {
+  //   isServer: boolean;
+  //   van: Van;
+  //   vanX: typeof vanX | typeof dummyVanX;
+  // }
+  // const setup: Setup;
+  const isServer: boolean;
+  export { isServer, van, vanX };
 }

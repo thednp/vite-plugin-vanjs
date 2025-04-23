@@ -3,7 +3,7 @@ import { dummyVanX, registerEnv } from "mini-van-plate/shared";
 const vanX = {
   ...dummyVanX,
   get default() {
-    return vanX;
+    return dummyVanX;
   },
 };
 

@@ -3,12 +3,13 @@ import van from "vanjs-core";
 import { cache, getCached } from "./cache.mjs";
 
 /** @typedef {import('./types').VanNode} VanNode */
+/** @typedef {import('./types').DynamicModule} DynamicModule */
 /** @typedef {import('./types').ComponentModule} ComponentModule */
+/** @typedef {import('./types').ComponentFn} ComponentFn */
 
 /**
  * Registers a lazy component.
- * @param {Promise<VanNode>} importFn
- * @returns {ComponentModule | Promise<ComponentModule>}
+ * @type {typeof import("./types").lazy}
  */
 export const lazy = (importFn) => {
   if (isServer) {
@@ -18,9 +19,11 @@ export const lazy = (importFn) => {
       if (cached) {
         return cached;
       }
-      // console.log("lazy.importFn", importFn.toString())
+
       const module = await importFn();
-      const component = module.Page || module.default;
+      /** @type {ComponentFn} */
+      const component = module?.default || module.Page;
+      /** @type {ComponentModule} */
       const result = { component, route: module.route };
 
       cache(importFn, result);
@@ -29,7 +32,9 @@ export const lazy = (importFn) => {
   }
 
   let initialized = false;
+  /** @type {import("vanjs-core").State<(ComponentModule["component"] | (() => string))>} */
   const component = van.state(() => "Loading..");
+  /** @type {import("vanjs-core").State<ComponentModule["route"]>} */
   const route = van.state({});
 
   const load = () => {
@@ -44,12 +49,16 @@ export const lazy = (importFn) => {
     }
 
     initialized = true;
-    importFn().then((module) => {
-      const comp = module.Page || module.default;
-      cache(importFn, { component: comp, route: module.route });
-      component.val = comp;
-      route.val = module.route;
-    });
+    importFn().then(
+      /** @param {DynamicModule} module */
+      (module) => {
+        /** @type {ComponentModule["component"]} */
+        const pageComponent = module?.default || module.Page;
+        cache(importFn, { component: pageComponent, route: module.route });
+        component.val = pageComponent;
+        route.val = module.route;
+      },
+    );
   };
 
   const lazyComponent = () => {
@@ -57,5 +66,6 @@ export const lazy = (importFn) => {
     return { component: component.val(), route: route.val };
   };
   lazyComponent.isLazy = true;
+  // @ts-expect-error - typescript cannot handle this isomorphically
   return lazyComponent;
 };

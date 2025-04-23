@@ -1,11 +1,12 @@
-import { dirname, join } from "node:path";
-import { existsSync } from "node:fs";
-import { readdir } from "node:fs/promises";
-import { normalizePath } from "vite";
-
 /** @typedef {import("./types").RouteConfig} RouteConfig */
 /** @typedef {import("./types").PageFile} PageFile */
 /** @typedef {import("./types").LayoutFile} LayoutFile */
+/** @typedef {import("./types").RouteFile} RouteFile */
+
+import { normalizePath } from "vite";
+import { dirname, join } from "node:path";
+import { existsSync } from "node:fs";
+import { readdir } from "node:fs/promises";
 
 /**
  * Get the file most probable route path for a given potential route.
@@ -37,26 +38,30 @@ export const fileToRoute = (file, routesDir) => {
  * @type {typeof import("./types").globFiles}
  */
 export const globFiles = async (dir, extensions) => {
+  /** @type {string[]} */
   const files = [];
 
+  /** @param {string} directory */
   async function scan(directory) {
     if (!existsSync(directory)) {
-      console.log('🍦 @vanjs/router: the "routes" folder does not exist.');
-      return files;
+      // console.log('🍦 @vanjs/router: the "routes" folder does not exist.');
+      return;
     }
     const entries = await readdir(directory, { withFileTypes: true });
     if (!entries.length) {
-      console.warn('🍦 @vanjs/router: the "routes" folder is empty.');
-      return files;
+      // console.warn('🍦 @vanjs/router: the "routes" folder is empty.');
+      return;
     }
 
     for (const entry of entries) {
       const fullPath = join(directory, entry.name);
 
+      // istanbul ignore else
       if (entry.isDirectory()) {
         await scan(fullPath);
       } else if (entry.isFile()) {
         // Check if file has allowed extension
+        // istanbul ignore else
         if (extensions.some((ext) => entry.name.endsWith(ext))) {
           files.push(fullPath);
         }
@@ -88,19 +93,29 @@ export const scanRoutes = async (config, pluginConfig) => {
   }));
 
   // Remove duplicate routes (prefer non-layout files)
-  const uniqueRoutes = routes.reduce((acc, route) => {
-    const existing = acc.find((r) => r.routePath === route.routePath);
-    if (
-      !existing || (existing.path.includes("(") && !route.path.includes("("))
-    ) {
-      // Remove the existing route if this is a better match
-      if (existing) {
-        acc = acc.filter((r) => r !== existing);
+  /** @type {typeof routes} */
+  const uniqueRoutes = routes.reduce(
+    /**
+     * @param {typeof routes} acc
+     * @param {typeof routes[0]} route
+     * @returns {typeof routes}
+     */
+    (acc, route) => {
+      const existing = acc.find((r) => r.routePath === route.routePath);
+      if (
+        !existing || (existing.path.includes("(") && !route.path.includes("("))
+      ) {
+        // Remove the existing route if this is a better match
+        // istanbul ignore if - should not be possible
+        if (existing) {
+          acc = acc.filter((r) => r !== existing);
+        }
+        acc.push(route);
       }
-      acc.push(route);
-    }
-    return acc;
-  }, []);
+      return acc;
+    },
+    [],
+  );
 
   return uniqueRoutes;
 };
@@ -120,6 +135,7 @@ export const findLayouts = (routePath, config, pluginConfig) => {
     let layoutFile = null;
     const dirName = dir.split(/[/\\]/).pop();
 
+    // istanbul ignore else
     if (dirName) {
       // Look for a layout file in the current directory
       for (const ext of extensions) {
@@ -137,6 +153,7 @@ export const findLayouts = (routePath, config, pluginConfig) => {
       }
     }
 
+    // istanbul ignore else
     if (layoutFile && layoutFile !== routePath) {
       layouts.unshift({
         id: `Layout${layouts.length}`,
@@ -176,14 +193,10 @@ export const getRoutes = async (config, pluginConfig) => {
   return processLayoutRoutes(routes, config, pluginConfig);
 };
 
-/** @type {(route: RouteConfig) => string} */
+/** @type {(route: RouteFile) => string} */
 export const generateRouteProloaders = (route) => {
   const moduleName = "PageModule";
   const layoutName = "Module";
-
-  if (!route.layouts?.length) {
-    return `${moduleName}.route`;
-  }
 
   return `{
     preload: async (params) => {
@@ -209,7 +222,7 @@ export const generateRouteProloaders = (route) => {
   }`;
 };
 
-/** @type {(route: RouteProps) => string} */
+/** @type {(route: RouteFile) => string} */
 export const generateComponentRoute = (route) => {
   if (route.layouts?.length > 0) {
     // Only generate imports for unique layouts
@@ -243,7 +256,7 @@ export const generateComponentRoute = (route) => {
   return `lazy(() => import('${route.path}'))`;
 };
 
-/** @type {(route: RouteConfig) => string} */
+/** @type {(route: RouteFile) => string} */
 export const generateRoute = (route) => {
   return `Route({
     path: "${route.routePath}",

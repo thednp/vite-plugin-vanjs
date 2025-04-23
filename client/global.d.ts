@@ -34,12 +34,12 @@ declare module "@vanjs/client" {
    * @param target the target element
    * @param content the element(s) to hydrate
    */
-  export const hydrate: (
-    target: HTMLElement,
+  export const hydrate: <T = HTMLElement>(
+    target: T,
     content:
       | ChildElement
       | ChildElement[]
       | JSX.Element
       | Promise<ChildElement | ChildElement[] | JSX.Element>,
-  ) => HTMLElement;
+  ) => T;
 }

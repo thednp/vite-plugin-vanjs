@@ -1,4 +1,4 @@
-import setup from "../setup/index.mjs";
+import isServer from "../setup/isServer.mjs";
 import { getTagKey } from "./helpers.mjs";
 
 /** @typedef {typeof import("./types.d.ts").getHeadTags} GetTags */
@@ -20,7 +20,7 @@ const createHeadTags = () => new Map();
  * @type {GetTags}
  */
 const getHeadTags = (() => {
-  if (setup.isServer) {
+  if (isServer) {
     // On server, create one Map per request scope
     let serverHeadTags;
     return () => {
@@ -51,7 +51,7 @@ export const resetHeadTags = () => {
 export const initializeHeadTags = () => {
   const tags = getHeadTags();
   /* istanbul ignore else */
-  if (!tags.size && !setup.isServer) {
+  if (!tags.size && !isServer) {
     Array.from(document.head.children).forEach((tag) => {
       tags.set(getTagKey(tag), tag);
     });

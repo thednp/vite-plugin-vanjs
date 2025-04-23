@@ -1,14 +1,13 @@
-// van-ssr.mjs
+// setup/van-ssr.mjs
 import { registerEnv } from "mini-van-plate/shared";
 import van from "mini-van-plate/van-plate";
 
-// Create our own tag function that wraps the original
 function tagWithHydration(ns, name, ...args) {
   // Get original tag function
   const originalTag = ns ? van.tags(ns)[name] : van.tags[name];
-
-  let [{ is: _is, ...props }, ...children] =
-    Object.getPrototypeOf(args[0] ?? 0) === Object.prototype
+  let [props, ...children] =
+    Object.getPrototypeOf(args[0] ?? /* istanbul ignore next */ 0) ===
+        Object.prototype
       ? args
       : [{}, ...args];
 
@@ -17,7 +16,7 @@ function tagWithHydration(ns, name, ...args) {
     props && (
       Object.keys(props).some((k) => k.startsWith("on")) || // has events
       Object.values(props).some((v) =>
-        v && typeof v === "function" && "val" in v
+        v && typeof v === "object" && "val" in v
       ) || // has state
       typeof args[0] === "function" // is component
     )
@@ -29,7 +28,6 @@ function tagWithHydration(ns, name, ...args) {
   return originalTag(props, ...children);
 }
 
-// Create our tags proxy using the same pattern as vanjs-core
 const tagsProxy = new Proxy(
   (ns) =>
     new Proxy(tagWithHydration.bind(undefined, ns), {
@@ -44,6 +42,7 @@ const vanSSR = {
   ...van,
   tags: tagsProxy,
 };
+
 registerEnv({ van: vanSSR });
 
 export default vanSSR;

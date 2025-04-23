@@ -1,5 +1,6 @@
 /// <reference path="global.d.ts" />
 import type { Element as VanElement, TagFunc } from "mini-van-plate/van-plate";
+import { ResolvedConfig } from "vite";
 
 /**
  * A function that takes a list of files and a manifest and returns a string
@@ -45,12 +46,17 @@ export const fileToRoute: (file: string, routesDir: string) => string;
 
 export type PageFile = { path: string; routePath: string };
 export type LayoutFile = { id: string; path: string };
+export type RouteFile = PageFile & { layouts: Array<LayoutFile> };
 export type PluginConfig = { routesDir: string; extensions: string[] };
 /**
  * Find all layout files for a given route.
  */
 
-export const findLayouts: (routePath: string) => Array<LayoutFile>;
+export const findLayouts: (
+  routePath: string,
+  config: ResolvedConfig,
+  pluginConfig: PluginConfig,
+) => Array<LayoutFile>;
 
 /**
  * Identify all files in a folder.
@@ -77,7 +83,7 @@ export const processLayoutRoutes: (
   routes: Array<PageFile>,
   config: ResolvedConfig,
   pluginConfig: PluginConfig,
-) => Promise<Array<PageFile & { layouts: Array<LayoutFile> }>>;
+) => Array<PRouteFile>;
 
 /**
  * Scan and process layouts and return them.
@@ -85,4 +91,4 @@ export const processLayoutRoutes: (
 export const getRoutes: (
   config: ResolvedConfig,
   pluginConfig: PluginConfig,
-) => Promise<Array<PageFile & { layouts: Array<LayoutFile> }>>;
+) => Promise<Array<RouteFile>>;
