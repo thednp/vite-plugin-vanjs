@@ -22,7 +22,7 @@ describe(`Test SSR`, () => {
 
   // Mock Vite's internals
   vi.mock('vite', () => ({
-    normalizePath: (path: string) => path.replace(/\\/g, '/'),
+    // normalizePath: (path: string) => path.replace(/\\/g, '/'),
     transformWithEsbuild: vi.fn().mockImplementation((code) => 
       Promise.resolve({ 
         code,  // return the same code that was passed
