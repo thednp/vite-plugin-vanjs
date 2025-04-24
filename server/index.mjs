@@ -70,35 +70,51 @@ function renderPreloadLink(file) {
 /**
  * @type {typeof import("./types.d.ts").renderPreloadLinks}
  */
+/**
+ * @type {typeof import("./types.d.ts").renderPreloadLinks}
+ */
 export function renderPreloadLinks(modules, manifest) {
   let links = "";
   const seen = new Set();
-  const ignored = new Set();
+  const ignoredAssets = new Set();
+
+  // First pass: collect all assets from ignored paths
+  Object.entries(manifest).forEach(([id, files]) => {
+    // istanbul ignore else
+    if (["src/pages", "src/routes"].some((l) => id.includes(l))) {
+      files.forEach((asset) => ignoredAssets.add(asset));
+    }
+  });
+
+  // Second pass: generate preload links
   modules.forEach((id) => {
     const files = manifest[id];
-    const ignoredId = ["src/pages", "src/routes"].some((l) => id.includes(l));
-    if (ignoredId) files.forEach((f) => ignored.add(f));
 
-    /* istanbul ignore else */
-    if (files?.length && !ignoredId) {
+    // istanbul ignore else
+    if (files?.length) {
       files.forEach((file) => {
-        /* istanbul ignore else */
-        if (!seen.has(file) && !ignored.has(file)) {
-          seen.add(file);
-          const filename = basename(file);
-          /* istanbul ignore next - impossible to test */
-          if (manifest[filename]) {
-            for (const depFile of manifest[filename]) {
-              if (!ignored.has(depFile)) {
-                links += renderPreloadLink(depFile);
-                seen.add(depFile);
-              }
+        // Skip if we've seen this file or if it's an asset from an ignored path
+        if (seen.has(file) || ignoredAssets.has(file)) return;
+
+        seen.add(file);
+        const filename = basename(file);
+
+        // Handle dependencies
+        // istanbul ignore next - no way to test this
+        if (manifest[filename]) {
+          for (const depFile of manifest[filename]) {
+            // istanbul ignore else
+            if (!seen.has(depFile) && !ignoredAssets.has(depFile)) {
+              links += renderPreloadLink(depFile);
+              seen.add(depFile);
             }
           }
-          links += renderPreloadLink(file);
         }
+
+        links += renderPreloadLink(file);
       });
     }
   });
+
   return links;
 }

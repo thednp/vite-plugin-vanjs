@@ -26,12 +26,10 @@ export const Route = (routeProps) => {
   if (!isLazyComponent(component)) {
     /** @type {() => Promise<ComponentModule>} */
     const wrappedComponent = lazy(() =>
-      new Promise((resolve) =>
-        resolve({
-          Page: component,
-          route: { preload, load },
-        })
-      )
+      Promise.resolve({
+        Page: component,
+        route: { preload, load },
+      })
     );
     routes.push({ ...rest, path, component: wrappedComponent });
     return;

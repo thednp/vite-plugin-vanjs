@@ -51,16 +51,7 @@ declare module "virtual:@vanjs/hydration" {}
 declare module "@vanjs/setup" {
   import van from "@vanjs/van";
   import vanX from "@vanjs/vanX";
-  // import type { Van } from "vanjs-core";
-  // import type * as vanX from "vanjs-ext";
-  // import type { dummyVanX } from "mini-van-plate/shared";
 
-  // interface Setup {
-  //   isServer: boolean;
-  //   van: Van;
-  //   vanX: typeof vanX | typeof dummyVanX;
-  // }
-  // const setup: Setup;
   const isServer: boolean;
   export { isServer, van, vanX };
 }
