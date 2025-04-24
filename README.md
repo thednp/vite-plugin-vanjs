@@ -18,7 +18,7 @@ A mini meta-framework for [VanJS](https://vanjs.org/) developed around the aweso
 * ***@vanjs/server*** - provides various tools for Server Side Rendering (SSR);
 * ***@vanjs/client*** - provides various tools for Client Side Rendering (CSR).
 
-The plugin will automatically load the appropriate Van or VanX objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required objects in an isomorphic enviroment.
+The plugin will automatically load the appropriate Van or VanX objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required objects on the server.
 
 Also in _development_ mode, the plugin will load the `van.debug.js` module to help you better troubleshoot your VanJS application.
 
