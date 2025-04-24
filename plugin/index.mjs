@@ -86,7 +86,7 @@ export default function VitePluginVanJS(options = {}) {
           if (module) {
             server.moduleGraph.invalidateModule(module);
           }
-          server.hot.send({ type: "full-reload" });
+          server.ws.send({ type: "full-reload" });
         }
       };
       server.watcher.add(pagesPath);
