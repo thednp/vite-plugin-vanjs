@@ -49,22 +49,29 @@ export const matchRoute = (initialPath) => {
   const path = initialPath !== "/" && initialPath.endsWith("/")
     ? initialPath.slice(0, -1)
     : initialPath;
-  // identify a nested not-found route
-  const nestedNotFound = path.split("/").slice(0, -1).join("/") + "/*";
-  const exactMatch = routes.find((r) =>
-    r.path === nestedNotFound || r.path === path
-  );
 
-  if (exactMatch) {
+  // First try exact match (excluding wildcards)
+  let foundMatch = routes.find((r) => r.path === path && !r.path.includes("*"));
+
+  // Then try nested wildcard match if no exact match found
+  if (!foundMatch) {
+    // Build the path for potential nested wildcard, e.g. /admin/* for /admin/articles
+    const nestedPath = path.split("/").slice(0, -1).join("/") + "/*";
+    foundMatch = routes.find((r) => r.path === nestedPath);
+  }
+
+  // If we found either an exact or nested wildcard match, return it with params
+  if (foundMatch) {
     return {
-      ...exactMatch,
-      params: extractParams(exactMatch.path, path) ?? /* istanbul ignore next */
+      ...foundMatch,
+      params: extractParams(foundMatch.path, path) ?? /* istanbul ignore next */
         undefined,
     };
   }
 
-  // identify any other route
+  // Try parameterized routes (like /users/:id)
   for (const route of routes) {
+    // Skip the global catch-all
     if (route.path === "*") continue;
     const params = extractParams(route.path, path);
 
@@ -73,6 +80,6 @@ export const matchRoute = (initialPath) => {
     }
   }
 
-  // fallback to default not-found route
+  // Finally, fallback to global catch-all route
   return routes.find((r) => r.path === "*") || null;
 };
