@@ -201,7 +201,11 @@ describe(`Test SSR`, () => {
     expect(config).toEqual({
       optimizeDeps: {
         noDiscovery: true,
-        include: [],
+        include: [
+          'vanjs-core',
+          'vanjs-ext',
+          'mini-van-plate'
+        ],
       },
       ssr: {
         noExternal: ['vanjs-*', '*-vanjs', '@vanjs/*'],

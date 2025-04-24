@@ -6,7 +6,7 @@ export * from "../meta/types";
 export * from "../server/types";
 export * from "../client/types";
 export * from "../parser/types";
-import type { Plugin, ResolvedConfig, ViteDevServer } from "vite";
+import type { Plugin } from "vite";
 
 export type VanJSPluginOptions = {
   routesDir: string;
@@ -14,7 +14,7 @@ export type VanJSPluginOptions = {
 };
 
 export type VanJSPlugin = (
-  options?: Partial<VanJSPluginOptions>
+  options?: Partial<VanJSPluginOptions>,
 ) => Plugin;
 
 // This is what your plugin actually returns, so declare it as a Plugin type
