@@ -248,7 +248,8 @@ export const unwrap: (
 ) => UnwrapResult;
 
 export type JSXComponentFn = () => JSX.Element;
-export type ComponentFn = VanComponent | JSXComponentFn;
+export type FragmentFn = () => ChildDom | ChildDom[];
+export type ComponentFn = FragmentFn | VanComponent | JSXComponentFn;
 
 export type ComponentModule = {
   component: ComponentFn;

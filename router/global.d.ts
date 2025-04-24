@@ -72,11 +72,6 @@ declare module "@vanjs/router" {
    *   return Router(); // or <Router /> for JSX
    * }
    */
-  // export const Router: JSX.Component<HTMLElement> & VanComponent<HTMLElement>;
-  // export function Router(props?: ComponentProps<HTMLElement>): HTMLElement;
-  // export function Router(
-  //   props?: JSX.IntrinsicElements["main"] & { children: null },
-  // ): HTMLElement;
   export const Router:
     & VanComponent<"main">
     & JSX.Component<"main">;
@@ -232,7 +227,8 @@ declare module "@vanjs/router" {
   ) => { children: ChildDom[] };
 
   export type JSXComponentFn = () => JSX.Element;
-  export type ComponentFn = VanComponent | JSXComponentFn;
+  export type FragmentFn = () => ChildDom | ChildDom[];
+  export type ComponentFn = FragmentFn | VanComponent | JSXComponentFn;
 
   export type ComponentModule = {
     component: ComponentFn;
