@@ -46,8 +46,6 @@ declare module "@vanjs/vanX" {
   export default vanX;
 }
 
-declare module "virtual:@vanjs/hydration" {}
-
 declare module "@vanjs/setup" {
   import van from "@vanjs/van";
   import vanX from "@vanjs/vanX";

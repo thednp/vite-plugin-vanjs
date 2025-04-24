@@ -36,6 +36,10 @@ export default function VitePluginVanJS(options = {}) {
     enforce: "pre",
     config() {
       return {
+        optimizeDeps: {
+          noDiscovery: true,
+          include: [],
+        },
         ssr: {
           noExternal: ["vanjs-*", "*-vanjs", "@vanjs/*"],
         },

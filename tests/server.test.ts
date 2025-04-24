@@ -199,6 +199,10 @@ describe(`Test SSR`, () => {
     // console.log("resolveSomeID", toAbsolute('../tests/routes/admin.ts'));
 
     expect(config).toEqual({
+      optimizeDeps: {
+        noDiscovery: true,
+        include: [],
+      },
       ssr: {
         noExternal: ['vanjs-*', '*-vanjs', '@vanjs/*'],
       },
