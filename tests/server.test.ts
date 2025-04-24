@@ -267,7 +267,7 @@ describe(`Test SSR`, () => {
         })),
         invalidateModule: vi.fn(),
       },
-      hot: {
+      ws: {
         send: vi.fn(),
       },
     };
@@ -292,7 +292,7 @@ describe(`Test SSR`, () => {
 
     // Verify the handler triggered appropriate actions
     expect(mockServer.moduleGraph.getModuleById).toHaveBeenCalled();
-    expect(mockServer.hot.send).toHaveBeenCalledWith({ type: 'full-reload' });
+    expect(mockServer.ws.send).toHaveBeenCalledWith({ type: 'full-reload' });
 
     // Test other events
     handlers.change('/mock/root/src/routes/existing-page.tsx');
