@@ -133,13 +133,22 @@ export default function VitePluginVanJS(options = {}) {
       );
 
       // Resolve early when source already resolved. EG: @vanjs/van
-      if (source === setupResolved || setupResolved.includes(source)) {
+      if (
+        (ops.ssr || isTest) &&
+        (source === setupResolved || setupResolved.includes(source))
+      ) {
         return setupResolved;
       }
-      if (source === resolvedVan || resolvedVan.includes(source)) {
+      if (
+        (ops.ssr || isTest) &&
+        (source === resolvedVan || resolvedVan.includes(source))
+      ) {
         return resolvedVan;
       }
-      if (source === resolvedVanX || resolvedVanX.includes(source)) {
+      if (
+        (ops.ssr || isTest) &&
+        (source === resolvedVanX || resolvedVanX.includes(source))
+      ) {
         return resolvedVanX;
       }
 
