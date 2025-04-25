@@ -42,7 +42,7 @@ export default function VitePluginVanJS(options = {}) {
             "vanjs-core",
             "vanjs-ext",
             "mini-van-plate/van-plate",
-            "mini-van-plate/shares",
+            "mini-van-plate/shared",
           ],
         },
         ssr: {

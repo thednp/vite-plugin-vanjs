@@ -208,7 +208,7 @@ describe(`Test SSR`, () => {
           'vanjs-core',
           'vanjs-ext',
           'mini-van-plate/van-plate',
-          'mini-van-plate/shares'
+          'mini-van-plate/shared'
         ],
       },
       ssr: {
