@@ -752,6 +752,8 @@ declare namespace JSX {
     draggable?: FunctionMaybe<boolean>;
     hidden?: FunctionMaybe<boolean>;
     id?: FunctionMaybe<string>;
+    is?: FunctionMaybe<string>;
+    inert?: FunctionMaybe<boolean>;
     lang?: FunctionMaybe<string>;
     spellcheck?: FunctionMaybe<boolean>;
     style?: FunctionMaybe<CSSProperties | string>;
