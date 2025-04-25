@@ -18,15 +18,6 @@ A mini meta-framework for [VanJS](https://vanjs.org/) developed around the aweso
 * ***@vanjs/server*** - provides various tools for Server Side Rendering (SSR);
 * ***@vanjs/client*** - provides various tools for Client Side Rendering (CSR).
 
-The plugin will automatically load the appropriate Van or VanX objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required objects on the server.
-
-Also in _development_ mode, the plugin will load the `van.debug.js` module to help you better troubleshoot your VanJS application.
-
-
-### Notes 
-* The plugin uses `van-ext` along with `mini-van-plate` so you can have everything ready from the start.
-* Kickstart your VanJS project with `npm create vanjs@latest`. Some starter templates feature this plugin and most essential tools.
-
 
 ### Install
 ```bash
@@ -53,7 +44,15 @@ For a complete guide on how to use the plugin, be sure to check the wiki:
 * [Metadata](https://github.com/thednp/vite-plugin-vanjs/wiki/Metadata): the quick guide to help you manage your app meta tags;
 * [JSX](https://github.com/thednp/vite-plugin-vanjs/wiki/JSX): a complete guide on how to use JSX transformation;
 * [Isomorphic](https://github.com/thednp/vite-plugin-vanjs/wiki/Isomorphic): a quick guide on isomorphism in VanJS;
+* [Hydration](https://github.com/thednp/vite-plugin-vanjs/wiki/Hydration): a quick note on how the plugin handles hydration;
 * [About](https://github.com/thednp/vite-plugin-vanjs/wiki/About): some note on the project.
+
+
+### Notes
+* The plugin will automatically load the appropriate **Van** or **VanX** objects depending on the client/server environment with zero configuration needed. It uses the `mini-van-plate/shared` module to register the required `mini-van-plate/van-plate` on the server.
+* Also in _development_ mode, the plugin will load the `van.debug.js` module to help you better troubleshoot your VanJS application. However JSX transformation is not compatible with the `van.debug.js` module.
+* The plugin uses `van-ext` along with `mini-van-plate` so you can have everything ready from the start.
+* Kickstart your VanJS project with `npm create vanjs@latest`. Some starter templates feature this plugin and most essential tools.
 
 
 ### Credits
