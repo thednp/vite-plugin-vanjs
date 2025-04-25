@@ -51,5 +51,5 @@ export const A = (
     }
   });
 
-  return van.tags.a(newProps, (children || otherChildren || /* istanbul ignore next */ []));
+  return van.tags.a(newProps, (children || otherChildren));
 };
