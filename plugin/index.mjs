@@ -126,17 +126,6 @@ export default function VitePluginVanJS(options = {}) {
           : "../setup/index-debug.mjs",
       );
 
-      // Resolve early when source already resolved. EG: @vanjs/van
-      if (source === setupResolved || setupResolved.includes(source)) {
-        return setupResolved;
-      }
-      if (source === resolvedVan || resolvedVan.includes(source)) {
-        return resolvedVan;
-      }
-      if (source === resolvedVanX || resolvedVanX.includes(source)) {
-        return resolvedVanX;
-      }
-
       // istanbul ignore else
       if (!isSetupFile && !isVanXFile) {
         if (source === "@vanjs/setup") {

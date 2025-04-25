@@ -157,37 +157,21 @@ describe(`Test SSR`, () => {
     expect(plugin.resolveId('virtual:@vanjs/routes', undefined, { ssr: false })).toEqual('\0virtual:@vanjs/routes');
     // resolve modules development
     process.env.NODE_ENV = 'development';
-    const resolvedSetupSSR = plugin.resolveId('@vanjs/setup', undefined, { ssr: true });
-    let resolvedSetup = plugin.resolveId('@vanjs/setup', undefined, { ssr: false });
-    let resolvedVan = plugin.resolveId('@vanjs/van', undefined, { ssr: false });
-    let resolvedVanSSR = plugin.resolveId('@vanjs/van', undefined, { ssr: true });
-    let resolvedVanX = plugin.resolveId('@vanjs/vanX', undefined, { ssr: false });
-    let resolvedVanXSSR = plugin.resolveId('@vanjs/vanX', undefined, { ssr: true });
-    expect(plugin.resolveId(resolvedSetupSSR!, undefined, {ssr: true})).toEqual(toAbsolute('../setup/index-ssr.mjs'));
-    expect(plugin.resolveId(resolvedSetup!, undefined, { ssr: false })).toEqual(toAbsolute('../setup/index-debug.mjs'));
-    expect(plugin.resolveId(resolvedVanSSR!, undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
-    expect(plugin.resolveId(resolvedVan!, undefined, { ssr: false })).toEqual(toAbsolute('../setup/van-debug.mjs'));
-    expect(plugin.resolveId(resolvedVanXSSR!, undefined, { ssr: true } )).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
-    expect(plugin.resolveId(resolvedVanX!, undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
-    expect(resolvedSetupSSR).toEqual(toAbsolute('../setup/index-ssr.mjs'));
-    expect(resolvedSetup).toEqual(toAbsolute('../setup/index-debug.mjs'));
-    expect(resolvedVanSSR).toEqual(toAbsolute('../setup/van-ssr.mjs'));
-    expect(resolvedVan).toEqual(toAbsolute('../setup/van-debug.mjs'));
-    expect(resolvedVanXSSR).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
-    expect(resolvedVanX).toEqual(toAbsolute('../setup/vanX.mjs'));
+    expect(plugin.resolveId("@vanjs/setup", undefined, {ssr: true})).toEqual(toAbsolute('../setup/index-ssr.mjs'));
+    expect(plugin.resolveId("@vanjs/setup", undefined, { ssr: false })).toEqual(toAbsolute('../setup/index-debug.mjs'));
+    expect(plugin.resolveId("@vanjs/van", undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
+    expect(plugin.resolveId("@vanjs/van", undefined, { ssr: false })).toEqual(toAbsolute('../setup/van-debug.mjs'));
+    expect(plugin.resolveId("@vanjs/vanX", undefined, { ssr: true } )).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect(plugin.resolveId("@vanjs/vanX", undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
+
     // resolve modules production
     process.env.NODE_ENV = 'production';
-    resolvedSetup = plugin.resolveId('@vanjs/setup', undefined, { ssr: false });
-    resolvedVan = plugin.resolveId('@vanjs/van', undefined, { ssr: false });
-    resolvedVanSSR = plugin.resolveId('@vanjs/van', undefined, { ssr: true });
-    resolvedVanX = plugin.resolveId('@vanjs/vanX', undefined, { ssr: false });
-    resolvedVanXSSR = plugin.resolveId('@vanjs/vanX', undefined, { ssr: true });
-    expect(resolvedSetupSSR).toEqual(toAbsolute('../setup/index-ssr.mjs'));
-    expect(resolvedSetup).toEqual(toAbsolute('../setup/index.mjs'));
-    expect(resolvedVanSSR).toEqual(toAbsolute('../setup/van-ssr.mjs'));
-    expect(resolvedVan).toEqual(toAbsolute('../setup/van.mjs'));
-    expect(resolvedVanXSSR).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
-    expect(resolvedVanX).toEqual(toAbsolute('../setup/vanX.mjs'));
+    expect(plugin.resolveId('@vanjs/setup', undefined, { ssr: true })).toEqual(toAbsolute('../setup/index-ssr.mjs'));
+    expect(plugin.resolveId('@vanjs/setup', undefined, { ssr: false })).toEqual(toAbsolute('../setup/index.mjs'));
+    expect(plugin.resolveId('@vanjs/van', undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
+    expect(plugin.resolveId('@vanjs/van', undefined, { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
+    expect(plugin.resolveId('@vanjs/vanX', undefined, { ssr: true })).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect(plugin.resolveId('@vanjs/vanX', undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
 
     // edge cases
     expect(plugin.resolveId("vanjs-core", "/vite-plugin-vanjs/jsx/jsx.mjs", { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
