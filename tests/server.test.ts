@@ -16,8 +16,6 @@ import vanjs from "../plugin/index.mjs";
 import { renderToString, renderPreloadLinks } from "@vanjs/server";
 import { Router, Route, lazy, setRouterState, routerState, fixRouteUrl, routes } from "@vanjs/router";
 
-// import "virtual:@vanjs/routes";
-
 describe(`Test SSR`, () => {
 
   // Mock Vite's internals
@@ -152,7 +150,7 @@ describe(`Test SSR`, () => {
     }));
 
     // coverage
-    plugin.configResolved({ mode: "development", root: toAbsolute("..") } as any);
+    plugin.configResolved({ mode: "test", root: toAbsolute("..") } as any);
     // virtual:module 
     expect(plugin.resolveId('virtual:@vanjs/routes', undefined, { ssr: false })).toEqual('\0virtual:@vanjs/routes');
     // resolve modules development
@@ -166,6 +164,17 @@ describe(`Test SSR`, () => {
 
     // resolve modules production
     process.env.NODE_ENV = 'production';
+    // plugin.configResolved({ mode: "production", root: toAbsolute("..") } as any);
+    expect(plugin.resolveId('@vanjs/setup', undefined, { ssr: true })).toEqual(toAbsolute('../setup/index-ssr.mjs'));
+    expect(plugin.resolveId('@vanjs/setup', undefined, { ssr: false })).toEqual(toAbsolute('../setup/index.mjs'));
+    expect(plugin.resolveId('@vanjs/van', undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
+    expect(plugin.resolveId('@vanjs/van', undefined, { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
+    expect(plugin.resolveId('@vanjs/vanX', undefined, { ssr: true })).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect(plugin.resolveId('@vanjs/vanX', undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
+
+    // resolve modules test
+    process.env.NODE_ENV = 'test';
+    // plugin.configResolved({ mode: "test", root: toAbsolute("..") } as any);
     expect(plugin.resolveId('@vanjs/setup', undefined, { ssr: true })).toEqual(toAbsolute('../setup/index-ssr.mjs'));
     expect(plugin.resolveId('@vanjs/setup', undefined, { ssr: false })).toEqual(toAbsolute('../setup/index.mjs'));
     expect(plugin.resolveId('@vanjs/van', undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
@@ -178,10 +187,19 @@ describe(`Test SSR`, () => {
     expect(plugin.resolveId("src/van.js", "src/van-debug.js", { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
     expect(plugin.resolveId("src/some-plugin-dont-exist", "another-importer", { ssr: true })).toEqual(null);
 
-    process.env.NODE_ENV = 'development';
-
-    // console.log("toAbsolute(\"..\")", toAbsolute(".."));
-    // console.log("resolveSomeID", toAbsolute('../tests/routes/admin.ts'));
+    // test plugin early returns
+    const resolvedSetupSSR = plugin.resolveId('@vanjs/setup', undefined, { ssr: true });
+    const resolvedSetup = plugin.resolveId('@vanjs/setup', undefined, { ssr: false });
+    const resolvedVan = plugin.resolveId('@vanjs/van', undefined, { ssr: false });
+    const resolvedVanSSR = plugin.resolveId('@vanjs/van', undefined, { ssr: true });
+    const resolvedVanX = plugin.resolveId('@vanjs/vanX', undefined, { ssr: false });
+    const resolvedVanXSSR = plugin.resolveId('@vanjs/vanX', undefined, { ssr: true });
+    expect(plugin.resolveId(resolvedSetupSSR!, undefined, { ssr: true })).toEqual(toAbsolute('../setup/index-ssr.mjs'));
+    expect(plugin.resolveId(resolvedSetup!, undefined, { ssr: false })).toEqual(toAbsolute('../setup/index.mjs'));
+    expect(plugin.resolveId(resolvedVanSSR!, undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
+    expect(plugin.resolveId(resolvedVan!, undefined, { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
+    expect(plugin.resolveId(resolvedVanXSSR!, undefined, { ssr: true })).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect(plugin.resolveId(resolvedVanX!, undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
 
     expect(config).toEqual({
       optimizeDeps: {
@@ -189,7 +207,8 @@ describe(`Test SSR`, () => {
         include: [
           'vanjs-core',
           'vanjs-ext',
-          'mini-van-plate'
+          'mini-van-plate/van-plate',
+          'mini-van-plate/shares'
         ],
       },
       ssr: {

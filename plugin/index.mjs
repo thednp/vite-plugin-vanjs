@@ -41,7 +41,8 @@ export default function VitePluginVanJS(options = {}) {
           include: [
             "vanjs-core",
             "vanjs-ext",
-            "mini-van-plate",
+            "mini-van-plate/van-plate",
+            "mini-van-plate/shares",
           ],
         },
         ssr: {
@@ -101,17 +102,22 @@ export default function VitePluginVanJS(options = {}) {
     },
     /** @type {(source: string, importer: string | undefined, ops: { ssr: boolean }) => string | null} */
     resolveId(source, importer, ops) {
+      // istanbul ignore else
+      if (source === virtualModuleId) {
+        return resolvedVirtualModuleId;
+      }
       const isVanXFile = importer &&
         /vanjs-ext[\/\\]src[\/\\]van-x/.test(importer);
       const isSetupFile = importer &&
         /vite-plugin-vanjs[\/\\]setup/.test(importer);
       const isProduction = process.env.NODE_ENV === "production";
+      const isTest = process.env.NODE_ENV === "test";
       const isJSXImport = source.includes("/vite-plugin-vanjs/jsx/jsx") ||
         importer?.includes("/vite-plugin-vanjs/jsx/jsx.mjs");
 
       const resolvedVan = toAbsolute(
         ops.ssr ? "../setup/van-ssr.mjs" : (isJSXImport || isProduction ||
-            config.mode === "test")
+            isTest)
           ? "../setup/van.mjs"
           : "../setup/van-debug.mjs",
       );
@@ -121,10 +127,21 @@ export default function VitePluginVanJS(options = {}) {
       const setupResolved = toAbsolute(
         ops.ssr
           ? "../setup/index-ssr.mjs"
-          : (isProduction || config.mode === "test")
+          : (isProduction || isTest)
           ? "../setup/index.mjs"
           : "../setup/index-debug.mjs",
       );
+
+      // Resolve early when source already resolved. EG: @vanjs/van
+      if (source === setupResolved || setupResolved.includes(source)) {
+        return setupResolved;
+      }
+      if (source === resolvedVan || resolvedVan.includes(source)) {
+        return resolvedVan;
+      }
+      if (source === resolvedVanX || resolvedVanX.includes(source)) {
+        return resolvedVanX;
+      }
 
       // istanbul ignore else
       if (!isSetupFile && !isVanXFile) {
@@ -141,10 +158,7 @@ export default function VitePluginVanJS(options = {}) {
           return resolvedVanX;
         }
       }
-      // istanbul ignore else
-      if (source === virtualModuleId) {
-        return resolvedVirtualModuleId;
-      }
+
       return null;
     },
     /** @type {(id: string, ops: { ssr: boolean }) => Promise<({ code: string, map: null } | null)>} */
