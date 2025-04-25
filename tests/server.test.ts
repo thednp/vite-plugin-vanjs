@@ -190,6 +190,7 @@ describe(`Test SSR`, () => {
     expect(resolvedVanX).toEqual(toAbsolute('../setup/vanX.mjs'));
 
     // edge cases
+    expect(plugin.resolveId("vanjs-core", "/vite-plugin-vanjs/jsx/jsx.mjs", { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
     expect(plugin.resolveId("src/van.js", "src/van-debug.js", { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
     expect(plugin.resolveId("src/some-plugin-dont-exist", "another-importer", { ssr: true })).toEqual(null);
 
