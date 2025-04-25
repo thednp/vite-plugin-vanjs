@@ -106,11 +106,12 @@ export default function VitePluginVanJS(options = {}) {
       const isSetupFile = importer &&
         /vite-plugin-vanjs[\/\\]setup/.test(importer);
       const isProduction = process.env.NODE_ENV === "production";
+      const isJSXImport = source.includes("/vite-plugin-vanjs/jsx/jsx") ||
+        importer?.includes("/vite-plugin-vanjs/jsx/jsx.mjs");
+
       const resolvedVan = toAbsolute(
-        ops.ssr
-          ? "../setup/van-ssr.mjs"
-          : (importer?.endsWith("jsx/jsx.mjs") || isProduction ||
-              config.mode === "test")
+        ops.ssr ? "../setup/van-ssr.mjs" : (isJSXImport || isProduction ||
+            config.mode === "test")
           ? "../setup/van.mjs"
           : "../setup/van-debug.mjs",
       );
