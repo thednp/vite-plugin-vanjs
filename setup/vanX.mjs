@@ -20,14 +20,11 @@ const vanX = {
   list,
   replace,
   compact,
-  // Define default as part of the initial object
-  get default() {
-    return vanX;
-  },
 };
 
 // Export named exports
 export { calc, compact, list, noreactive, raw, reactive, replace, stateFields };
 
 // Export as default
-export default vanX;
+export { vanX as default };
+export {};

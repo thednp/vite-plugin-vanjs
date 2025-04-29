@@ -121,7 +121,8 @@ describe(`Test SSR`, () => {
 
     expect(reactive(obj).a).to.equal(1);
     expect(reactive(obj).b).to.equal(2);
-    expect((vanX as typeof vanX & { default: typeof vanX}).default).toBeDefined();
+    // expect((vanX as typeof vanX & { default: typeof vanX}).default).toBeDefined();
+    expect(vanX).toBeDefined();
 
     expect(Div.render()).toContain("Sample div");
     expect(Anchor.render()).not.toContain("onclick");

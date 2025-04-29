@@ -121,7 +121,12 @@ function createHydrationContext() {
     const newSet = new Set();
 
     const processElements = (root, set) => {
-      const elements = root.querySelectorAll("[data-hk]");
+      const newRoot = root instanceof Element ? root : root instanceof Array &&
+          root.every((child) => child instanceof Element)
+        ? document.createElement("div").append(...root)
+        : null;
+
+      const elements = newRoot ? newRoot.querySelectorAll("[data-hk]") : [];
       let lastParent = null;
 
       elements.forEach((el) => {

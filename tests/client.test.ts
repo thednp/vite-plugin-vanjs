@@ -94,7 +94,8 @@ describe(`Test client-side`, () => {
     );
 
     // console.log({ Anchor, Icon })
-    expect(vanXDefault.default).toBeDefined()
+    // expect(vanXDefault.default).toBeDefined()
+    expect(vanXDefault).toBeDefined()
     expect(reactive(obj).a).to.equal(1);
     expect(reactive(obj).b).to.equal(2);
     expect(Anchor.getAttribute("onclick")).toBeNull();
@@ -194,6 +195,17 @@ describe(`Test client-side`, () => {
     newBody = van.add(oldBody.cloneNode() as HTMLElement, Layout({ children: InfoPage() }));
     // console.log("info", {oldBody: oldBody.outerHTML, newBody: newBody.outerHTML});
     van.hydrate(oldBody as HTMLElement, body => hydrate(body, newBody));
+    expect(oldBody.innerText).to.contain('Info');
+
+    oldBody.removeAttribute("data-h");
+    // console.log("info", {oldBody: oldBody.outerHTML, newBody: newBody.outerHTML});
+    van.hydrate(oldBody as HTMLElement, body => hydrate(body, InfoPage()));
+    expect(oldBody.innerText).to.contain('Info');
+    // console.log("\ninfo\n", docBody.outerHTML);
+
+    oldBody.removeAttribute("data-h");
+    // console.log("info", {oldBody: oldBody.outerHTML, newBody: newBody.outerHTML});
+    van.hydrate(oldBody as HTMLElement, body => hydrate(body, null));
     expect(oldBody.innerText).to.contain('Info');
     // console.log("\ninfo\n", docBody.outerHTML);
   })
