@@ -106,12 +106,17 @@ function createHydrationContext() {
     return parent;
   }
 
-  /** @type {(oldDom: HTMLElement, newDom: HTMLElement) => HTMLElement} */
+  /** @type {(oldDom: HTMLElement, newDom: HTMLElement | HTMLElement[]) => HTMLElement} */
   function diffAndHydrate(oldDom, newDom) {
     // SPA mode
     // istanbul ignore else
     if (!oldDom.children.length && !elementsMatch(oldDom, newDom)) {
       return oldDom.replaceChildren(...unwrap(newDom).children);
+    }
+    // istanbul ignore else
+    if (newDom instanceof Array) {
+      oldDom.replaceChildren(...unwrap(newDom).children);
+      return;
     }
 
     // SSR Mode
@@ -121,12 +126,7 @@ function createHydrationContext() {
     const newSet = new Set();
 
     const processElements = (root, set) => {
-      const newRoot = root instanceof Element ? root : root instanceof Array &&
-          root.every((child) => child instanceof Element)
-        ? document.createElement("div").append(...root)
-        : null;
-
-      const elements = newRoot ? newRoot.querySelectorAll("[data-hk]") : [];
+      const elements = root.querySelectorAll("[data-hk]");
       let lastParent = null;
 
       elements.forEach((el) => {
