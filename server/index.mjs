@@ -80,8 +80,12 @@ export function renderPreloadLinks(modules, manifest) {
 
   // First pass: collect all assets from ignored paths
   Object.entries(manifest).forEach(([id, files]) => {
-    // istanbul ignore else
-    if (["src/pages", "src/routes"].some((l) => id.includes(l))) {
+    // istanbul ignore else - don't pre-render routes, layouts and JSX stuff
+    if (
+      ["src/pages", "src/routes", "vite-plugin-vanjs/jsx"].some((l) =>
+        id.includes(l)
+      )
+    ) {
       files.forEach((asset) => ignoredAssets.add(asset));
     }
   });
