@@ -19,22 +19,14 @@ const pluginDefaults = {
   extensions: [".tsx", ".jsx", ".ts", ".js"],
 };
 
-// Aliases coming from plugin.config()
-// const resolvedVan = toAbsolute("../setup/van");
-// const resolvedVanX = toAbsolute("../setup/vanX");
-// const resolvedSetup = toAbsolute("../setup/index");
-
 // Define module mapping configuration
 const moduleAliases = {
   // Core modules
   "@vanjs/van": "../setup/van",
-  // [resolvedVan]: "../setup/van",
   "@vanjs/vanX": "../setup/vanX",
-  // [resolvedVanX]: "../setup/vanX",
 
   // Setup modules
   "@vanjs/setup": "../setup/index",
-  // [resolvedSetup]: "../setup/index",
 
   // Other modules
   "@vanjs/client": "../client",
@@ -47,19 +39,14 @@ const moduleAliases = {
 // SSR specific module mappings
 const ssrModuleAliases = {
   "@vanjs/van": "../setup/van-ssr",
-  // [resolvedVan]: "../setup/van-ssr",
   "@vanjs/vanX": "../setup/vanX-ssr",
-  // [resolvedVanX]: "../setup/vanX-ssr",
   "@vanjs/setup": "../setup/index-ssr",
-  // [resolvedSetup]: "../setup/index-ssr",
 };
 
 // Debug specific module mappings (development only)
 const debugModuleAliases = {
   "@vanjs/van": "../setup/van-debug",
-  // [resolvedVan]: "../setup/van-debug",
   "@vanjs/setup": "../setup/index-debug",
-  // [resolvedSetup]: "../setup/index-debug",
 };
 
 export default function VitePluginVanJS(options = {}) {
@@ -155,14 +142,8 @@ export default function VitePluginVanJS(options = {}) {
       const isTest = process.env.NODE_ENV === "test";
       const isSetupFile = typeof importer === "string" &&
         importer.includes("vite-plugin-vanjs/setup");
-      // const isVanXFile = typeof importer === "string" &&
-      //   importer.includes("vanjs-ext/src/van-x");
       const isImportedVanXFile = typeof importer === "string" &&
         importer.includes("vite-plugin-vanjs/setup/vanX");
-      // const isImportedVanFile = !isImportedVanXFile && typeof importer === "string" &&
-      //   importer.includes("vite-plugin-vanjs/setup/van");
-      // const isImportedSetupFile = typeof importer === "string" &&
-      //   importer.includes("vite-plugin-vanjs/setup/index");
       const isResolvedVanXFile = source.includes(
         "vite-plugin-vanjs/setup/vanX",
       );
