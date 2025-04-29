@@ -19,6 +19,49 @@ const pluginDefaults = {
   extensions: [".tsx", ".jsx", ".ts", ".js"],
 };
 
+// Aliases coming from plugin.config()
+// const resolvedVan = toAbsolute("../setup/van");
+// const resolvedVanX = toAbsolute("../setup/vanX");
+// const resolvedSetup = toAbsolute("../setup/index");
+
+// Define module mapping configuration
+const moduleAliases = {
+  // Core modules
+  "@vanjs/van": "../setup/van",
+  // [resolvedVan]: "../setup/van",
+  "@vanjs/vanX": "../setup/vanX",
+  // [resolvedVanX]: "../setup/vanX",
+
+  // Setup modules
+  "@vanjs/setup": "../setup/index",
+  // [resolvedSetup]: "../setup/index",
+
+  // Other modules
+  "@vanjs/client": "../client",
+  "@vanjs/server": "../server",
+  "@vanjs/meta": "../meta",
+  "@vanjs/router": "../router",
+  "@vanjs/jsx": "../jsx",
+};
+
+// SSR specific module mappings
+const ssrModuleAliases = {
+  "@vanjs/van": "../setup/van-ssr",
+  // [resolvedVan]: "../setup/van-ssr",
+  "@vanjs/vanX": "../setup/vanX-ssr",
+  // [resolvedVanX]: "../setup/vanX-ssr",
+  "@vanjs/setup": "../setup/index-ssr",
+  // [resolvedSetup]: "../setup/index-ssr",
+};
+
+// Debug specific module mappings (development only)
+const debugModuleAliases = {
+  "@vanjs/van": "../setup/van-debug",
+  // [resolvedVan]: "../setup/van-debug",
+  "@vanjs/setup": "../setup/index-debug",
+  // [resolvedSetup]: "../setup/index-debug",
+};
+
 export default function VitePluginVanJS(options = {}) {
   const pluginConfig = { ...pluginDefaults, ...options };
   const { routesDir } = pluginConfig;
@@ -101,71 +144,67 @@ export default function VitePluginVanJS(options = {}) {
       server.watcher.on("change", changeHandler);
     },
     /** @type {(source: string, importer: string | undefined, ops: { ssr: boolean }) => string | null} */
-    resolveId(source, importer, ops) {
-      // istanbul ignore else
+    resolveId(source, importer, { ssr }) {
+      // Handle virtual module
       if (source === virtualModuleId) {
         return resolvedVirtualModuleId;
       }
-      const isVanXFile = importer &&
-        /vanjs-ext[\/\\]src[\/\\]van-x/.test(importer);
-      const isSetupFile = importer &&
-        /vite-plugin-vanjs[\/\\]setup/.test(importer);
+
+      // Get the appropriate module aliases based on environment
       const isProduction = process.env.NODE_ENV === "production";
       const isTest = process.env.NODE_ENV === "test";
+      const isSetupFile = typeof importer === "string" &&
+        importer.includes("vite-plugin-vanjs/setup");
+      // const isVanXFile = typeof importer === "string" &&
+      //   importer.includes("vanjs-ext/src/van-x");
+      const isImportedVanXFile = typeof importer === "string" &&
+        importer.includes("vite-plugin-vanjs/setup/vanX");
+      // const isImportedVanFile = !isImportedVanXFile && typeof importer === "string" &&
+      //   importer.includes("vite-plugin-vanjs/setup/van");
+      // const isImportedSetupFile = typeof importer === "string" &&
+      //   importer.includes("vite-plugin-vanjs/setup/index");
+      const isResolvedVanXFile = source.includes(
+        "vite-plugin-vanjs/setup/vanX",
+      );
+      const isResolvedVanFile = !isResolvedVanXFile &&
+        source.includes("vite-plugin-vanjs/setup/van");
+      const isResolvedSetupFile = source.includes(
+        "vite-plugin-vanjs/setup/index",
+      );
       const isJSXImport = source.includes("/vite-plugin-vanjs/jsx/jsx") ||
-        importer?.includes("/vite-plugin-vanjs/jsx/jsx.mjs");
+        (typeof importer === "string" &&
+          importer.includes("/vite-plugin-vanjs/jsx/jsx.mjs"));
+      const isDebugImport = !ssr && typeof importer === "string" &&
+        importer.includes("/src/van.debug.js") &&
+        source.includes("/van.js");
+      let aliases = moduleAliases;
 
-      const resolvedVan = toAbsolute(
-        ops.ssr ? "../setup/van-ssr.mjs" : (isJSXImport || isProduction ||
-            isTest)
-          ? "../setup/van.mjs"
-          : "../setup/van-debug.mjs",
-      );
-      const resolvedVanX = toAbsolute(
-        ops.ssr ? "../setup/vanX-ssr.mjs" : "../setup/vanX.mjs",
-      );
-      const setupResolved = toAbsolute(
-        ops.ssr
-          ? "../setup/index-ssr.mjs"
-          : (isProduction || isTest)
-          ? "../setup/index.mjs"
-          : "../setup/index-debug.mjs",
-      );
-
-      // Resolve early when source already resolved. EG: @vanjs/van
-      if (
-        (ops.ssr || isTest) &&
-        (source === setupResolved || setupResolved.includes(source))
-      ) {
-        return setupResolved;
-      }
-      if (
-        (ops.ssr || isTest) &&
-        (source === resolvedVan || resolvedVan.includes(source))
-      ) {
-        return resolvedVan;
-      }
-      if (
-        (ops.ssr || isTest) &&
-        (source === resolvedVanX || resolvedVanX.includes(source))
-      ) {
-        return resolvedVanX;
+      // Handle special case for debug
+      if (isDebugImport) {
+        return toAbsolute("../setup/van.mjs");
       }
 
-      // istanbul ignore else
-      if (!isSetupFile && !isVanXFile) {
-        if (source === "@vanjs/setup") {
-          return setupResolved;
-        }
-        if (importer?.endsWith("debug.js") && source.endsWith("/van.js")) {
-          return toAbsolute("../setup/van.mjs");
-        }
-        if (source === "vanjs-core" || source === "@vanjs/van") {
-          return resolvedVan;
-        }
-        if (source === "vanjs-ext" || source === "@vanjs/vanX") {
-          return resolvedVanX;
-        }
+      // Select appropriate aliases based on environment
+      if (ssr) {
+        aliases = { ...aliases, ...ssrModuleAliases };
+      } else if (!isProduction && !isTest && !isJSXImport) {
+        aliases = { ...aliases, ...debugModuleAliases };
+      }
+      // Check if the source is a known module
+      const matchedSource =
+        isResolvedVanFile || (source === "vanjs-core" && !isSetupFile)
+          ? "@vanjs/van"
+          : isResolvedVanXFile ||
+              (source === "vanjs-ext" && /* istanbul ignore next */
+                !isImportedVanXFile)
+          ? "@vanjs/vanX"
+          : isResolvedSetupFile && (!ssr && isSetupFile || ssr && !isSetupFile)
+          ? "@vanjs/setup"
+          : null;
+      const resolvedPath = matchedSource ? aliases[matchedSource] : null;
+
+      if (resolvedPath) {
+        return toAbsolute(resolvedPath + ".mjs");
       }
 
       return null;

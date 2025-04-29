@@ -5,7 +5,7 @@
 [![NPM Version](https://img.shields.io/npm/v/vite-plugin-vanjs.svg)](https://www.npmjs.com/package/vite-plugin-vanjs)
 [![NPM Downloads](https://img.shields.io/npm/dm/vite-plugin-vanjs.svg)](http://npm-stat.com/charts.html?package=vite-plugin-vanjs)
 [![typescript version](https://img.shields.io/badge/typescript-5.6.2-brightgreen)](https://www.typescriptlang.org/)
-[![vanjs-core version](https://img.shields.io/badge/vanjs--core-1.5.3-brightgreen)](https://github.com/vanjs-org/van)
+[![vanjs-core version](https://img.shields.io/badge/vanjs--core-1.5.5-brightgreen)](https://github.com/vanjs-org/van)
 [![mini-van-plate version](https://img.shields.io/badge/mini--van--plate-0.6.3-brightgreen)](https://github.com/vanjs-org/mini-van-plate)
 [![vitest version](https://img.shields.io/badge/vitest-3.1.2-brightgreen)](https://www.vitest.dev/)
 [![vite version](https://img.shields.io/badge/vite-6.3.3-brightgreen)](https://vite.dev)
