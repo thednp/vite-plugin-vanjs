@@ -23,21 +23,21 @@ export const styleToString = (style) => {
   return typeof style === "string"
     ? style
     : typeof style === "object"
-    ? Object.entries(style).reduce((acc, [key, value]) =>
-      acc +
-      key
-        .split(/(?=[A-Z])/)
-        .join("-")
-        .toLowerCase() +
-      ":" +
-      // allow state values in style object
-      (typeof value === "object" && "val" in value ? value.val : value) +
-      ";", "")
-    : /* istanbul ignore next */ "";
+      ? Object.entries(style).reduce((acc, [key, value]) =>
+        acc +
+        key
+          .split(/(?=[A-Z])/)
+          .join("-")
+          .toLowerCase() +
+        ":" +
+        // allow state values in style object
+        (typeof value === "object" && "val" in value ? value.val : value) +
+        ";", "")
+      : /* istanbul ignore next */ "";
 };
 
-/** @type {(el1: HTMLElement, el2: HTMLElement | HTMLElement[]) => boolean} */
-export function elementsMatch(el1, el2) {
+/** @type {(el1: HTMLElement, el2: HTMLElement | HTMLElement[], deep?: boolean) => boolean} */
+export function elementsMatch(el1, el2, deep) {
   // Quick initial checks before recursing
   // istanbul ignore else
   if (
@@ -63,14 +63,24 @@ export function elementsMatch(el1, el2) {
       child.querySelector("[data-hk]"))
   );
 
+  // istanbul ignore next
   if (!hasHydratedChildren) {
     return true; // If no hydrated children, elements match based on initial checks
   }
 
-  return childNodes1.every((child, idx) =>
-    elementsMatch(child, childNodes2[idx])
-  );
+  // Only recurse if opted in
+  // istanbul ignore next
+  return deep
+    ? childNodes1.every((child, idx) => elementsMatch(child, childNodes2[idx]))
+    : true;
 }
+
+/** @type {<E extends Element = Element, T extends keyof HTMLElementTagNameMap>(target: E, ...tagNames: T[]) => boolean} */
+const isTag = (target, ...tagNames) => {
+  return tagNames.some((tag) =>
+    target.tagName.toLowerCase() === tag.toLowerCase()
+  );
+};
 
 function createHydrationContext() {
   /** @type {WeakMap<Element, Element>} */
@@ -180,12 +190,8 @@ export const hydrate = (target, content) => {
   const wrapper = unwrap(content);
   const currentChildren = Array.from(target.children);
   const newChildren = Array.from(wrapper.children);
-  const isStyleLink = (tag) =>
-    [HTMLStyleElement, HTMLLinkElement].some((e) => tag instanceof e);
-  const isStyle = (tag) => tag instanceof HTMLStyleElement;
-  const isLink = (tag) => tag instanceof HTMLLinkElement;
 
-  if (target.tagName.toLowerCase() === "head") {
+  if (isTag(target, "head")) {
     // Keep current tags on first hydration
     if (!target.hasAttribute("data-h")) {
       target.setAttribute("data-h", "");
@@ -193,14 +199,18 @@ export const hydrate = (target, content) => {
     }
 
     // Handle non-style/link tags first
-    const regularTags = newChildren.filter((child) => !isStyleLink(child));
+    const regularTags = newChildren.filter((child) =>
+      !isTag(child, "style", "link")
+    );
 
     // Handle style/link tags separately
-    const styleTags = newChildren.filter((child) => isStyleLink(child));
+    const styleTags = newChildren.filter((child) =>
+      isTag(child, "style", "link")
+    );
 
     // Create maps for existing tags
     const existingStyles = new Map(
-      currentChildren.filter(isStyleLink)
+      currentChildren.filter((child) => isTag(child, "style", "link"))
         .map((child) => [getTagKey(child), child]),
     );
 
@@ -224,29 +234,29 @@ export const hydrate = (target, content) => {
 
       // Skip if tag already exists with same content+id/href
       if (existing) {
-        /* istanbul ignore next - try again later */
-        if (isStyle(existing) && isStyle(newChild)) {
+        // istanbul ignore next - try again later
+        if (isTag(existing, "style") && isTag(newChild, "style")) {
           if (
             existing.textContent === newChild.textContent &&
             existing.id === newChild.id
           ) return;
         }
-        /* istanbul ignore next - try again later */
-        if (isLink(existing) && isLink(newChild)) {
+        // istanbul ignore next - try again later
+        if (isTag(existing, "link") && isTag(newChild, "link")) {
           if (existing.href === newChild.href) return;
         }
       }
 
       // For link tags, add with disabled state first
-      /* istanbul ignore else - try again later */
-      if (isLink(newChild)) {
+      // istanbul ignore else - try again later
+      if (isTag(newChild, "link")) {
         const temp = newChild.cloneNode();
         temp.disabled = true;
 
         const originalRel = temp.rel;
         temp.rel = "preload";
         temp.as = "style";
-        /* istanbul ignore next */
+        // istanbul ignore next
         temp.onload = () => {
           temp.rel = originalRel;
           temp.removeAttribute("as");
@@ -258,9 +268,9 @@ export const hydrate = (target, content) => {
 
         target.appendChild(temp);
       } // For style tags, add new one first
-      else if (isStyle(newChild)) {
+      else if (isTag(newChild, "style")) {
         target.appendChild(newChild);
-        /* istanbul ignore next - try again later */
+        // istanbul ignore next - try again later
         if (existing && existing.parentNode === target) {
           // Remove old one in next frame
           existing.remove();
