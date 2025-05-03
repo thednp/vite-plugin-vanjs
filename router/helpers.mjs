@@ -1,9 +1,7 @@
-// import van from "vanjs-core";
 import isServer from "../setup/isServer.mjs";
 import { routerState, setRouterState } from "./state.mjs";
-import { matchRoute } from "./routes.mjs";
+import { matchRoute } from "./matchRoute.mjs";
 
-/** @typedef {typeof import("./types.d.ts").unwrap} Unwrap */
 /** @typedef {typeof import("./types.d.ts").navigate} Navigate */
 /** @typedef {import("./types.d.ts").Route} Route */
 /** @typedef {import("./types.d.ts").VanNode} VanNode */
@@ -19,41 +17,6 @@ import { matchRoute } from "./routes.mjs";
  */
 export const isCurrentPage = (pageName) => {
   return routerState.pathname.val === pageName;
-};
-
-/**
- * Merge the children of an Element or an array of elements with an optional array of children
- * into the childen prperty of a simple object.
- * @type {Unwrap}
- */
-export const unwrap = (source, ...children) => {
-  const layout = () => {
-    /** @type {VanNode[]} */
-    const pageChildren =
-      source && typeof source === "object" && "children" in source &&
-        Array.isArray(source?.children)
-        ? source.children
-        : typeof source === "function"
-        // @ts-expect-error - this case is specific to VanJS components in SSR
-        ? [...source()?.children || source()]
-        : typeof HTMLElement !== "undefined" && source instanceof HTMLElement
-        ? [...source.children]
-        : /* istanbul ignore next */ Array.isArray(source)
-        ? source
-        : [source];
-
-    // return van.tags.fragment(
-    // ...(children || /* istanbul ignore next */ []),
-    // ...pageChildren,
-    // );
-    return {
-      children: [
-        ...(children || /* istanbul ignore next */ []),
-        ...pageChildren,
-      ],
-    };
-  };
-  return layout();
 };
 
 /**
@@ -119,47 +82,6 @@ export const navigate = (path, options = {}) => {
     // Server-side navigation - throw error
     console.error("Direct navigation is not supported on server");
   }
-};
-
-/**
- * Extract route params
- * @param {string} pattern
- * @param {string} path
- * @returns {Record<string, string> | null}
- */
-export const extractParams = (pattern, path) => {
-  /** @type {Record<string, string>} */
-  const params = {};
-  const patternParts = pattern.split("/");
-  const pathParts = path.split("/");
-
-  if (patternParts.length !== pathParts.length) return null;
-
-  for (let i = 0; i < patternParts.length; i++) {
-    const patternPart = patternParts[i];
-    const pathPart = pathParts[i];
-
-    if (patternPart.startsWith(":")) {
-      params[patternPart.slice(1)] = pathPart;
-    } else if (patternPart !== pathPart) {
-      return null;
-    }
-  }
-
-  return params;
-};
-
-/**
- * Fix the URL of a route
- * @param {string=} url
- * @returns
- */
-export const fixRouteUrl = (url) => {
-  if (!url) return "/";
-  if (url.startsWith("/")) {
-    return url;
-  }
-  return `/${url}`;
 };
 
 /**

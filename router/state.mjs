@@ -1,7 +1,19 @@
 // router/state.js
 import van from "vanjs-core";
 import isServer from "../setup/isServer.mjs";
-import { fixRouteUrl } from "./helpers.mjs";
+
+/**
+ * Fix the URL of a route
+ * @param {string=} url
+ * @returns
+ */
+export const fixRouteUrl = (url) => {
+  if (!url) return "/";
+  if (url.startsWith("/")) {
+    return url;
+  }
+  return `/${url}`;
+};
 
 const initialPath = !isServer ? globalThis.location.pathname : "/";
 const initialSearch = !isServer ? globalThis.location.search : "";

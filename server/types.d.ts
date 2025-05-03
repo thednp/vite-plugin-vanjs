@@ -21,11 +21,11 @@ type ValidVanNode =
   | VanElement
   | TagFunc;
 
-type VanComponent = () => HTMLElement | ValidVanNode | ValidVanNode[];
+type VComponent = () => HTMLElement | ValidVanNode | ValidVanNode[];
 export type Source =
   | Promise<ValidVanNode>
-  | VanComponent
-  | (() => VanComponent)
+  | VComponent
+  | (() => VComponent)
   | ValidVanNode
   | ValidVanNode[]
   | undefined;

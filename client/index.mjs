@@ -1,4 +1,4 @@
-import { unwrap } from "../router/index.mjs";
+import { unwrap } from "../router/unwrap.mjs";
 import { getTagKey } from "../meta/helpers.mjs";
 
 /**
@@ -23,17 +23,17 @@ export const styleToString = (style) => {
   return typeof style === "string"
     ? style
     : typeof style === "object"
-      ? Object.entries(style).reduce((acc, [key, value]) =>
-        acc +
-        key
-          .split(/(?=[A-Z])/)
-          .join("-")
-          .toLowerCase() +
-        ":" +
-        // allow state values in style object
-        (typeof value === "object" && "val" in value ? value.val : value) +
-        ";", "")
-      : /* istanbul ignore next */ "";
+    ? Object.entries(style).reduce((acc, [key, value]) =>
+      acc +
+      key
+        .split(/(?=[A-Z])/)
+        .join("-")
+        .toLowerCase() +
+      ":" +
+      // allow state values in style object
+      (typeof value === "object" && "val" in value ? value.val : value) +
+      ";", "")
+    : /* istanbul ignore next */ "";
 };
 
 /** @type {(el1: HTMLElement, el2: HTMLElement | HTMLElement[], deep?: boolean) => boolean} */
@@ -118,6 +118,7 @@ function createHydrationContext() {
 
   /** @type {(oldDom: HTMLElement, newDom: HTMLElement | HTMLElement[]) => HTMLElement} */
   function diffAndHydrate(oldDom, newDom) {
+    if (!oldDom || !newDom) return;
     // SPA mode
     // istanbul ignore else
     if (!oldDom.children.length && !elementsMatch(oldDom, newDom)) {

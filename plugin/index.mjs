@@ -203,7 +203,8 @@ export default function VitePluginVanJS(options = {}) {
         }
 
         const routesScript = `
-import { Route, routes } from "@vanjs/router/routes.mjs";
+import { Route } from "@vanjs/router/route.mjs";
+import { routes } from "@vanjs/router/routes.mjs";
 import { lazy } from "@vanjs/router/lazy.mjs";
 
 // Reset current routes

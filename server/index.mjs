@@ -70,9 +70,6 @@ function renderPreloadLink(file) {
 /**
  * @type {typeof import("./types.d.ts").renderPreloadLinks}
  */
-/**
- * @type {typeof import("./types.d.ts").renderPreloadLinks}
- */
 export function renderPreloadLinks(modules, manifest) {
   let links = "";
   const seen = new Set();
@@ -82,7 +79,7 @@ export function renderPreloadLinks(modules, manifest) {
   Object.entries(manifest).forEach(([id, files]) => {
     // istanbul ignore else - don't pre-render routes, layouts and JSX stuff
     if (
-      ["src/pages", "src/routes", "vite-plugin-vanjs/jsx"].some((l) =>
+      ["src/pages", "src/routes", "vite-plugin-vanjs/"].some((l) =>
         id.includes(l)
       )
     ) {

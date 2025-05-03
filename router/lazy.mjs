@@ -1,5 +1,6 @@
-import isServer from "../setup/isServer.mjs";
+// router/lazy.mjs
 import van from "vanjs-core";
+import isServer from "../setup/isServer.mjs";
 import { cache, getCached } from "./cache.mjs";
 
 /** @typedef {import('./types').VanNode} VanNode */

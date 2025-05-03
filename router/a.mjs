@@ -1,6 +1,6 @@
 // router/a.mjs
 import van from "vanjs-core";
-import { matchRoute } from "./routes.mjs";
+import { matchRoute } from "./matchRoute.mjs";
 import { executeLifecycle, isCurrentPage, navigate } from "./helpers.mjs";
 
 /** @typedef {typeof import("./types").A} A */
