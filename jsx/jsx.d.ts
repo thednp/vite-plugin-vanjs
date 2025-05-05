@@ -26,6 +26,11 @@ export type { Fragment } from "./fragment";
 export as namespace JSX;
 export = JSX;
 
+// trick TypeScript into thinking this is real React
+declare global {
+  const React: {};
+}
+
 declare namespace JSX {
   // type FunctionMaybe<T = unknown> = { (): T } | T;
   // type Element = VanNode;

@@ -1,2 +1,2 @@
 /// <reference types="vite/client" />
-/// <reference types="../src/types.d.ts" />
+/// <reference types="../plugin/types.d.ts" />
