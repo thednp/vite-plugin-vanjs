@@ -205,8 +205,7 @@ describe(`Test SSR`, () => {
         include: [
           'vanjs-core',
           'vanjs-ext',
-          'mini-van-plate/van-plate',
-          'mini-van-plate/shared'
+          'mini-van-plate'
         ],
       },
       ssr: {
