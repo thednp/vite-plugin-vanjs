@@ -36,6 +36,7 @@ deno add npm:vite-plugin-vanjs@latest
 bun add vite-plugin-vanjs@latest
 ```
 
+
 ### Wiki
 
 For a complete guide on how to use the plugin, be sure to check the wiki:
