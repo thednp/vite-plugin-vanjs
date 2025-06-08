@@ -6,13 +6,29 @@ declare module "@vanjs/client" {
   } from "mini-van-plate/van-plate";
 
   /**
-   * Sets the attribute value of the given name of the given element.
+   * Sets the attribute value of the given name to a given target element.
    *
    * @param element the target element
    * @param key the attribute name
    * @param value the attribute value
    */
   export const setAttribute: (
+    element: Element,
+    name: string,
+    value: boolean | string | number | null | undefined,
+  ) => void;
+
+  /**
+   * Sets the attribute value of the given name and a given namespace
+   * to a given target element.
+   *
+   * @param namespace the attribute/element namespace
+   * @param element the target element
+   * @param key the attribute name
+   * @param value the attribute value
+   */
+  export const setAttributeNS: (
+    namespace: string | null,
     element: Element,
     name: string,
     value: boolean | string | number | null | undefined,

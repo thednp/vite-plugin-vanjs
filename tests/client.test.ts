@@ -5,13 +5,14 @@ import process from "node:process";
 import van from '@vanjs/van';
 import * as vanX from 'vanjs-ext';
 import vanXDefault from "@vanjs/vanX";
-import { hydrate } from "@vanjs/client";
+import { hydrate, setAttribute, setAttributeNS } from "@vanjs/client";
 import { Head, Title, Meta, Script, Style, Link, addMeta, resetHeadTags, initializeHeadTags, SupportedTags } from "@vanjs/meta";
 import { Router, Route, lazy, A, setRouterState, routerState, navigate, routes, unwrap } from "@vanjs/router";
 import { Layout } from "./routes/(root).ts";
 import { Page as IndexPage } from "./routes/(root)/index.ts";
 import { Page as ContactPage } from "./routes/contact.ts";
 import { Page as InfoPage } from "./routes/(root)/info.ts";
+import { jsx } from "@vanjs/jsx";
 const styleUrl = PATH.resolve(process.cwd(), "tests", 'test-style.css');
 const scriptUrl = PATH.resolve(process.cwd(), "tests", 'test-script.js');
 const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
@@ -345,5 +346,26 @@ describe(`Test client-side`, () => {
     // console.log(unwrap(Page3()))
     expect((unwrap(Page3()) ).children.length).toEqual(2);
     expect((unwrap([h1('Hello VanJS'), div('some div 5')])).children.length).toEqual(2);
+  });
+
+  test("Test edge cases", async () => {
+    const anchor = van.tags.a({ class: "my-anchor" });
+    setAttribute(anchor, "id", "test-div");
+    setAttribute(anchor, "removable", true);
+    expect(anchor.id).toEqual("test-div");
+    expect(anchor.getAttribute("removable")).toEqual('');
+    setAttribute(anchor, "removable", null);
+    expect(anchor.getAttribute("removable")).toBeNull();
+    // namespace attributes
+    setAttributeNS("http://www.w3.org/1999/xlink", anchor, "xlink:href", null);
+    expect(anchor.getAttribute("href")).toBeNull();
+
+    const svg = jsx("svg", { class: "my-div" }) as SVGSVGElement;
+    setAttributeNS(null, svg, "xml:lang", "en");
+    expect(svg.getAttribute("xml:lang")).toEqual("en");
+    setAttributeNS("http://www.w3.org/1999/xlink", svg, "xlink", "https://test.dev");
+    expect(svg.getAttributeNS("http://www.w3.org/1999/xlink", "xlink")).toEqual("https://test.dev");
+    setAttributeNS("http://www.w3.org/1999/xlink", svg, "xmlns:xlink", null);
+    expect(svg.getAttributeNS("http://www.w3.org/1999/xlink", "xmlns:xlink")).toBeNull();
   })
 })

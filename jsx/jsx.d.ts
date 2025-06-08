@@ -2341,6 +2341,215 @@ declare namespace JSX {
     use: UseSVGAttributes<SVGUseElement>;
     view: ViewSVGAttributes<SVGViewElement>;
   }
+  /** @type {MathMLElementTagNameMap} */
+  interface MathMLElementTags {
+    math: MathMLMathAttributes<MathMLElement>;
+    mi: MathMLAnnotationAttributes<MathMLMiElement>;
+    mn: MathMLAnnotationAttributes<MathMLMnElement>;
+    mo: MathMLOperatorAttributes<MathMLMoElement>;
+    ms: MathMLAnnotationAttributes<MathMLMsElement>;
+    mtext: MathMLAnnotationAttributes<MathMLMtextElement>;
+    mspace: MathMLMspaceAttributes<MathMLMspaceElement>;
+    mrow: MathMLRowAttributes<MathMLMrowElement>;
+    mfrac: MathMLFracAttributes<MathMLMfracElement>;
+    msqrt: MathMLRowAttributes<MathMLMsqrtElement>;
+    mroot: MathMLRowAttributes<MathMLMrootElement>;
+    mstyle: MathMLStyleAttributes<MathMLMstyleElement>;
+    merror: MathMLRowAttributes<MathMLMerrorElement>;
+    mpadded: MathMLPaddedAttributes<MathMLMpaddedElement>;
+    mphantom: MathMLRowAttributes<MathMLMphantomElement>;
+    mfenced: MathMLFencedAttributes<MathMLMfencedElement>;
+    mtable: MathMLTableAttributes<MathMLMtableElement>;
+    mtr: MathMLTableRowAttributes<MathMLMtrElement>;
+    mtd: MathMLTableCellAttributes<MathMLMtdElement>;
+    msub: MathMLScriptAttributes<MathMLMsubElement>;
+    msup: MathMLScriptAttributes<MathMLMsupElement>;
+    msubsup: MathMLScriptAttributes<MathMLMsubsupElement>;
+    mmultiscripts: MathMLMultiscriptsAttributes<MathMLMmultiscriptsElement>;
+    mover: MathMLScriptAttributes<MathMLMoverElement>;
+    munder: MathMLScriptAttributes<MathMLMunderElement>;
+    munderover: MathMLScriptAttributes<MathMLMunderoverElement>;
+    semantics: MathMLSemanticsAttributes<MathMLSemanticsElement>;
+    annotation: MathMLAnnotationElementAttributes<MathMLAnnotationElement>;
+    "annotation-xml": MathMLAnnotationElementAttributes<
+      MathMLAnnotationXMLElement
+    >;
+  }
+
+  /** MathML-specific attribute interfaces */
+  interface MathMLAttributes<T> extends AriaAttributes, DOMAttributes<T> {
+    class?: FunctionMaybe<string>;
+    id?: FunctionMaybe<string>;
+    style?: FunctionMaybe<CSSProperties | string>;
+    dir?: FunctionMaybe<"ltr" | "rtl">;
+    mathvariant?: FunctionMaybe<
+      | "normal"
+      | "bold"
+      | "italic"
+      | "bold-italic"
+      | "double-struck"
+      | "bold-fraktur"
+      | "script"
+      | "bold-script"
+      | "fraktur"
+      | "sans-serif"
+      | "bold-sans-serif"
+      | "sans-serif-italic"
+      | "sans-serif-bold-italic"
+      | "monospace"
+      | "initial"
+      | "tailed"
+      | "looped"
+      | "stretched"
+    >;
+  }
+
+  interface MathMLMathAttributes<T> extends MathMLAttributes<T> {
+    display?: FunctionMaybe<"block" | "inline">;
+    alttext?: FunctionMaybe<string>;
+    altimg?: FunctionMaybe<string>;
+    "altimg-width"?: FunctionMaybe<string>;
+    "altimg-height"?: FunctionMaybe<string>;
+    "altimg-valign"?: FunctionMaybe<string>;
+    mathbackground?: FunctionMaybe<string>;
+    mathcolor?: FunctionMaybe<string>;
+    mathsize?: FunctionMaybe<string>;
+  }
+
+  interface MathMLAnnotationAttributes<T> extends MathMLAttributes<T> {
+    mathbackground?: FunctionMaybe<string>;
+    mathcolor?: FunctionMaybe<string>;
+  }
+
+  interface MathMLOperatorAttributes<T> extends MathMLAnnotationAttributes<T> {
+    form?: FunctionMaybe<"prefix" | "infix" | "postfix">;
+    fence?: FunctionMaybe<"true" | "false">;
+    separator?: FunctionMaybe<"true" | "false">;
+    lspace?: FunctionMaybe<string>;
+    rspace?: FunctionMaybe<string>;
+    stretchy?: FunctionMaybe<"true" | "false">;
+    symmetric?: FunctionMaybe<"true" | "false">;
+    maxsize?: FunctionMaybe<string>;
+    minsize?: FunctionMaybe<string>;
+    largeop?: FunctionMaybe<"true" | "false">;
+    movablelimits?: FunctionMaybe<"true" | "false">;
+    accent?: FunctionMaybe<"true" | "false">;
+  }
+
+  interface MathMLMspaceAttributes<T> extends MathMLAnnotationAttributes<T> {
+    width?: FunctionMaybe<string>;
+    height?: FunctionMaybe<string>;
+    depth?: FunctionMaybe<string>;
+  }
+
+  interface MathMLRowAttributes<T> extends MathMLAnnotationAttributes<T> {}
+
+  interface MathMLFracAttributes<T> extends MathMLAnnotationAttributes<T> {
+    linethickness?: FunctionMaybe<string>;
+    numalign?: FunctionMaybe<"left" | "center" | "right">;
+    denomalign?: FunctionMaybe<"left" | "center" | "right">;
+    bevelled?: FunctionMaybe<"true" | "false">;
+  }
+
+  interface MathMLStyleAttributes<T> extends MathMLAnnotationAttributes<T> {
+    mathbackground?: FunctionMaybe<string>;
+    mathcolor?: FunctionMaybe<string>;
+    mathsize?: FunctionMaybe<string>;
+    mathdepth?: FunctionMaybe<string>;
+  }
+
+  interface MathMLPaddedAttributes<T> extends MathMLAnnotationAttributes<T> {
+    width?: FunctionMaybe<string>;
+    height?: FunctionMaybe<string>;
+    depth?: FunctionMaybe<string>;
+    lspace?: FunctionMaybe<string>;
+    voffset?: FunctionMaybe<string>;
+  }
+
+  interface MathMLFencedAttributes<T> extends MathMLAnnotationAttributes<T> {
+    open?: FunctionMaybe<string>;
+    close?: FunctionMaybe<string>;
+    separators?: FunctionMaybe<string>;
+  }
+
+  interface MathMLTableAttributes<T> extends MathMLAnnotationAttributes<T> {
+    align?: FunctionMaybe<
+      | "axis"
+      | "baseline"
+      | "center"
+      | "top"
+      | "bottom"
+      | string
+    >;
+    rowalign?: FunctionMaybe<
+      "top" | "bottom" | "center" | "baseline" | "axis"
+    >;
+    columnalign?: FunctionMaybe<
+      "left" | "center" | "right"
+    >;
+    columnlines?: FunctionMaybe<
+      "none" | "solid" | "dashed"
+    >;
+    rowlines?: FunctionMaybe<
+      "none" | "solid" | "dashed"
+    >;
+    frame?: FunctionMaybe<
+      "none" | "solid" | "dashed"
+    >;
+    framespacing?: FunctionMaybe<string>;
+    equalrows?: FunctionMaybe<"true" | "false">;
+    equalcolumns?: FunctionMaybe<"true" | "false">;
+    displaystyle?: FunctionMaybe<"true" | "false">;
+    side?: FunctionMaybe<"left" | "right" | "leftoverlap" | "rightoverlap">;
+    minlabelspacing?: FunctionMaybe<string>;
+    width?: FunctionMaybe<string>;
+  }
+
+  interface MathMLTableRowAttributes<T> extends MathMLAnnotationAttributes<T> {
+    rowalign?: FunctionMaybe<
+      "top" | "bottom" | "center" | "baseline" | "axis"
+    >;
+    columnalign?: FunctionMaybe<
+      "left" | "center" | "right"
+    >;
+  }
+
+  interface MathMLTableCellAttributes<T> extends MathMLAnnotationAttributes<T> {
+    rowspan?: FunctionMaybe<number | string>;
+    columnspan?: FunctionMaybe<number | string>;
+    rowalign?: FunctionMaybe<
+      "top" | "bottom" | "center" | "baseline" | "axis"
+    >;
+    columnalign?: FunctionMaybe<
+      "left" | "center" | "right"
+    >;
+  }
+
+  interface MathMLScriptAttributes<T> extends MathMLAnnotationAttributes<T> {
+    subscriptshift?: FunctionMaybe<string>;
+    superscriptshift?: FunctionMaybe<string>;
+  }
+
+  interface MathMLMultiscriptsAttributes<T>
+    extends MathMLAnnotationAttributes<T> {
+    subscriptshift?: FunctionMaybe<string>;
+    superscriptshift?: FunctionMaybe<string>;
+  }
+
+  interface MathMLSemanticsAttributes<T> extends MathMLAnnotationAttributes<T> {
+    encoding?: FunctionMaybe<string>;
+    src?: FunctionMaybe<string>;
+  }
+
+  interface MathMLAnnotationElementAttributes<T>
+    extends MathMLAnnotationAttributes<T> {
+    encoding?: FunctionMaybe<string>;
+    src?: FunctionMaybe<string>;
+  }
   interface IntrinsicElements
-    extends HTMLElementTags, HTMLElementDeprecatedTags, SVGElementTags {}
+    extends
+      HTMLElementTags,
+      HTMLElementDeprecatedTags,
+      SVGElementTags,
+      MathMLElementTags {}
 }

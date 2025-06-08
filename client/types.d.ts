@@ -2,13 +2,29 @@
 import * as CSS from "csstype";
 
 /**
- * Sets the attribute value of the given name of the given element.
+ * Sets the attribute value of a given name of a given element.
  *
  * @param element the target element
  * @param key the attribute name
  * @param value the attribute value
  */
 export const setAttribute: (
+  element: Element,
+  name: string,
+  value: boolean | string | number | null | undefined,
+) => void;
+
+/**
+ * Sets a namespaced attribute value of a given namespace, name and a given element.
+ * Fallback to regular setAttribute automatically.
+ *
+ * @param namespace the namespace string
+ * @param element the target element
+ * @param key the attribute name
+ * @param value the attribute value
+ */
+export const setAttributeNS: (
+  namespace: string,
   element: Element,
   name: string,
   value: boolean | string | number | null | undefined,

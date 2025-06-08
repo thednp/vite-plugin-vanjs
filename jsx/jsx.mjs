@@ -1,22 +1,32 @@
 import van from "vanjs-core";
 import isServer from "../setup/isServer.mjs";
-import { setAttribute, styleToString } from "../client/index.mjs";
+import { setAttributeNS, styleToString } from "../client/index.mjs";
+import { namespaceElements } from "./namespaceElements.mjs";
 
+let currentNamespace;
+
+/**
+ * Compiles JSX to VanJS elements with automatic namespace resolution.
+ *
+ * @param {string|Function} jsxTag - The tag name (e.g., 'svg') or component function.
+ * @param {Object} props - Props including children, ref, style, and attributes.
+ * @returns {Element|null} The compiled VanJS element or null for invalid tags.
+ */
 export const jsx = (jsxTag, { children, ref, style, ...rest }) => {
-  // filter props with undefined values
+  // Filter props with undefined values
   const props = Object.fromEntries(
     Object.entries(rest).filter(([_, val]) => val !== undefined),
   );
 
   if (typeof jsxTag === "string") {
-    const newElement = van.tags[jsxTag](props, children);
+    const ns = currentNamespace || namespaceElements[jsxTag];
+    const newElement = (ns ? van.tags(ns) : van.tags)[jsxTag](props, children);
 
+    // Handle style reactively
     van.derive(() => {
-      /* istanbul ignore else */
       if (style) {
         const styleProp = typeof style === "function" ? style() : style;
         const styleValue = styleToString(styleProp);
-
         if (isServer) {
           newElement.propsStr += ` style="${styleValue}"`;
         } else {
@@ -25,13 +35,18 @@ export const jsx = (jsxTag, { children, ref, style, ...rest }) => {
       }
     });
 
-    // on server it's good enough to return here
-    if (isServer) return newElement;
+    // On server, apply props as string
+    if (isServer) {
+      return newElement;
+    }
 
-    // on the client, we sure do need to set the attributes
+    // On client, apply attributes reactively
     for (const [k, value] of Object.entries(props)) {
+      // Use element's namespace for attributes
+      const attrNamespace = k === "xmlns" ? null : newElement.namespaceURI;
+
       if (typeof value === "function" && !k.startsWith("on")) {
-        van.derive(() => setAttribute(newElement, k, value()));
+        van.derive(() => setAttributeNS(attrNamespace, newElement, k, value()));
         continue;
       }
 
@@ -41,11 +56,13 @@ export const jsx = (jsxTag, { children, ref, style, ...rest }) => {
       }
 
       if (typeof value === "object" && "val" in value) {
-        van.derive(() => setAttribute(newElement, k, value.val));
+        van.derive(() =>
+          setAttributeNS(attrNamespace, newElement, k, value.val)
+        );
         continue;
       }
 
-      setAttribute(newElement, k, value);
+      setAttributeNS(attrNamespace, newElement, k, value);
     }
 
     if (ref) ref.val = { current: newElement };

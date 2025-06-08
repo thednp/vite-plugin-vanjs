@@ -53,6 +53,19 @@ describe(`Test client-side JSX`, () => {
     expect(spanRef?.val?.current.tagName).toEqual('SPAN');
   });
 
+  test(`Test SVG`, async () => {
+    const svg = <svg width="100" height="100">
+    <circle cx="50" cy="50" r="40" fill="blue" />
+  </svg>
+    const svgWithSVGNS = <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="40" fill="blue" />
+  </svg>
+
+    expect((svg as SVGAElement).getAttribute("width")).toEqual("100");
+    expect((svgWithSVGNS as SVGAElement).getAttribute("xmlns")).toEqual("http://www.w3.org/2000/svg");
+
+  });
+
   test(`Test fragment`, async () => {
     const Component = () => {
       return (
