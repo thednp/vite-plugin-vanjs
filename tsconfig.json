@@ -2,8 +2,6 @@
    // https://janessagarrow.com/blog/typescript-and-esbuild/
   "compilerOptions": {
     "lib": ["DOM", "ESNext", "DOM.Iterable"],
-    "rootDir": "./",
-    "baseUrl": "./",
     "module": "ESNext",
     "target": "ESNext",
     "moduleResolution": "Bundler",

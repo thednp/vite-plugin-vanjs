@@ -5,7 +5,7 @@
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import process from "node:process";
-import { transformWithEsbuild } from "vite";
+import { transformWithOxc } from "vite";
 import { routes } from "../router/routes.mjs";
 import { generateRoute, getRoutes } from "./helpers.mjs";
 
@@ -218,10 +218,10 @@ ${
         }
 `;
 
-        const result = await transformWithEsbuild(
+        const result = await transformWithOxc(
           routesScript,
           id,
-          { loader: "js" },
+          { lang: "js" },
         );
 
         return {
