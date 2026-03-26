@@ -1,10 +1,10 @@
 // plugin/types.ts
-export * from "../jsx/types";
-export * from "../setup/types";
-export * from "../router/types";
-export * from "../meta/types";
-export * from "../server/types";
-export * from "../client/types";
+export * from "../jsx/types.d.ts";
+export * from "../setup/types.d.ts";
+export * from "../router/types.d.ts";
+export * from "../meta/types.d.ts";
+export * from "../server/types.d.ts";
+export * from "../client/types.d.ts";
 import type { PluginOption } from "vite";
 
 export type VanJSPluginOptions = {

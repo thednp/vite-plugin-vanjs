@@ -15,7 +15,7 @@ describe(`Test client-side JSX`, () => {
       <button
         id="my-button"
         onClick={async () => className.val += " two"}
-        data-test={true}
+        data-test
         style="border: 1px solid red"
         class={className}
         >
