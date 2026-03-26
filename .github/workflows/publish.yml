@@ -33,7 +33,7 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Build (if needed)
-        run: pnpm build # Optional
+        # run: pnpm build # Later
 
       # - name: Install playwright (required for test)
       #   run: pnpm exec playwright install
