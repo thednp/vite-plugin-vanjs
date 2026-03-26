@@ -1,7 +1,12 @@
 // deno-lint-ignore-file no-empty-interface ban-types
 
 import * as csstype from "csstype";
-import type { Primitive, State, StateView } from "vanjs-core";
+import type {
+  Primitive,
+  PropValueOrDerived,
+  State,
+  StateView,
+} from "vanjs-core";
 import { Element as VElement } from "mini-van-plate/van-plate";
 
 /**
@@ -21,7 +26,7 @@ export type VanNode =
   | null
   | undefined;
 
-export type { Fragment } from "./fragment";
+export type { Fragment } from "./fragment.d.ts";
 
 export as namespace JSX;
 export = JSX;
@@ -32,8 +37,6 @@ declare global {
 }
 
 declare namespace JSX {
-  // type FunctionMaybe<T = unknown> = { (): T } | T;
-  // type Element = VanNode;
   type FunctionMaybe<T = unknown> = (() => T) | StateView<T> | T | undefined;
   type Element =
     | State<Primitive | null | undefined>
@@ -41,8 +44,6 @@ declare namespace JSX {
     | DOMElement
     | HTMLElement
     | ArrayElement
-    // | TagComponent<any>
-    // | Component
     | FunctionElement
     | (string & {})
     | Primitive
@@ -142,8 +143,7 @@ declare namespace JSX {
     extends
       CustomAttributes<T>,
       CustomEventHandlersCamelCase<T>,
-      CustomEventHandlersLowerCase<T>,
-      CustomEventHandlersNamespaced<T> {
+      CustomEventHandlersLowerCase<T> {
     children?: Element;
     innerHTML?: string;
     innerText?: string | number;
@@ -2344,36 +2344,34 @@ declare namespace JSX {
   /** @type {MathMLElementTagNameMap} */
   interface MathMLElementTags {
     math: MathMLMathAttributes<MathMLElement>;
-    mi: MathMLAnnotationAttributes<MathMLMiElement>;
-    mn: MathMLAnnotationAttributes<MathMLMnElement>;
-    mo: MathMLOperatorAttributes<MathMLMoElement>;
-    ms: MathMLAnnotationAttributes<MathMLMsElement>;
-    mtext: MathMLAnnotationAttributes<MathMLMtextElement>;
-    mspace: MathMLMspaceAttributes<MathMLMspaceElement>;
-    mrow: MathMLRowAttributes<MathMLMrowElement>;
-    mfrac: MathMLFracAttributes<MathMLMfracElement>;
-    msqrt: MathMLRowAttributes<MathMLMsqrtElement>;
-    mroot: MathMLRowAttributes<MathMLMrootElement>;
-    mstyle: MathMLStyleAttributes<MathMLMstyleElement>;
-    merror: MathMLRowAttributes<MathMLMerrorElement>;
-    mpadded: MathMLPaddedAttributes<MathMLMpaddedElement>;
-    mphantom: MathMLRowAttributes<MathMLMphantomElement>;
-    mfenced: MathMLFencedAttributes<MathMLMfencedElement>;
-    mtable: MathMLTableAttributes<MathMLMtableElement>;
-    mtr: MathMLTableRowAttributes<MathMLMtrElement>;
-    mtd: MathMLTableCellAttributes<MathMLMtdElement>;
-    msub: MathMLScriptAttributes<MathMLMsubElement>;
-    msup: MathMLScriptAttributes<MathMLMsupElement>;
-    msubsup: MathMLScriptAttributes<MathMLMsubsupElement>;
-    mmultiscripts: MathMLMultiscriptsAttributes<MathMLMmultiscriptsElement>;
-    mover: MathMLScriptAttributes<MathMLMoverElement>;
-    munder: MathMLScriptAttributes<MathMLMunderElement>;
-    munderover: MathMLScriptAttributes<MathMLMunderoverElement>;
-    semantics: MathMLSemanticsAttributes<MathMLSemanticsElement>;
-    annotation: MathMLAnnotationElementAttributes<MathMLAnnotationElement>;
-    "annotation-xml": MathMLAnnotationElementAttributes<
-      MathMLAnnotationXMLElement
-    >;
+    mi: MathMLAnnotationAttributes<MathMLElement>;
+    mn: MathMLAnnotationAttributes<MathMLElement>;
+    mo: MathMLOperatorAttributes<MathMLElement>;
+    ms: MathMLAnnotationAttributes<MathMLElement>;
+    mtext: MathMLAnnotationAttributes<MathMLElement>;
+    mspace: MathMLMspaceAttributes<MathMLElement>;
+    mrow: MathMLRowAttributes<MathMLElement>;
+    mfrac: MathMLFracAttributes<MathMLElement>;
+    msqrt: MathMLRowAttributes<MathMLElement>;
+    mroot: MathMLRowAttributes<MathMLElement>;
+    mstyle: MathMLStyleAttributes<MathMLElement>;
+    merror: MathMLRowAttributes<MathMLElement>;
+    mpadded: MathMLPaddedAttributes<MathMLElement>;
+    mphantom: MathMLRowAttributes<MathMLElement>;
+    mfenced: MathMLFencedAttributes<MathMLElement>;
+    mtable: MathMLTableAttributes<MathMLElement>;
+    mtr: MathMLTableRowAttributes<MathMLElement>;
+    mtd: MathMLTableCellAttributes<MathMLElement>;
+    msub: MathMLScriptAttributes<MathMLElement>;
+    msup: MathMLScriptAttributes<MathMLElement>;
+    msubsup: MathMLScriptAttributes<MathMLElement>;
+    mmultiscripts: MathMLMultiscriptsAttributes<MathMLElement>;
+    mover: MathMLScriptAttributes<MathMLElement>;
+    munder: MathMLScriptAttributes<MathMLElement>;
+    munderover: MathMLScriptAttributes<MathMLElement>;
+    semantics: MathMLSemanticsAttributes<MathMLElement>;
+    annotation: MathMLAnnotationElementAttributes<MathMLElement>;
+    "annotation-xml": MathMLAnnotationElementAttributes<MathMLElement>;
   }
 
   /** MathML-specific attribute interfaces */

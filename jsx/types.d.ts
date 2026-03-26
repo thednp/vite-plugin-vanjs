@@ -1,5 +1,5 @@
 /// <reference path="global.d.ts" />
-import type { Fragment } from "./fragment";
+import type { Fragment } from "./fragment.d.ts";
 
 declare function jsx(
   type: unknown,
@@ -12,5 +12,5 @@ declare function jsx(
     [key: string]: unknown;
   })[];
 
-export type { JSX } from "./jsx";
+export type { JSX } from "./jsx.d.ts";
 export { Fragment, jsx, jsx as jsxDEV, jsx as jsxs };

@@ -1,9 +1,9 @@
+/// <reference types="./jsx.d.ts" />
+
 import van from "vanjs-core";
 import isServer from "../setup/isServer.mjs";
 import { setAttributeNS, styleToString } from "../client/index.mjs";
-import { namespaceElements } from "./namespaceElements.mjs";
-
-let currentNamespace;
+import { namespaceElements } from "./ns.mjs";
 
 /**
  * Compiles JSX to VanJS elements with automatic namespace resolution.
@@ -19,7 +19,7 @@ export const jsx = (jsxTag, { children, ref, style, ...rest }) => {
   );
 
   if (typeof jsxTag === "string") {
-    const ns = currentNamespace || namespaceElements[jsxTag];
+    const ns = namespaceElements[jsxTag];
     const newElement = (ns ? van.tags(ns) : van.tags)[jsxTag](props, children);
 
     // Handle style reactively

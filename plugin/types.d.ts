@@ -5,7 +5,6 @@ export * from "../router/types";
 export * from "../meta/types";
 export * from "../server/types";
 export * from "../client/types";
-export * from "../parser/types";
 import type { PluginOption } from "vite";
 
 export type VanJSPluginOptions = {
@@ -14,7 +13,7 @@ export type VanJSPluginOptions = {
 };
 
 export declare const VitePluginVanJS: (
-  config?: VitePluginVanJS,
+  config?: VanJSPluginOptions,
 ) => PluginOption<VanJSPluginOptions>;
 
 export default VitePluginVanJS;

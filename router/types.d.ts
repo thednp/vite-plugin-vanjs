@@ -12,7 +12,7 @@ import type {
   PropValueOrDerived,
   State,
 } from "vanjs-core";
-import { LayoutFile } from "../plugin/types";
+import { LayoutFile } from "../plugin/types.d.ts";
 
 // type VanElement = VElement | Exclude<Primitive, boolean | undefined>;
 // type DOMElement = globalThis.Element;

@@ -1,4 +1,4 @@
-import type { JSX } from "./jsx";
+import type { JSX } from "./jsx.d.ts";
 
 export type FragmentProps = {
   children?: JSX.Element;
