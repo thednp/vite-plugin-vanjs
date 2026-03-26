@@ -16,19 +16,18 @@ import vanjs from "../plugin/index.mjs";
 import { renderToString, renderPreloadLinks } from "@vanjs/server";
 import { Router, Route, lazy, setRouterState, routerState, fixRouteUrl, routes } from "@vanjs/router";
 
+// Mock Vite's internals
+vi.mock('vite', () => ({
+  // normalizePath: (path: string) => path.replace(/\\/g, '/'),
+  transformWithOxc: vi.fn().mockImplementation((code) => 
+    Promise.resolve({ 
+      code,  // return the same code that was passed
+      map: null 
+    })
+  ),
+}));
+
 describe(`Test SSR`, () => {
-
-  // Mock Vite's internals
-  vi.mock('vite', () => ({
-    // normalizePath: (path: string) => path.replace(/\\/g, '/'),
-    transformWithEsbuild: vi.fn().mockImplementation((code) => 
-      Promise.resolve({ 
-        code,  // return the same code that was passed
-        map: null 
-      })
-    ),
-  }));
-
   afterEach(async () => {
     process.env.NODE_ENV = "test";
   });
@@ -223,7 +222,8 @@ describe(`Test SSR`, () => {
           '@vanjs/jsx': expect.any(String),
         },
       },
-      esbuild: {
+      // esbuild: {
+      oxc: {
         jsx: 'automatic',
         jsxImportSource: '@vanjs/jsx',
       },

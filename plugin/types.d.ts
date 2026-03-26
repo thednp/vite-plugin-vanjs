@@ -8,8 +8,8 @@ export * from "../client/types.d.ts";
 import type { PluginOption } from "vite";
 
 export type VanJSPluginOptions = {
-  routesDir: string;
-  extensions: string[];
+  routesDir?: string;
+  extensions?: string[];
 };
 
 export declare const VitePluginVanJS: (

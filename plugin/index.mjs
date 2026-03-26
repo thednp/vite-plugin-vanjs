@@ -89,7 +89,7 @@ export default function VitePluginVanJS(options = {}) {
             "@vanjs/jsx": toAbsolute("../jsx"),
           },
         },
-        esbuild: {
+        oxc: {
           jsx: "automatic",
           jsxImportSource: "@vanjs/jsx",
         },
@@ -175,7 +175,7 @@ export default function VitePluginVanJS(options = {}) {
         isResolvedVanFile || (source === "vanjs-core" && !isSetupFile)
           ? "@vanjs/van"
           : isResolvedVanXFile ||
-              (source === "vanjs-ext" && /* istanbul ignore next */
+              (source === "vanjs-ext" && /* istanbul ignore next @preserve */
                 !isImportedVanXFile)
           ? "@vanjs/vanX"
           : isResolvedSetupFile && (!ssr && isSetupFile || ssr && !isSetupFile)
@@ -214,7 +214,7 @@ ${currentRoutes.map(generateRoute).join("\n")}
 ${
           ops.ssr && currentRoutes.length
             ? `console.log(\`🍦 @vanjs/router registered ${currentRoutes.length} routes.\`)`
-            : /* istanbul ignore next - satisfied */ ""
+            : /* istanbul ignore next @preserve - satisfied */ ""
         }
 `;
 

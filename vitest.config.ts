@@ -6,22 +6,24 @@ export default defineConfig({
   test: {
     globals: true,
     include: [
-      "tests/**.test.?(c|m)[jt]s?(x)",
+      "tests/**.test.tsx",
+      "tests/**.test.ts"
     ],
     coverage: {
       provider: "istanbul",
       reporter: ["html", "text", "lcov"],
       enabled: true,
       include: [
-        "plugin/*",
-        "meta/*",
-        "router/*",
-        "setup/*",
-        "client/*",
-        "server/*",
-        "jsx/*",
-        "parser/*",
+        "plugin/*.[mjs|ts]",
+        "meta/*.[mjs|ts]",
+        "router/.[mjs|ts]*",
+        "setup/*.[mjs|ts]",
+        "client/*.[mjs|ts]",
+        "server/*.[mjs|ts]",
+        "jsx/*.[mjs|ts]",
+        // "parser/*.[mjs|ts]",
       ],
+      // exclude: ["*.json"]
     },
   },
 });
