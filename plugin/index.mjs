@@ -5,7 +5,7 @@
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import process from "node:process";
-import { transformWithOxc } from "vite";
+// import { transformWithOxc } from "vite";
 import { routes } from "../router/routes.mjs";
 import { generateRoute, getRoutes } from "./helpers.mjs";
 
@@ -89,10 +89,13 @@ export default function VitePluginVanJS(options = {}) {
             "@vanjs/jsx": toAbsolute("../jsx"),
           },
         },
-        oxc: {
+        esbuild: {
           jsx: "automatic",
           jsxImportSource: "@vanjs/jsx",
         },
+        // oxc: {
+        //   jsxInject: `import React from "@vanjs/jsx";`
+        // },
       };
     },
     /** @param {import("vite").ResolvedConfig} resolvedConfig */
@@ -218,15 +221,28 @@ ${
         }
 `;
 
-        const result = await transformWithOxc(
-          routesScript,
-          id,
-          { lang: "js" },
-        );
+        const vite = await import("vite");
+        // @ts-expect-error - this might be ok
+
+        const viteVersion = this.meta.viteVersion;
+        const isVite8 = viteVersion.startsWith("8")
+        const transformer = isVite8
+          ? "transformWithOxc"
+          : "transformWithEsbuild";
+        const langProp = isVite8 ? "lang" : "loader";
+        const mapProp = isVite8 ? "source_map" : "sourcemap";
+
+        const result = await vite[transformer](routesScript, id, {
+          [langProp]: "js",
+          [mapProp]: true,
+        });
 
         return {
           code: result.code,
-          map: null,
+          map: result.map ? (
+            // @ts-expect-error - this might be ok
+            isVite8 ? JSON.parse(result.map) : result.map
+          ) : null,
         };
       }
       return null;
