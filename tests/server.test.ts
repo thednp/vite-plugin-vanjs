@@ -20,7 +20,6 @@ import { mockPlugin7Context, mockPlugin8Context } from "./fixtures/mock.ts";
 
 // Mock Vite's internals
 vi.mock('vite', () => ({
-  // normalizePath: (path: string) => path.replace(/\\/g, '/'),
   transformWithOxc: vi.fn().mockImplementation((code) => 
     Promise.resolve({ 
       code,  // return the same code that was passed
@@ -28,13 +27,10 @@ vi.mock('vite', () => ({
     })
   ),
   transformWithEsbuild: vi.fn().mockImplementation(async (code) => {
-    const vite = await import("vite");
-    const result = await vite.transformWithOxc(code, "some-id.ts", {
-      sourcemap: true,
-      lang: "js",
+    return Promise.resolve({ 
+      code,  // return the same code that was passed
+      map: [{"file": "./file.ts"}]
     })
-
-    return Promise.resolve(result)
   }),
 }));
 

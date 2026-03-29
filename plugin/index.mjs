@@ -63,9 +63,6 @@ export default function VitePluginVanJS(options = {}) {
   let config;
   /** @type {RouteFile[] | null} */
   let routeCache = null;
-  /** @type {PluginContext} */
-  let context;
-  let viteVersion = "8.0.0";
   let isOxc = true;
 
   const virtualModuleId = "virtual:@vanjs/routes";
@@ -75,9 +72,8 @@ export default function VitePluginVanJS(options = {}) {
     name: "vanjs",
     enforce: "pre",
     buildStart() {
-      context = this;
-      viteVersion = context.meta?.viteVersion[0];
-      isOxc = Number(viteVersion) >= 8;
+      const viteVersion = this.meta?.viteVersion;
+      isOxc = Number(viteVersion[0]) >= 8;
     },
     // @ts-expect-error - this is temporary esbuild will be
     config() {
@@ -239,9 +235,8 @@ routes.length = 0;
 // Register routes
 ${currentRoutes.map(generateRoute).join("\n")}
 ${
-          (ops && ops.ssr && currentRoutes.length)
-            ? `console.log(\`🍦 @vanjs/router registered ${currentRoutes.length} routes.\`)`
-            : /* istanbul ignore next @preserve */ ""
+          (ops && ops.ssr && currentRoutes.length) &&
+          `console.log(\`🍦 @vanjs/router registered ${currentRoutes.length} routes.\`)`
         }
 `;
 
