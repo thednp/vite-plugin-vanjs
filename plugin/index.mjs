@@ -76,10 +76,10 @@ export default function VitePluginVanJS(options = {}) {
     enforce: "pre",
     buildStart() {
       context = this;
-      viteVersion = (context.meta?.viteVersion[0]);
+      viteVersion = context.meta?.viteVersion[0];
       isOxc = Number(viteVersion) >= 8;
     },
-    // @ts-expect-error - this is temporary esbuild will be 
+    // @ts-expect-error - this is temporary esbuild will be
     config() {
       return {
         optimizeDeps: {
@@ -106,20 +106,22 @@ export default function VitePluginVanJS(options = {}) {
           },
         },
         ...(
-          isOxc ? {
-            oxc: {
-              include: /\.(jsx?|tsx?)$/,
-              jsx: {
-                runtime: 'preserve', // Options: 'automatic', 'classic', 'preserve'
-                importSource: "@vanjs/jsx", // Default import source
+          isOxc
+            ? {
+              oxc: {
+                include: /\.(jsx?|tsx?)$/,
+                jsx: {
+                  runtime: "preserve", // Options: 'automatic', 'classic', 'preserve'
+                  importSource: "@vanjs/jsx", // Default import source
+                },
               },
             }
-          } : {
-            esbuild: {
-              jsx: "automatic",
-              jsxImportSource: "@vanjs/jsx",
+            : {
+              esbuild: {
+                jsx: "automatic",
+                jsxImportSource: "@vanjs/jsx",
+              },
             }
-          }
         ),
       };
     },
@@ -201,12 +203,12 @@ export default function VitePluginVanJS(options = {}) {
         isResolvedVanFile || (source === "vanjs-core" && !isSetupFile)
           ? "@vanjs/van"
           : isResolvedVanXFile ||
-            (source === "vanjs-ext" &&
-              !isImportedVanXFile)
-            ? "@vanjs/vanX"
-            : isResolvedSetupFile && (!ssr && isSetupFile || ssr && !isSetupFile)
-              ? "@vanjs/setup"
-              : null;
+              (source === "vanjs-ext" &&
+                !isImportedVanXFile)
+          ? "@vanjs/vanX"
+          : isResolvedSetupFile && (!ssr && isSetupFile || ssr && !isSetupFile)
+          ? "@vanjs/setup"
+          : null;
       const resolvedPath = matchedSource ? aliases[matchedSource] : null;
 
       if (resolvedPath) {
@@ -236,16 +238,15 @@ routes.length = 0;
 
 // Register routes
 ${currentRoutes.map(generateRoute).join("\n")}
-${(ops && ops.ssr && currentRoutes.length)
+${
+          (ops && ops.ssr && currentRoutes.length)
             ? `console.log(\`🍦 @vanjs/router registered ${currentRoutes.length} routes.\`)`
-            : /* istanbul ignore next @preserve */""
-          }
+            : /* istanbul ignore next @preserve */ ""
+        }
 `;
 
         const vite = await import("vite");
-        const transformer = isOxc
-          ? "transformWithOxc"
-          : "transformWithEsbuild";
+        const transformer = isOxc ? "transformWithOxc" : "transformWithEsbuild";
         const langProp = isOxc ? "lang" : "loader";
         // const mapProp = isOxc ? "source_map" : "sourcemap";
 
@@ -256,11 +257,13 @@ ${(ops && ops.ssr && currentRoutes.length)
 
         return {
           code: result.code,
-          map: result.map ? (
-            typeof result.map === "string"
-              ? JSON.parse(result.map)
-              : /* istanbul ignore next @preserve */ result.map
-          ) : /* istanbul ignore next @preserve */ null,
+          map: result.map
+            ? (
+              typeof result.map === "string"
+                ? JSON.parse(result.map)
+                : /* istanbul ignore next @preserve */ result.map
+            )
+            : /* istanbul ignore next @preserve */ null,
         };
       }
       return null;
