@@ -15,6 +15,8 @@ import { type Element as VanElement } from "mini-van-plate/van-plate";
 import vanjs from "../plugin/index.mjs";
 import { renderToString, renderPreloadLinks } from "@vanjs/server";
 import { Router, Route, lazy, setRouterState, routerState, fixRouteUrl, routes } from "@vanjs/router";
+import type { UserConfig } from "vite";
+import { mockPlugin7Context, mockPlugin8Context } from "./fixtures/mock.ts";
 
 // Mock Vite's internals
 vi.mock('vite', () => ({
@@ -22,9 +24,18 @@ vi.mock('vite', () => ({
   transformWithOxc: vi.fn().mockImplementation((code) => 
     Promise.resolve({ 
       code,  // return the same code that was passed
-      map: null 
+      map: `[{"file": "./file.ts"}]`
     })
   ),
+  transformWithEsbuild: vi.fn().mockImplementation(async (code) => {
+    const vite = await import("vite");
+    const result = await vite.transformWithOxc(code, "some-id.ts", {
+      sourcemap: true,
+      lang: "js",
+    })
+
+    return Promise.resolve(result)
+  }),
 }));
 
 describe(`Test SSR`, () => {
@@ -135,12 +146,13 @@ describe(`Test SSR`, () => {
     const plugin = vanjs({
       routesDir: "tests/routes"
     });
-    const config = plugin.config();
+    const config = await (plugin?.config as any)() as UserConfig;
 
     // expect(typeof plugin.config()?.resolve?.alias["@vanjs/setup"]).to.not.equal('undefined');
     expect(plugin).toEqual(expect.objectContaining({
       name: 'vanjs',
       enforce: 'pre',
+      buildStart: expect.any(Function),
       config: expect.any(Function),
       configResolved: expect.any(Function),
       configureServer: expect.any(Function),
@@ -149,54 +161,54 @@ describe(`Test SSR`, () => {
     }));
 
     // coverage
-    plugin.configResolved({ mode: "test", root: toAbsolute("..") } as any);
+    await (plugin.configResolved as any)({ mode: "test", root: toAbsolute("..") } );
     // virtual:module 
-    expect(plugin.resolveId('virtual:@vanjs/routes', undefined, { ssr: false })).toEqual('\0virtual:@vanjs/routes');
+    expect(await (plugin.resolveId as any)('virtual:@vanjs/routes', undefined, { ssr: false })).toEqual('\0virtual:@vanjs/routes');
     // resolve modules development
     process.env.NODE_ENV = 'development';
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/setup"], undefined, {ssr: true})).toEqual(toAbsolute('../setup/index-ssr.mjs'));
-    // expect(plugin.resolveId(config.resolve.alias["@vanjs/setup"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/index-debug.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/van"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/van"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/van-debug.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/vanX"], undefined, { ssr: true } )).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/vanX"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, {ssr: true})).toEqual(toAbsolute('../setup/index-ssr.mjs'));
+    // expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/index-debug.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/van"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/van"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/van-debug.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: true } )).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
 
     // resolve modules production
     process.env.NODE_ENV = 'production';
     // plugin.configResolved({ mode: "production", root: toAbsolute("..") } as any);
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/setup"], undefined, {ssr: true})).toEqual(toAbsolute('../setup/index-ssr.mjs'));
-    // expect(plugin.resolveId(config.resolve.alias["@vanjs/setup"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/index.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/van"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/van"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/vanX"], undefined, { ssr: true } )).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/vanX"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, {ssr: true})).toEqual(toAbsolute('../setup/index-ssr.mjs'));
+    // expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/index.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/van"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/van"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: true } )).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
 
     // resolve modules test
     process.env.NODE_ENV = 'test';
     // plugin.configResolved({ mode: "test", root: toAbsolute("..") } as any);
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/setup"], undefined, {ssr: true})).toEqual(toAbsolute('../setup/index-ssr.mjs'));
-    // expect(plugin.resolveId(config.resolve.alias["@vanjs/setup"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/index.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/van"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/van"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/vanX"], undefined, { ssr: true } )).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/vanX"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, {ssr: true})).toEqual(toAbsolute('../setup/index-ssr.mjs'));
+    // expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/index.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/van"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/van"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: true } )).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
 
     // edge cases
-    expect(plugin.resolveId("vanjs-core", "/vite-plugin-vanjs/jsx/jsx.mjs", { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
-    expect(plugin.resolveId("src/van.js", "/src/van.debug.js", { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
-    expect(plugin.resolveId("src/some-plugin-dont-exist", "another-importer", { ssr: true })).toEqual(null);
+    expect((plugin.resolveId as any)("vanjs-core", "/vite-plugin-vanjs/jsx/jsx.mjs", { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
+    expect((plugin.resolveId as any)("src/van.js", "/src/van.debug.js", { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
+    expect((plugin.resolveId as any)("src/some-plugin-dont-exist", "another-importer", { ssr: true })).toEqual(null);
       
     // test aliases
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/setup"], "/setup/index", { ssr: true })).toEqual(toAbsolute('../setup/index-ssr.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/setup"], toAbsolute("../setup/index"), { ssr: false })).toEqual(toAbsolute('../setup/index.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/van"], toAbsolute("../setup/van-ssr.mjs"), { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/van"], toAbsolute("../setup/van.mjs"), { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/vanX"], toAbsolute("../setup/vanX-ssr.mjs"), { ssr: true })).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/vanX"], toAbsolute("../setup/vanX.mjs"), { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/vanX"], "/some-coverage-case", { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/vanX"], "/some-coverage-case", { ssr: true })).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/vanX"], toAbsolute("../setup/vanX"), { ssr: true })).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
-    expect(plugin.resolveId(config.resolve.alias["@vanjs/vanX"], toAbsolute("../setup/vanX"), { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], "/setup/index", { ssr: true })).toEqual(toAbsolute('../setup/index-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], toAbsolute("../setup/index"), { ssr: false })).toEqual(toAbsolute('../setup/index.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/van"], toAbsolute("../setup/van-ssr.mjs"), { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/van"], toAbsolute("../setup/van.mjs"), { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], toAbsolute("../setup/vanX-ssr.mjs"), { ssr: true })).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], toAbsolute("../setup/vanX.mjs"), { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], "/some-coverage-case", { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], "/some-coverage-case", { ssr: true })).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], toAbsolute("../setup/vanX"), { ssr: true })).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], toAbsolute("../setup/vanX"), { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
 
     expect(config).toEqual({
       optimizeDeps: {
@@ -222,29 +234,86 @@ describe(`Test SSR`, () => {
           '@vanjs/jsx': expect.any(String),
         },
       },
-      // esbuild: {
       oxc: {
+        include: /\.(jsx?|tsx?)$/,
+        jsx: {
+          runtime: 'preserve', // Options: 'automatic', 'classic', 'preserve'
+          importSource: "@vanjs/jsx", // Default import source
+        },
+      },
+    });
+  });  
+
+  test("Test plugin with vite 7 or older", async () => {
+    const plugin = vanjs();
+    // @ts-expect-error - testing
+    plugin.buildStart.call(mockPlugin7Context);
+    const config = await (plugin?.config as any)() as UserConfig;
+
+    expect(config).toEqual({
+      optimizeDeps: {
+        noDiscovery: true,
+        include: [
+          'vanjs-core',
+          'vanjs-ext',
+          'mini-van-plate'
+        ],
+      },
+      ssr: {
+        noExternal: ['vanjs-*', '*-vanjs', '@vanjs/*'],
+      },
+      resolve: {
+        alias: {
+          '@vanjs/setup': expect.any(String),
+          '@vanjs/van': expect.any(String),
+          '@vanjs/vanX': expect.any(String),
+          '@vanjs/client': expect.any(String),
+          '@vanjs/server': expect.any(String),
+          '@vanjs/meta': expect.any(String),
+          '@vanjs/router': expect.any(String),
+          '@vanjs/jsx': expect.any(String),
+        },
+      },
+      esbuild: {
         jsx: 'automatic',
         jsxImportSource: '@vanjs/jsx',
       },
     });
   });
 
-  test("Test filesystem router", async () => {
+
+  test("Test filesystem router vite 8", async () => {
     const plugin1 = vanjs({ routesDir: "tests/routes" });
-    plugin1.configResolved({ mode: "development", root: toAbsolute("..") } as any);
-    expect((await plugin1.load("\0virtual:@vanjs/routes", { ssr: true }))?.code.length).toBeGreaterThan(0);
+    // @ts-expect-error
+    plugin1.buildStart.call(mockPlugin8Context);
+    (plugin1.configResolved as any)({ mode: "development", root: toAbsolute("..") } as any);
+    expect((await (plugin1.load as any)("\0virtual:@vanjs/routes", { ssr: true }))?.code.length).toBeGreaterThan(0);
     expect(routes.length).toEqual(7);
     routes.length = 0;
     const plugin2 = vanjs({ routesDir: "tests/not-exist" });
-    plugin2.configResolved({ mode: "development", root: toAbsolute("..") } as any);
-    expect((await plugin2.load("\0virtual:@vanjs/routes", { ssr: false }))).toEqual({ code: "", map: null});
+    // @ts-expect-error
+    plugin2.buildStart.call(mockPlugin8Context);
+    (plugin2.configResolved as any)({ mode: "development", root: toAbsolute("..") } as any);
+    expect((await (plugin2.load as any)("\0virtual:@vanjs/routes", { ssr: false }))).toEqual({ code: "", map: null});
     expect(routes.length).toEqual(0);
     const plugin3 = vanjs({ routesDir: "tests/routes/empty" });
-    plugin3.configResolved({ mode: "development", root: toAbsolute("..") } as any);
-    expect((await plugin2.load("\0virtual:@vanjs/routes", { ssr: false }))).toEqual({ code: "", map: null});
+    (plugin3.configResolved as any)({ mode: "development", root: toAbsolute("..") } as any);
+    expect((await (plugin2.load as any)("\0virtual:@vanjs/routes", { ssr: false }))).toEqual({ code: "", map: null});
     const plugin4 = vanjs();
-    expect((await plugin4.load("not-exist", { ssr: false }))).toBeNull();
+    expect((await (plugin4.load as any)("not-exist", { ssr: false }))).toBeNull();
+  });
+
+  test("Test filesystem router vite 7", async () => {
+    const plugin1 = vanjs({ routesDir: "tests/routes" });
+    // @ts-expect-error
+    plugin1.buildStart.call(mockPlugin7Context);
+    (plugin1.configResolved as any)({ mode: "development", root: toAbsolute("..") } as any);
+    
+    const result = await (plugin1.load as any)("\0virtual:@vanjs/routes", { ssr: true })
+    console.log({ result })
+
+    expect(result?.code.length).toBeGreaterThan(0);
+    expect(result?.map).toBeDefined();
   });
 
   test('Should set up file watchers correctly', () => {
@@ -273,13 +342,13 @@ describe(`Test SSR`, () => {
     };
 
     // Initialize plugin with config
-    plugin.configResolved({ 
+    (plugin.configResolved as any)({ 
       root: '/mock/root',
       mode: 'development'
     } as any);
 
     // Set up server
-    plugin.configureServer(mockServer as any);
+    (plugin.configureServer as any)(mockServer as any);
 
     // Verify watcher was set up
     expect(mockServer.watcher.add).toHaveBeenCalledWith(join('/mock/root', 'src/routes'));

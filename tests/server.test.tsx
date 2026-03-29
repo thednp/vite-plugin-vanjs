@@ -1,4 +1,5 @@
 /// <reference types="../" />
+// import React from "@vanjs/jsx"
 import { expect, test, describe } from "vitest";
 import { renderToString } from "@vanjs/server";
 

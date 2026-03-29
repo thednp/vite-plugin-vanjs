@@ -5,7 +5,7 @@ export * from "../router/types.d.ts";
 export * from "../meta/types.d.ts";
 export * from "../server/types.d.ts";
 export * from "../client/types.d.ts";
-import type { PluginOption } from "vite";
+import type { Plugin } from "vite";
 
 export type VanJSPluginOptions = {
   routesDir?: string;
@@ -14,6 +14,6 @@ export type VanJSPluginOptions = {
 
 export declare const VitePluginVanJS: (
   config?: VanJSPluginOptions,
-) => PluginOption<VanJSPluginOptions>;
+) => Plugin<VanJSPluginOptions>;
 
 export default VitePluginVanJS;

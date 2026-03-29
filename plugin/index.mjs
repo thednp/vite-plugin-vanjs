@@ -1,11 +1,16 @@
+/** @typedef {typeof import("./types").VitePluginVanJS} VitePluginVanJS */
+/** @typedef {import("./types").VanJSPluginOptions} VanJSPluginOptions */
 /** @typedef {import("vite").ResolvedConfig} ResolvedConfig */
 /** @typedef {import("./types").PageFile} PageFile */
 /** @typedef {import("./types").RouteFile} RouteFile */
+/** @typedef {import("vite").BuildAppHook} BuildAppHook */
+/** @typedef {import("vite").TransformResult} TransformResult */
+/** @typedef {import("vite").Plugin} Plugin */
+/** @typedef {ThisParameterType<BuildAppHook>} PluginContext */
 
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
 import process from "node:process";
-// import { transformWithOxc } from "vite";
 import { routes } from "../router/routes.mjs";
 import { generateRoute, getRoutes } from "./helpers.mjs";
 
@@ -49,6 +54,7 @@ const debugModuleAliases = {
   "@vanjs/setup": "../setup/index-debug",
 };
 
+/** @type {VitePluginVanJS} */
 export default function VitePluginVanJS(options = {}) {
   const pluginConfig = { ...pluginDefaults, ...options };
   const { routesDir } = pluginConfig;
@@ -57,6 +63,10 @@ export default function VitePluginVanJS(options = {}) {
   let config;
   /** @type {RouteFile[] | null} */
   let routeCache = null;
+  /** @type {PluginContext} */
+  let context;
+  let viteVersion = "8.0.0";
+  let isOxc = true;
 
   const virtualModuleId = "virtual:@vanjs/routes";
   const resolvedVirtualModuleId = "\0" + virtualModuleId;
@@ -64,6 +74,12 @@ export default function VitePluginVanJS(options = {}) {
   return {
     name: "vanjs",
     enforce: "pre",
+    buildStart() {
+      context = this;
+      viteVersion = (context.meta?.viteVersion[0]);
+      isOxc = Number(viteVersion) >= 8;
+    },
+    // @ts-expect-error - this is temporary esbuild will be 
     config() {
       return {
         optimizeDeps: {
@@ -89,20 +105,27 @@ export default function VitePluginVanJS(options = {}) {
             "@vanjs/jsx": toAbsolute("../jsx"),
           },
         },
-        esbuild: {
-          jsx: "automatic",
-          jsxImportSource: "@vanjs/jsx",
-        },
-        // oxc: {
-        //   jsxInject: `import React from "@vanjs/jsx";`
-        // },
+        ...(
+          isOxc ? {
+            oxc: {
+              include: /\.(jsx?|tsx?)$/,
+              jsx: {
+                runtime: 'preserve', // Options: 'automatic', 'classic', 'preserve'
+                importSource: "@vanjs/jsx", // Default import source
+              },
+            }
+          } : {
+            esbuild: {
+              jsx: "automatic",
+              jsxImportSource: "@vanjs/jsx",
+            }
+          }
+        ),
       };
     },
-    /** @param {import("vite").ResolvedConfig} resolvedConfig */
     configResolved(resolvedConfig) {
       config = resolvedConfig;
     },
-    /** @param {import("vite").ViteDevServer} server */
     configureServer(server) {
       // Watch routes directory
       const pagesPath = join(config.root, routesDir);
@@ -132,7 +155,6 @@ export default function VitePluginVanJS(options = {}) {
       server.watcher.on("unlinkDir", changeHandler);
       server.watcher.on("change", changeHandler);
     },
-    /** @type {(source: string, importer: string | undefined, ops: { ssr: boolean }) => string | null} */
     resolveId(source, importer, { ssr }) {
       // Handle virtual module
       if (source === virtualModuleId) {
@@ -174,16 +196,17 @@ export default function VitePluginVanJS(options = {}) {
         aliases = { ...aliases, ...debugModuleAliases };
       }
       // Check if the source is a known module
+      /* istanbul ignore next @preserve */
       const matchedSource =
         isResolvedVanFile || (source === "vanjs-core" && !isSetupFile)
           ? "@vanjs/van"
           : isResolvedVanXFile ||
-              (source === "vanjs-ext" && /* istanbul ignore next @preserve */
-                !isImportedVanXFile)
-          ? "@vanjs/vanX"
-          : isResolvedSetupFile && (!ssr && isSetupFile || ssr && !isSetupFile)
-          ? "@vanjs/setup"
-          : null;
+            (source === "vanjs-ext" &&
+              !isImportedVanXFile)
+            ? "@vanjs/vanX"
+            : isResolvedSetupFile && (!ssr && isSetupFile || ssr && !isSetupFile)
+              ? "@vanjs/setup"
+              : null;
       const resolvedPath = matchedSource ? aliases[matchedSource] : null;
 
       if (resolvedPath) {
@@ -192,7 +215,6 @@ export default function VitePluginVanJS(options = {}) {
 
       return null;
     },
-    /** @type {(id: string, ops: { ssr: boolean }) => Promise<({ code: string, map: null } | null)>} */
     async load(id, ops) {
       // istanbul ignore else
       if (id === resolvedVirtualModuleId) {
@@ -214,35 +236,31 @@ routes.length = 0;
 
 // Register routes
 ${currentRoutes.map(generateRoute).join("\n")}
-${
-          ops.ssr && currentRoutes.length
+${(ops && ops.ssr && currentRoutes.length)
             ? `console.log(\`🍦 @vanjs/router registered ${currentRoutes.length} routes.\`)`
-            : /* istanbul ignore next @preserve - satisfied */ ""
-        }
+            : /* istanbul ignore next @preserve */""
+          }
 `;
 
         const vite = await import("vite");
-        // @ts-expect-error - this might be ok
-
-        const viteVersion = this.meta.viteVersion;
-        const isVite8 = viteVersion.startsWith("8")
-        const transformer = isVite8
+        const transformer = isOxc
           ? "transformWithOxc"
           : "transformWithEsbuild";
-        const langProp = isVite8 ? "lang" : "loader";
-        const mapProp = isVite8 ? "source_map" : "sourcemap";
+        const langProp = isOxc ? "lang" : "loader";
+        // const mapProp = isOxc ? "source_map" : "sourcemap";
 
         const result = await vite[transformer](routesScript, id, {
           [langProp]: "js",
-          [mapProp]: true,
+          sourcemap: true,
         });
 
         return {
           code: result.code,
           map: result.map ? (
-            // @ts-expect-error - this might be ok
-            isVite8 ? JSON.parse(result.map) : result.map
-          ) : null,
+            typeof result.map === "string"
+              ? JSON.parse(result.map)
+              : /* istanbul ignore next @preserve */ result.map
+          ) : /* istanbul ignore next @preserve */ null,
         };
       }
       return null;
