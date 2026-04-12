@@ -1,5 +1,7 @@
 ## vite-plugin-vanjs
 
+>> Note: this is work in progress
+
 [![Coverage Status](https://coveralls.io/repos/github/thednp/vite-plugin-vanjs/badge.svg)](https://coveralls.io/github/thednp/vite-plugin-vanjs)
 [![ci](https://github.com/thednp/vite-plugin-vanjs/actions/workflows/ci.yml/badge.svg)](https://github.com/thednp/vite-plugin-vanjs/actions/workflows/ci.yml)
 [![NPM Version](https://img.shields.io/npm/v/vite-plugin-vanjs.svg)](https://www.npmjs.com/package/vite-plugin-vanjs)
