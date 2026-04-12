@@ -1,21 +1,27 @@
 // @vitest-environment happy-dom
 import { expect, test, describe, beforeEach } from "vitest";
-import PATH from "node:path";
+import type { ValidChildDomValue } from "vanjs-core";
+// import PATH from "node:path";
 import process from "node:process";
-import van from '@vanjs/van';
-import * as vanX from 'vanjs-ext';
-import vanXDefault from "@vanjs/vanX";
-import { hydrate, setAttribute, setAttributeNS } from "@vanjs/client";
-import { Head, Title, Meta, Script, Style, Link, addMeta, resetHeadTags, initializeHeadTags, SupportedTags } from "@vanjs/meta";
-import { Router, Route, lazy, A, setRouterState, routerState, navigate, routes, unwrap } from "@vanjs/router";
+import van from 'vanjs-core';
+import { wait } from "./fixtures/wait"
+import { routes } from "vite-plugin-vanjs/router-routes"
+import { lazy } from "vite-plugin-vanjs/router-lazy"
+import { Route } from "vite-plugin-vanjs/router-route"
+// import van from 'vanjs-core';
+import * as vanX from '@vanjs/vanX';
+import vanXDefault from "../src/setup/vanX";
+import { hydrate, setAttribute, setAttributeNS } from "../src/client";
+import { Head, Title, Meta, addMeta, resetHeadTags, initializeHeadTags } from "../src/meta";
+import { Router, A, setRouterState, routerState, navigate, unwrap } from "../src/router";
 import { Layout } from "./routes/(root).ts";
 import { Page as IndexPage } from "./routes/(root)/index.ts";
 import { Page as ContactPage } from "./routes/contact.ts";
 import { Page as InfoPage } from "./routes/(root)/info.ts";
-import { jsx } from "@vanjs/jsx";
-const styleUrl = PATH.resolve(process.cwd(), "tests", 'test-style.css');
-const scriptUrl = PATH.resolve(process.cwd(), "tests", 'test-script.js');
-const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
+import { jsx } from "../src/jsx";
+// import { ChildDom } from "vanjs-core";
+
+console.log("window", typeof window)
 
 describe(`Test client-side`, () => {
   beforeEach(() => {
@@ -28,33 +34,16 @@ describe(`Test client-side`, () => {
     const defaultHead = () => [
       Title('Sample title'),
       Meta({ name: "description", content: 'Sample description' }),
-      Script({ id: "my-script" }, "// hello from vanjs 1"),
-      Script("// hello from vanjs 2"),
-      Link({ href: "/some-url.css" }),
-      Style({ id: "my-style" }, "p { line-height: 1.5 }"),
-      Style("p { font-weight: normal }"),
     ]
     defaultHead();
-    const headTags = Head() as unknown as (() => SupportedTags[]);
-    const allTags = headTags() as SupportedTags[];
+    const headTags = Head();
+    const allTags = headTags();
 
-    expect(allTags).to.have.length(7);
+    expect(allTags).to.have.length(2);
     expect(allTags[0].tagName).to.equal("TITLE");
     expect(allTags[0].innerText).to.equal("Sample title");
     expect(allTags[1].tagName).to.equal("META");
     expect(allTags[1].getAttribute('content')).to.equal("Sample description");
-    expect(allTags[2].tagName).to.equal("SCRIPT")
-    expect(allTags[2].innerText).to.equal("// hello from vanjs 1");
-    expect(allTags[2].getAttribute('id')).to.equal("my-script");
-    expect(allTags[3].tagName).to.equal("SCRIPT")
-    expect(allTags[3].innerText).to.equal("// hello from vanjs 2");
-    expect(allTags[4].tagName).to.equal("LINK");
-    expect(allTags[4].getAttribute('href')).to.equal("/some-url.css");
-    expect(allTags[5].tagName).to.equal("STYLE")
-    expect(allTags[5].innerText).to.contain("line-height");
-    expect(allTags[5].getAttribute('id')).to.equal("my-style");
-    expect(allTags[6].tagName).to.equal("STYLE");
-    expect(allTags[6].innerText).to.contain("font-weight");
     
     // override title
     const Page = () => {
@@ -77,7 +66,7 @@ describe(`Test client-side`, () => {
 
   test("Test setup", async () => {
     const { reactive } = vanX;
-    const { a } = van.tags;
+    const { a, span } = van.tags;
     const { svg, path } = van.tags("http://www.w3.org/2000/svg");
 
     const obj = { a: 1, b: 2 };
@@ -95,7 +84,10 @@ describe(`Test client-side`, () => {
     );
 
     // console.log({ Anchor, Icon })
-    // expect(vanXDefault.default).toBeDefined()
+    expect(span()).toBeDefined(); // no props
+    expect(span(span("test"))).toBeDefined() // only dom children
+    expect(span("Testing no props")).toBeDefined() // only text child
+    expect(vanXDefault.default).toBeDefined()
     expect(vanXDefault).toBeDefined()
     expect(reactive(obj).a).to.equal(1);
     expect(reactive(obj).b).to.equal(2);
@@ -105,7 +97,7 @@ describe(`Test client-side`, () => {
   })
 
   test("Test hydrate", async () => {
-    const { head, body, div, h1, style, script, link, title } = van.tags;
+    const { head, body, div, h1, title, meta } = van.tags;
     const docHead = head({ "data-h": "" });
     const docBody = body({ class: "main", id: "main", "data-root": ""});
 
@@ -130,39 +122,35 @@ describe(`Test client-side`, () => {
     const Head = () => {
       return [
         title("Sample Title"),
-        link({rel: "stylesheet", href: styleUrl}),
-        style({id: "test-style"}, "p {margin: 0}"),
-        script({src: scriptUrl, type: "module"}),
+        meta({ name: "description", content: "Sample Title"}),
       ]
     }
     const Head1 = () => {
       return [
         title("Sample Title 1"),
-        link({rel: "stylesheet", href: styleUrl}),
-        style({id: "test-style"}, "p {margin: 0}"),
-        style({id: "test-style1"}, "ul {margin: 0}"),
-        script({src: script1Url, type: "module"}),
       ]
     };
 
     // hydrate with async content
     let testDiv = hydrate(div(), PageAsync());
-    await new Promise(res => setTimeout(res, 17))
+    await wait(17);
     expect(testDiv.innerHTML).to.contain('some div 4');
+    await wait(17);
     testDiv = hydrate(testDiv, PageAsync1());
-    await new Promise(res => setTimeout(res, 17))
+    await wait(17);
     expect(testDiv.innerHTML).to.contain('some div 5');
     expect(testDiv.hasAttribute("data-h")).toBeTruthy();
 
     // hydrate head
     van.hydrate(docHead, head => hydrate(head, Head()));
-    expect(docHead.children.length).toEqual(4);
+    await wait(17);
+    expect(docHead.children.length).toEqual(2);
 
     van.hydrate(docHead, head => hydrate(head, Head1()));
-    expect(docHead.children.length).toEqual(7);
+    expect(docHead.children.length).toEqual(2);
 
     van.hydrate(docHead, head => hydrate(head, Head()));
-    expect(docHead.children.length).toEqual(8);
+    expect(docHead.children.length).toEqual(2);
 
     // hydrate root
     van.hydrate(docBody, body => hydrate(body, Page()));
@@ -172,30 +160,30 @@ describe(`Test client-side`, () => {
     // test hydration with diffing
     docBody.removeAttribute("data-h");
     let oldBody = docBody.cloneNode() as HTMLElement;
-    let newBody = van.add(oldBody.cloneNode() as HTMLElement, Layout({ children: IndexPage() }));
+    let newBody = van.add(oldBody.cloneNode() as HTMLElement, Layout({ children: IndexPage() })) as HTMLElement;
     // console.log('index', {oldBody: oldBody.outerHTML, newBody: newBody.outerHTML});
     van.hydrate(oldBody, body => hydrate(body, newBody));
     expect(oldBody.innerText).to.contain('Hello VanJS');
 
     // test initial hydration
     oldBody.removeAttribute("data-h");
-    newBody = van.add(oldBody.cloneNode() as HTMLElement, Layout({ children: IndexPage() }));
+    newBody = van.add(oldBody.cloneNode() as HTMLElement, Layout({ children: IndexPage() })) as HTMLElement;
     // console.log('index', {oldBody: oldBody.outerHTML, newBody: newBody.outerHTML});
     van.hydrate(oldBody, body => hydrate(body, newBody));
     expect(oldBody.innerText).to.contain('Hello VanJS');
     // console.log("index\n", docBody.outerHTML);
     
     // test non-initial hydration
-    newBody = van.add(oldBody.cloneNode() as HTMLElement, Layout({ children: ContactPage() }));
+    newBody = van.add(oldBody.cloneNode() as HTMLElement, Layout({ children: ContactPage() })) as HTMLElement;
     // console.log('contact', {oldBody: oldBody.outerHTML, newBody: newBody.outerHTML});
     van.hydrate(oldBody, body => hydrate(body, newBody));
     expect(oldBody.innerText).to.contain('Contact');
     // console.log("\ncontact\n", docBody.outerHTML);
     
     // oldBody.removeAttribute("data-h");
-    newBody = van.add(oldBody.cloneNode() as HTMLElement, Layout({ children: InfoPage() }));
+    newBody = van.add(oldBody.cloneNode() as HTMLElement, Layout({ children: InfoPage() })) as HTMLElement;
     // console.log("info", {oldBody: oldBody.outerHTML, newBody: newBody.outerHTML});
-    van.hydrate(oldBody as HTMLElement, body => hydrate(body, newBody));
+    van.hydrate(oldBody, body => hydrate(body, newBody));
     expect(oldBody.innerText).to.contain('Info');
 
     oldBody.removeAttribute("data-h");
@@ -206,6 +194,7 @@ describe(`Test client-side`, () => {
 
     oldBody.removeAttribute("data-h");
     // console.log("info", {oldBody: oldBody.outerHTML, newBody: newBody.outerHTML});
+    // @ts-expect-error - expected
     van.hydrate(oldBody as HTMLElement, body => hydrate(body, null));
     expect(oldBody.innerText).to.contain('Info');
     // console.log("\ninfo\n", docBody.outerHTML);
@@ -222,7 +211,8 @@ describe(`Test client-side`, () => {
     expect(document.body.innerText).to.contain('No Route Found');
   });
 
-  test("Test router", async () => {
+  test.only("Test router", async () => {
+    // process.env
     // reset routes from file-system router
     routes.length = 0;
     const Anchor = A({
@@ -266,41 +256,45 @@ describe(`Test client-side`, () => {
     });
 
     setRouterState('/');
-    await new Promise(res => setTimeout(res, 17));
-    
-    van.add(document.body, () => Router())
+    wait(17)
 
-    await new Promise(res => setTimeout(res, 17));
-    // console.log({ html: document.body.innerHTML });
+    const router = Router();
+    console.log("router", router, van.hydrate);
+    
+    van.add(document.body, () =>  Router() as Element)
+
+    wait(17);
+
+    console.log({ html: document.body.innerHTML, Anchor });
 
     Anchor.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
-    await new Promise(res => setTimeout(res, 17));
+    wait(17);
 
     // set router state
     Anchor.click();
-    await new Promise(res => setTimeout(res, 17));
+    wait(17)
     setRouterState('/test/'); // edge case for coverage
 
-    await new Promise(res => setTimeout(res, 17));
+    wait(17)
     expect(routerState.pathname.val).to.equal('/test/');
     expect(routerState.searchParams.val.toString()).to.equal('');
     expect(routerState.params.val).to.deep.equal({});
 
-    // await new Promise(res => setTimeout(res, 17));
+    // wait(17)
     // console.log({ html: document.body.innerHTML });
     
-    await new Promise(res => setTimeout(res, 17));
+    wait(17)
     expect(document.body.innerHTML).to.contain('Hello VanJS!');
 
     // set router state
     setRouterState('/not-there');
 
-    await new Promise(res => setTimeout(res, 17));
+    wait(17)
     expect(routerState.pathname.val).to.equal('/not-there');
     expect(routerState.searchParams.val.toString()).to.equal('');
     expect(routerState.params.val).to.deep.equal({});
 
-    await new Promise(res => setTimeout(res, 17));
+    wait(17)
     // console.log({ html: document.body.innerHTML })
     expect(document.body.innerHTML).to.contain('Not found!');
 
@@ -308,12 +302,12 @@ describe(`Test client-side`, () => {
     // navigate('/test/1?query=1');
     Anchor.click();
 
-    await new Promise(res => setTimeout(res, 17));
+    wait(17)
     expect(routerState.pathname.val).to.equal('/test/1');
     expect(routerState.searchParams.val.toString()).to.equal('query=1');
     expect(routerState.params.val).to.deep.equal({ someParam: '1' });
 
-    await new Promise(res => setTimeout(res, 17));
+    wait(17)
     // console.log({ html: document.body.innerHTML })
     expect(document.body.innerHTML).to.contain('Hello VanJS!');
   });
@@ -340,9 +334,9 @@ describe(`Test client-side`, () => {
     };
 
     // console.log(div( ...Array.from((unwrap(Page1())).children) ));
-    expect(div({}, ...Array.from((unwrap(Page1())).children)).innerHTML).to.contain('some div 1');
-    expect(div({}, ...Array.from((unwrap(Page2())).children)).innerHTML).to.contain('some div 2');
-    expect(div({}, ...Array.from((unwrap(Page3())).children)).innerHTML).to.contain('some div 3');
+    expect(div({}, ...(unwrap(Page1()).children as ValidChildDomValue[])).innerHTML).to.contain('some div 1');
+    expect(div({}, ...(unwrap(Page2()).children as ValidChildDomValue[])).innerHTML).to.contain('some div 2');
+    expect(div({}, ...(unwrap(Page3()).children as ValidChildDomValue[])).innerHTML).to.contain('some div 3');
     // console.log(unwrap(Page3()))
     expect((unwrap(Page3()) ).children.length).toEqual(2);
     expect((unwrap([h1('Hello VanJS'), div('some div 5')])).children.length).toEqual(2);

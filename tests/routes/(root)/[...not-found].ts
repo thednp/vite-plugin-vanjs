@@ -1,5 +1,5 @@
 import van from "vanjs-core";
-import { A } from "@vanjs/router";
+import { A } from "../../../src/router";
 
 export const Page = () => {
   const { div, h1, p, span } = van.tags;

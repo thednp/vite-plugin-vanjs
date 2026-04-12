@@ -1,0 +1,1 @@
+{"version":3,"file":"van-debug.mjs","names":[],"sources":["../../src/setup/van-debug.ts"],"sourcesContent":["import van from \"vanjs-core/debug\";\n\nexport default van;\n"],"mappings":";;;;;;;AAEA,IAAA,oBAAe"}

@@ -1,2 +1,4 @@
 /// <reference types="vite/client" />
-/// <reference types="../plugin/types.d.ts" />
+// <reference types="vite-plugin-vanjs" />
+// <reference types="@vanjs/jsx" />
+// <reference types="../src/plugin/types.d.ts" />

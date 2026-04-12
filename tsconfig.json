@@ -1,7 +1,10 @@
 {
-   // https://janessagarrow.com/blog/typescript-and-esbuild/
   "compilerOptions": {
-    "lib": ["DOM", "ESNext", "DOM.Iterable"],
+    "lib": [
+      "DOM",
+      "ESNext",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "target": "ESNext",
     "moduleResolution": "Bundler",
@@ -22,21 +25,16 @@
     "allowImportingTsExtensions": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "checkJs": true,
     "jsx": "preserve",
     "jsxImportSource": "@vanjs/jsx"
   },
   "include": [
-    "./tests/*.ts",
-    "./tests/*.tsx",
-    "./plugin/*.ts",
-    "./jsx/*.ts",
-    "./setup/*.ts",
-    "./router/*.ts",
-    "./meta/*.ts",
-    "./server/*.ts",
-    "./client/*.ts",
-    "./tests/vite-env.d.ts"
+    "src",
   ],
-  "exclude": ["node_modules", "experiments", "coverage"],
+  "exclude": [
+    "node_modules",
+    "experiments",
+    "coverage",
+    "dist"
+  ]
 }

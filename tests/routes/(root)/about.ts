@@ -1,12 +1,12 @@
 import van from "vanjs-core";
-import { navigate, A, RouterState } from "@vanjs/router";
+import { navigate, A, RouteEntry } from "../../../src/router";
 
 export const route = {
-  preload: async (params: RouterState["params"]) => {
+  preload: async (params: RouteEntry["params"]) => {
     // in most cases you may want to enforce user access control
     console.log('About preload triggered', params);
   },
-  load: async (params: RouterState["params"]) => {
+  load: async (params: RouteEntry["params"]) => {
     // Load data if needed
     // you might want to cache this data
     console.log('About load triggered', params);

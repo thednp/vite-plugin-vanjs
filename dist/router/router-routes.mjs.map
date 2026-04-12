@@ -1,0 +1,1 @@
+{"version":3,"file":"router-routes.mjs","names":[],"sources":["../../src/router/routes.ts"],"sourcesContent":["import type { RouteEntry } from \"./types.d.ts\";\n\nexport const routes: RouteEntry[] = [];\n"],"mappings":";;;;;;AAEA,MAAa,SAAuB,EAAE"}
