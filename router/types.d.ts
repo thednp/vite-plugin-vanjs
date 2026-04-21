@@ -1,4 +1,5 @@
 /// <reference path="global.d.ts" />
+
 import type {
   Element as VElement,
   TagFunc as IsoTagFunc,

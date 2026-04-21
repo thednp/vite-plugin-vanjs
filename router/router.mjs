@@ -9,136 +9,118 @@ import { Head, initializeHeadTags } from "../meta/index.mjs";
 
 import "virtual:@vanjs/routes";
 
-let isConnected = false;
+/** @typedef {import("./types.d.ts").ComponentModule} ComponentModule */
+/** @typedef {import("./types.d.ts").RouteEntry} RouteEntry */
+/** @typedef {import("./types.d.ts").VanNode} VanNode */
+
+/**
+ * Resolve component children from a module
+ * @param {ComponentModule | Element | Element[] | any} module
+ * @returns {VanNode[]}
+ */
+const resolveChildren = (module) => {
+  const isElement = typeof Element !== "undefined" && module instanceof Element;
+  const cp = (Array.isArray(module) || isElement)
+    ? module
+    : typeof module.component === "function"
+    ? module.component()
+    : module.component;
+  return cp ? Array.from(unwrap(cp).children) : /* istanbul ignore next */ [];
+};
+
+/**
+ * Update head tags
+ */
+const updateHead = () => {
+  // istanbul ignore else
+  if (document.head) {
+    van.hydrate(document.head, (head) => hydrate(head, Head()));
+  }
+};
+
+/**
+ * Initialize client-side router (Head + popstate listener)
+ */
+let _initialized = false;
+const initClient = () => {
+  // istanbul ignore if - already initialized
+  if (_initialized) return;
+
+  initializeHeadTags();
+  globalThis.addEventListener(
+    "popstate",
+    /** @param {Event & {target: globalThis}} e */
+    (e) => {
+      const location = e.target.location;
+      const oldPath = routerState.pathname._oldVal;
+      // istanbul ignore next - cannot test
+      if (location.pathname !== oldPath) {
+        setRouterState(location.pathname, location.search);
+      }
+    },
+  );
+  _initialized = true;
+};
 
 export const Router = (initialProps = /* istanbul ignore next */ {}) => {
   const { div, main } = van.tags;
 
-  /* istanbul ignore next - try again later */
   const props = Object.fromEntries(
     Object.entries(initialProps).filter(([_, val]) => val !== undefined),
   );
   const wrapper = main({ ...props, "data-root": true });
-  const mainLayout = () => {
-    const route = matchRoute(routerState.pathname.val);
-    /* istanbul ignore else */
-    if (!route) return van.add(wrapper, div("No Route Found"));
 
-    routerState.params.val = route.params || {};
-    // Server-side or async component: use renderComponent
-    if (isServer) {
-      const renderComponent = async () => {
-        try {
-          const module = await route.component();
-          const component = typeof module.component === "function"
-            ? module.component()
-            : /* istanbul ignore next */ module.component;
+  // Initialize Head BEFORE any route matching or lifecycle execution
+  if (!isServer) initClient();
 
-          await executeLifecycle(module, route.params);
-          return van.add(wrapper, unwrap(component).children);
-        } catch (error) {
-          /* istanbul ignore next */
-          console.error("Router error:", error);
-          /* istanbul ignore next */
-          return van.add(wrapper, div("Error loading page"));
-        }
-      };
+  const route = matchRoute(routerState.pathname.val);
+  /* istanbul ignore else */
+  if (!route) return van.add(wrapper, div("No Route Found"));
 
-      return renderComponent();
+  routerState.params.val = route.params || {};
+
+  // Server-side rendering
+  if (isServer) {
+    return (async () => {
+      try {
+        const module = await route.component();
+        await executeLifecycle(module, route.params);
+        return van.add(wrapper, ...resolveChildren(module));
+      } catch (error) {
+        /* istanbul ignore next */
+        console.error("Router error:", error);
+        /* istanbul ignore next */
+        return van.add(wrapper, div("Error loading page"));
+      }
+    })();
+  }
+
+  // Client-side: check if hydrating SSR content or SPA
+  const root = document.querySelector("[data-root]");
+
+  if (root) {
+    // Hydration path - root exists from SSR
+    const module = route.component();
+    executeLifecycle(module, route.params);
+    updateHead();
+    return van.add(wrapper, ...resolveChildren(module));
+  }
+
+  // SPA path - reactive routing
+  van.derive(() => {
+    const r = matchRoute(routerState.pathname.val);
+    if (!r) {
+      wrapper.replaceChildren(div("No Route Found"));
+      return;
     }
 
-    const root = document.querySelector("[data-root]");
-    // istanbul ignore else - cannot test unmount
-    if (!isConnected || !root) {
-      initializeHeadTags();
-      globalThis.addEventListener(
-        "popstate",
-        /** @param {Event & {target: globalThis}} e */
-        // istanbul ignore next - cannot test
-        (e) => {
-          const location = e.target.location;
-          const oldPath = routerState.pathname._oldVal;
-          // istanbul ignore next - cannot test
-          if (location.pathname !== oldPath) {
-            setRouterState(location.pathname, location.search);
-          }
-        },
-      );
-    }
+    const module = r.component();
+    executeLifecycle(module, r.params);
+    const children = resolveChildren(module);
 
-    // Client-side lazy component, lifeCycle is already executed on the server
-    // or when A component has been clicked in the client
-    if (root) {
-      // this case is when root is server side rendered
-      const children = () => {
-        const module = route.component();
-        executeLifecycle(module, route.params);
-        // istanbul ignore next - cannot test
-        const cp = (Array.isArray(module) || module instanceof Element)
-          ? module
-          : typeof module.component === "function"
-          ? module.component()
-          : module.component;
-        // istanbul ignore next - cannot test
-        const kids = () => cp ? Array.from(unwrap(cp).children) : [];
-        const kudos = kids();
+    wrapper.replaceChildren(...children);
+    updateHead();
+  });
 
-        isConnected = true;
-        // istanbul ignore else
-        if (document.head) {
-          van.hydrate(document.head, (head) => hydrate(head, Head()));
-        }
-
-        return kudos;
-      };
-
-      return van.add(wrapper, ...children());
-    }
-    // this case is when root is for SPA apps
-    const csrRoute = van.derive(() => {
-      const p = routerState.pathname.val;
-      return matchRoute(p);
-    });
-
-    const children = van.derive(() => {
-      const route = csrRoute.val;
-      // istanbul ignore if - can only be tested in client
-      if (!route) return [div("No Route Found")];
-      const md = route.component();
-      executeLifecycle(md, route.params);
-      // istanbul ignore next - cannot test all cases
-      const cp = (Array.isArray(md) || md instanceof Element)
-        ? md
-        : typeof md.component === "function"
-        ? md.component()
-        : md.component;
-      return cp
-        ? Array.from(unwrap(cp).children)
-        : /* istanbul ignore next */ [];
-    });
-
-    const component = () => {
-      const kids = () => children.val;
-      const result = () => {
-        return van.derive(() =>
-          van.hydrate(wrapper, (el) => {
-            const kudos = kids();
-            isConnected = true;
-            // istanbul ignore else
-            if (document.head) {
-              van.hydrate(document.head, (head) => hydrate(head, Head()));
-            }
-            return hydrate(el, kudos);
-          })
-        ).val;
-      };
-      return result();
-    };
-    const finalResult = component();
-    return finalResult
-      ? /* istanbul ignore next*/ van.add(wrapper, finalResult)
-      : wrapper;
-  };
-
-  return mainLayout();
+  return wrapper;
 };

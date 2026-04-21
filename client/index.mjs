@@ -133,13 +133,6 @@ export function elementsMatch(el1, el2, deep) {
     : true;
 }
 
-/** @type {<E extends Element = Element, T extends keyof HTMLElementTagNameMap>(target: E, ...tagNames: T[]) => boolean} */
-const isTag = (target, ...tagNames) => {
-  return tagNames.some((tag) =>
-    target.tagName.toLowerCase() === tag.toLowerCase()
-  );
-};
-
 function createHydrationContext() {
   /** @type {WeakMap<Element, Element>} */
   const parentCache = new WeakMap();
@@ -250,31 +243,15 @@ export const hydrate = (target, content) => {
   const currentChildren = Array.from(target.children);
   const newChildren = Array.from(wrapper.children);
 
-  if (isTag(target, "head")) {
+  if (target.tagName.toLowerCase() === "head") {
     // Keep current tags on first hydration
     if (!target.hasAttribute("data-h")) {
       target.setAttribute("data-h", "");
       return target;
     }
 
-    // Handle non-style/link tags first
-    const regularTags = newChildren.filter((child) =>
-      !isTag(child, "style", "link")
-    );
-
-    // Handle style/link tags separately
-    const styleTags = newChildren.filter((child) =>
-      isTag(child, "style", "link")
-    );
-
-    // Create maps for existing tags
-    const existingStyles = new Map(
-      currentChildren.filter((child) => isTag(child, "style", "link"))
-        .map((child) => [getTagKey(child), child]),
-    );
-
-    // Process regular tags normally
-    regularTags.forEach((newChild) => {
+    // Replace all tags uniformly - styles/scripts are handled via imports
+    newChildren.forEach((newChild) => {
       const key = getTagKey(newChild);
       const existing = currentChildren.find((child) =>
         getTagKey(child) === key
@@ -283,57 +260,6 @@ export const hydrate = (target, content) => {
         existing.replaceWith(newChild);
       } else {
         target.appendChild(newChild);
-      }
-    });
-
-    // Process style tags with special handling
-    styleTags.forEach((newChild) => {
-      const key = getTagKey(newChild);
-      const existing = existingStyles.get(key);
-
-      // Skip if tag already exists with same content+id/href
-      if (existing) {
-        // istanbul ignore next - try again later
-        if (isTag(existing, "style") && isTag(newChild, "style")) {
-          if (
-            existing.textContent === newChild.textContent &&
-            existing.id === newChild.id
-          ) return;
-        }
-        // istanbul ignore next - try again later
-        if (isTag(existing, "link") && isTag(newChild, "link")) {
-          if (existing.href === newChild.href) return;
-        }
-      }
-
-      // For link tags, add with disabled state first
-      // istanbul ignore else - try again later
-      if (isTag(newChild, "link")) {
-        const temp = newChild.cloneNode();
-        temp.disabled = true;
-
-        const originalRel = temp.rel;
-        temp.rel = "preload";
-        temp.as = "style";
-        // istanbul ignore next
-        temp.onload = () => {
-          temp.rel = originalRel;
-          temp.removeAttribute("as");
-          temp.disabled = false;
-          if (existing && existing.parentNode === target) {
-            existing.remove();
-          }
-        };
-
-        target.appendChild(temp);
-      } // For style tags, add new one first
-      else if (isTag(newChild, "style")) {
-        target.appendChild(newChild);
-        // istanbul ignore next - try again later
-        if (existing && existing.parentNode === target) {
-          // Remove old one in next frame
-          existing.remove();
-        }
       }
     });
   } else {

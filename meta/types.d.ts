@@ -14,6 +14,11 @@ export const initializeHeadTags: () => void | (() => Promise<void>);
 
 export type SupportedTags =
   | HTMLTitleElement
+  | HTMLLinkElement
+  | HTMLMetaElement;
+
+export type AllHeadTags =
+  | HTMLTitleElement
   | HTMLMetaElement
   | HTMLScriptElement
   | HTMLLinkElement
@@ -21,7 +26,7 @@ export type SupportedTags =
 
 export type TagProps = SupportedTags | PropsWithKnownKeys<SupportedTags>;
 
-export type HeadTags = SupportedTags[] | TagFunc[];
+export type HeadTags = AllHeadTags[] | TagFunc[];
 
 export const addMeta = (_tag: string | TagProps) => null;
 

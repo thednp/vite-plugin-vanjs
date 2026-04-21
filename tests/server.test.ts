@@ -8,7 +8,7 @@ const __dirname = dirname(__filename);
 const toAbsolute = (p:string) => resolve(__dirname, p);
 
 import { expect, test, describe, vi, afterEach } from "vitest";
-import { Head, Title, Meta, Script, Style, Link, resetHeadTags } from "@vanjs/meta";
+import { Head, Title, Meta, Link, resetHeadTags } from "@vanjs/meta";
 import van from "@vanjs/van";
 import vanX from "@vanjs/vanX";
 import { type Element as VanElement } from "mini-van-plate/van-plate";
@@ -44,11 +44,7 @@ describe(`Test SSR`, () => {
     const defaultHead = () => [
       Title('Sample title'),
       Meta({ name: "description", content: 'Sample description' }),
-      Script({ id: "my-script" }, "// hello from vanjs 1"),
-      Script("// hello from vanjs 2"),
       Link({ href: "/some-url.css" }),
-      Style({ id: "my-style" }, "p { line-height: 1.5 }"),
-      Style("p { font-weight: normal }"),
     ]
     // const App = () => initHead();
     defaultHead();
@@ -57,11 +53,7 @@ describe(`Test SSR`, () => {
 
     expect(allTags).to.contain('<title>Sample title</title>');
     expect(allTags).to.contain('<meta name="description" content="Sample description">');
-    expect(allTags).to.contain('<script id="my-script">// hello from vanjs 1</script>');
-    expect(allTags).to.contain('<script>// hello from vanjs 2</script>');
     expect(allTags).to.contain('<link href="/some-url.css">');
-    expect(allTags).to.contain('<style id="my-style">p { line-height: 1.5 }</style>');
-    expect(allTags).to.contain('<style>p { font-weight: normal }</style>');
     expect(await renderToString(true)).to.equal('true');
     expect(await renderToString(1)).to.equal('1');
     expect(await renderToString({ van: '' })).to.equal('');

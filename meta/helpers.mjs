@@ -36,6 +36,7 @@ const getTagAttribute = (tag) => {
 
     if (value) return value;
   }
+  // istanbul ignore next - a value must be provided
   return "";
 };
 

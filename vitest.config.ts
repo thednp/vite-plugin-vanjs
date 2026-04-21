@@ -21,9 +21,7 @@ export default defineConfig({
         "client/*.[mjs|ts]",
         "server/*.[mjs|ts]",
         "jsx/*.[mjs|ts]",
-        // "parser/*.[mjs|ts]",
       ],
-      // exclude: ["*.json"]
     },
   },
 });

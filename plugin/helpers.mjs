@@ -48,6 +48,7 @@ export const globFiles = async (dir, extensions) => {
       return;
     }
     const entries = await readdir(directory, { withFileTypes: true });
+    // istanbul ignore if
     if (!entries.length) {
       // console.warn('🍦 @vanjs/router: the "routes" folder is empty.');
       return;

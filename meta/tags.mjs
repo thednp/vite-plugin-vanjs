@@ -25,31 +25,15 @@ export const Meta = (props) => {
 };
 
 /**
- * Add a new `<link>` tag
+ * Add a new `<link>` tag, not to be used for stylesheets
  * @type {(props: PropsWithKnownKeys<HTMLLinkElement>) => null}
  */
 export const Link = (props) => {
   const { link } = van.tags;
-  addMeta(link(props));
-  return null;
-};
-
-/**
- * Add a new `<script>` tag
- * @type {(props: PropsWithKnownKeys<HTMLScriptElement>, content?: string) => null}
- */
-export const Script = (props, content) => {
-  const { script } = van.tags;
-  addMeta(script(props, content));
-  return null;
-};
-
-/**
- * Add a new `<style>` tag
- * @type {(props: PropsWithKnownKeys<HTMLStyleElement>, content: string) => null}
- */
-export const Style = (props, content) => {
-  const { style } = van.tags;
-  addMeta(style(props, content));
+  if (props.rel === "stylesheet") {
+    console.warn("Link doesn't support stylesheets.");
+  } else {
+    addMeta(link(props));
+  }
   return null;
 };

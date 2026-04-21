@@ -6,7 +6,7 @@ import van from '@vanjs/van';
 import * as vanX from 'vanjs-ext';
 import vanXDefault from "@vanjs/vanX";
 import { hydrate, setAttribute, setAttributeNS } from "@vanjs/client";
-import { Head, Title, Meta, Script, Style, Link, addMeta, resetHeadTags, initializeHeadTags, SupportedTags } from "@vanjs/meta";
+import { Head, Title, Meta, Link, addMeta, resetHeadTags, initializeHeadTags, SupportedTags } from "@vanjs/meta";
 import { Router, Route, lazy, A, setRouterState, routerState, navigate, routes, unwrap } from "@vanjs/router";
 import { Layout } from "./routes/(root).ts";
 import { Page as IndexPage } from "./routes/(root)/index.ts";
@@ -28,34 +28,22 @@ describe(`Test client-side`, () => {
     const defaultHead = () => [
       Title('Sample title'),
       Meta({ name: "description", content: 'Sample description' }),
-      Script({ id: "my-script" }, "// hello from vanjs 1"),
-      Script("// hello from vanjs 2"),
       Link({ href: "/some-url.css" }),
-      Style({ id: "my-style" }, "p { line-height: 1.5 }"),
-      Style("p { font-weight: normal }"),
+      // coverage
+      Link({ rel: "stylesheet", href: "/some-url.css" }),
     ]
     defaultHead();
     const headTags = Head() as unknown as (() => SupportedTags[]);
     const allTags = headTags() as SupportedTags[];
 
-    expect(allTags).to.have.length(7);
+    expect(allTags).to.have.length(3);
     expect(allTags[0].tagName).to.equal("TITLE");
     expect(allTags[0].innerText).to.equal("Sample title");
     expect(allTags[1].tagName).to.equal("META");
     expect(allTags[1].getAttribute('content')).to.equal("Sample description");
-    expect(allTags[2].tagName).to.equal("SCRIPT")
-    expect(allTags[2].innerText).to.equal("// hello from vanjs 1");
-    expect(allTags[2].getAttribute('id')).to.equal("my-script");
-    expect(allTags[3].tagName).to.equal("SCRIPT")
-    expect(allTags[3].innerText).to.equal("// hello from vanjs 2");
-    expect(allTags[4].tagName).to.equal("LINK");
-    expect(allTags[4].getAttribute('href')).to.equal("/some-url.css");
-    expect(allTags[5].tagName).to.equal("STYLE")
-    expect(allTags[5].innerText).to.contain("line-height");
-    expect(allTags[5].getAttribute('id')).to.equal("my-style");
-    expect(allTags[6].tagName).to.equal("STYLE");
-    expect(allTags[6].innerText).to.contain("font-weight");
-    
+    expect(allTags[2].tagName).to.equal("LINK");
+    expect(allTags[2].getAttribute('href')).to.equal("/some-url.css");
+
     // override title
     const Page = () => {
       // initialize again
@@ -159,10 +147,10 @@ describe(`Test client-side`, () => {
     expect(docHead.children.length).toEqual(4);
 
     van.hydrate(docHead, head => hydrate(head, Head1()));
-    expect(docHead.children.length).toEqual(7);
+    expect(docHead.children.length).toEqual(6);
 
     van.hydrate(docHead, head => hydrate(head, Head()));
-    expect(docHead.children.length).toEqual(8);
+    expect(docHead.children.length).toEqual(6);
 
     // hydrate root
     van.hydrate(docBody, body => hydrate(body, Page()));
