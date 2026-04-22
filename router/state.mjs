@@ -65,8 +65,6 @@ export function miniStore(init) {
       Object.getPrototypeOf(value) === Object
     ) {
       for (const [sp, sv] of Object.entries(value)) {
-        console.log({ sp, sv });
-
         target[prop] = defineProxy(sp, sv, {});
       }
     } else if (!Array.isArray(value)) {
@@ -74,7 +72,6 @@ export function miniStore(init) {
     } else {
       console.warn(typeof value + " is not supported.");
     }
-    console.log({ prop, value });
   }
   return target;
 }
