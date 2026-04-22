@@ -16,7 +16,7 @@ import { matchRoute } from "./matchRoute.mjs";
  * @returns {boolean}
  */
 export const isCurrentPage = (pageName) => {
-  return routerState.pathname.val === pageName;
+  return routerState.pathname === pageName;
 };
 
 /**
