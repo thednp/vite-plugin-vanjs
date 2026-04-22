@@ -270,9 +270,9 @@ describe(`Test client-side`, () => {
     setRouterState('/test/'); // edge case for coverage
 
     await new Promise(res => setTimeout(res, 17));
-    expect(routerState.pathname.val).to.equal('/test/');
-    expect(routerState.searchParams.val.toString()).to.equal('');
-    expect(routerState.params.val).to.deep.equal({});
+    expect(routerState.pathname).to.equal('/test/');
+    expect(routerState.searchParams.toString()).to.equal('');
+    expect(routerState.params).to.deep.equal({ someParam: "1" });
 
     // await new Promise(res => setTimeout(res, 17));
     // console.log({ html: document.body.innerHTML });
@@ -284,9 +284,9 @@ describe(`Test client-side`, () => {
     setRouterState('/not-there');
 
     await new Promise(res => setTimeout(res, 17));
-    expect(routerState.pathname.val).to.equal('/not-there');
-    expect(routerState.searchParams.val.toString()).to.equal('');
-    expect(routerState.params.val).to.deep.equal({});
+    expect(routerState.pathname).to.equal('/not-there');
+    expect(routerState.searchParams.toString()).to.equal('');
+    expect(routerState.params).to.deep.equal({ someParam: '1' });
 
     await new Promise(res => setTimeout(res, 17));
     // console.log({ html: document.body.innerHTML })
@@ -297,9 +297,9 @@ describe(`Test client-side`, () => {
     Anchor.click();
 
     await new Promise(res => setTimeout(res, 17));
-    expect(routerState.pathname.val).to.equal('/test/1');
-    expect(routerState.searchParams.val.toString()).to.equal('query=1');
-    expect(routerState.params.val).to.deep.equal({ someParam: '1' });
+    expect(routerState.pathname).to.equal('/test/1');
+    expect(routerState.searchParams.toString()).to.equal('query=1');
+    expect(routerState.params).to.deep.equal({ someParam: '1' });
 
     await new Promise(res => setTimeout(res, 17));
     // console.log({ html: document.body.innerHTML })

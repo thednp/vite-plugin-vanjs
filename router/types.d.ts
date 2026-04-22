@@ -4,7 +4,7 @@ import type {
   Element as VElement,
   TagFunc as IsoTagFunc,
 } from "mini-van-plate/van-plate";
-import van from "vanjs-core";
+// import van from "vanjs-core";
 import type {
   ChildDom,
   Primitive,
@@ -203,9 +203,9 @@ export type RouterState = {
  * This state is maintained by both server and client.
  */
 export const routerState: {
-  pathname: van.state<RouterState.pathname>;
-  searchParams: van.state<RouterState.searchParams>;
-  params?: van.state<RouterState.params>;
+  pathname: RouterState["pathname"];
+  searchParams: RouterState["searchParams"];
+  params?: RouterState["params"];
 };
 
 /**

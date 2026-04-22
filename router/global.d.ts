@@ -185,10 +185,15 @@ declare module "@vanjs/router" {
    * A reactive object that holds the current router state.
    * This state is maintained by both server and client.
    */
+  // export const routerState: {
+  //   pathname:  State<RouterState.pathname>;
+  //   searchParams: State<RouterState.searchParams>;
+  //   params?: State<RouterState.params>;
+  // };
   export const routerState: {
-    pathname: van.state<RouterState.pathname>;
-    searchParams: van.state<RouterState.searchParams>;
-    params?: van.state<RouterState.params>;
+    pathname: RouterState["pathname"];
+    searchParams: RouterState["searchParams"];
+    params?: RouterState["params"];
   };
 
   /**

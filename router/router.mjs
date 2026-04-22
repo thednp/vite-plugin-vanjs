@@ -52,7 +52,7 @@ const initClient = () => {
     /** @param {Event & {target: globalThis}} e */
     (e) => {
       const location = e.target.location;
-      const oldPath = routerState.pathname._oldVal;
+      const oldPath = routerState.pathname;
       // istanbul ignore next - cannot test
       if (location.pathname !== oldPath) {
         setRouterState(location.pathname, location.search);
@@ -73,11 +73,11 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
   // Initialize Head BEFORE any route matching or lifecycle execution
   if (!isServer) initClient();
 
-  const route = matchRoute(routerState.pathname.val);
+  const route = matchRoute(routerState.pathname);
   /* istanbul ignore else */
   if (!route) return van.add(wrapper, div("No Route Found"));
 
-  routerState.params.val = route.params || {};
+  Object.assign(routerState.params, route.params || {});
 
   // Server-side rendering
   if (isServer) {
@@ -108,7 +108,7 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
 
   // SPA path - reactive routing
   van.derive(() => {
-    const r = matchRoute(routerState.pathname.val);
+    const r = matchRoute(routerState.pathname);
     if (!r) {
       wrapper.replaceChildren(div("No Route Found"));
       return;
