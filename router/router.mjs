@@ -84,9 +84,10 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
 
         // 2. Execute lifecycle
         await executeLifecycle(module.route, route.params);
+        const children = resolveChildren(module);
 
         // 3. Render the component (data is now in dataCache)
-        return van.add(wrapper, ...resolveChildren(module));
+        return van.add(wrapper, ...children);
       } catch (error) {
         /* istanbul ignore next */
         console.error("Router error:", error);
@@ -113,8 +114,9 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
       const module = await route.component();
 
       await executeLifecycle(module.route, route.params);
+      const children = resolveChildren(module)
       updateHead();
-      return van.add(wrapper, ...resolveChildren(module));
+      return van.add(wrapper, ...children);
     };
   }
 
