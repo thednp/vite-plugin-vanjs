@@ -6,7 +6,7 @@ import { executeLifecycle } from "./helpers.mjs";
 import { unwrap } from "./unwrap.mjs";
 import { hydrate } from "../client/index.mjs";
 import { Head, initializeHeadTags } from "../meta/index.mjs";
-
+import * as dataCache from "./dataCache.mjs";
 import "virtual:@vanjs/routes";
 
 /** @typedef {import("./types.d.ts").ComponentModule} ComponentModule */
@@ -34,7 +34,7 @@ const resolveChildren = (module) => {
 const updateHead = () => {
   // istanbul ignore else
   if (document.head) {
-    van.hydrate(document.head, (head) => hydrate(head, Head()));
+    hydrate(document.head, Head());
   }
 };
 
@@ -64,16 +64,12 @@ const initClient = () => {
 
 export const Router = (initialProps = /* istanbul ignore next */ {}) => {
   const { div, main } = van.tags;
-
   const props = Object.fromEntries(
     Object.entries(initialProps).filter(([_, val]) => val !== undefined),
   );
-  const wrapper = main({ ...props, "data-root": true });
-
-  // Initialize Head BEFORE any route matching or lifecycle execution
-  if (!isServer) initClient();
-
+  const wrapper = main({ ...props, "data-root": "" });
   const route = matchRoute(routerState.pathname);
+
   /* istanbul ignore else */
   if (!route) return van.add(wrapper, div("No Route Found"));
 
@@ -81,10 +77,15 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
 
   // Server-side rendering
   if (isServer) {
-    return (async () => {
+    return async () => {
       try {
+        // 1. Resolve the module first (to get route lifecycle hooks)
         const module = await route.component();
-        await executeLifecycle(module, route.params);
+
+        // 2. Execute lifecycle
+        await executeLifecycle(module.route, route.params);
+
+        // 3. Render the component (data is now in dataCache)
         return van.add(wrapper, ...resolveChildren(module));
       } catch (error) {
         /* istanbul ignore next */
@@ -92,34 +93,46 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
         /* istanbul ignore next */
         return van.add(wrapper, div("Error loading page"));
       }
-    })();
+    };
   }
 
-  // Client-side: check if hydrating SSR content or SPA
+  // Init client here
+  if (!isServer) initClient();
+
+  // Client-side: hydrate data cache from SSR output
+  // This must happen BEFORE any component renders so useRouteData() works
+  if (globalThis.__DATA_CACHE) {
+    dataCache.hydrateFromJSON(globalThis.__DATA_CACHE);
+  }
+
+  // Client-side: check if hydrating SSR content or pure SPA
   const root = document.querySelector("[data-root]");
 
   if (root) {
-    // Hydration path - root exists from SSR
-    const module = route.component();
-    executeLifecycle(module, route.params);
-    updateHead();
-    return van.add(wrapper, ...resolveChildren(module));
+    return async () => {
+      const module = await route.component();
+
+      await executeLifecycle(module.route, route.params);
+      updateHead();
+      return van.add(wrapper, ...resolveChildren(module));
+    };
   }
 
-  // SPA path - reactive routing
+  // Pure SPA path - reactive routing
   van.derive(() => {
-    const r = matchRoute(routerState.pathname);
-    if (!r) {
+    const matchedRoute = matchRoute(routerState.pathname);
+    if (!matchedRoute) {
       wrapper.replaceChildren(div("No Route Found"));
       return;
     }
 
-    const module = r.component();
-    executeLifecycle(module, r.params);
-    const children = resolveChildren(module);
-
-    wrapper.replaceChildren(...children);
-    updateHead();
+    (async () => {
+      const module = await matchedRoute.component();
+      await executeLifecycle(module.route, matchedRoute.params);
+      const children = resolveChildren(module);
+      wrapper.replaceChildren(...children);
+      updateHead();
+    })();
   });
 
   return wrapper;

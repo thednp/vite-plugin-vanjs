@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-vanjs",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "author": "thednp",
   "license": "MIT",
   "description": "A mini meta-framework for VanJS powered by Vite",
@@ -15,6 +15,7 @@
     "setup",
     "router",
     "meta",
+    "data",
     "client",
     "server",
     "jsx",
@@ -103,7 +104,7 @@
     "@vitest/ui": "^4.1.5",
     "happy-dom": "^20.9.0",
     "typescript": "6.0.3",
-    "vite": "^8.0.9",
+    "vite": "^8.0.10",
     "vitest": "^4.1.5"
   },
   "packageManager": "pnpm@10.33.0",

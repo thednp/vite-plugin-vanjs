@@ -1,7 +1,8 @@
-// router/routes.mjs
+// router/route.mjs
 import { isLazyComponent } from "./helpers.mjs";
 import { routes } from "./routes.mjs";
 import { lazy } from "./lazy.mjs";
+
 /** @typedef {import("./types.d.ts").RouteProps} RouteProps */
 /** @typedef {import("./types.d.ts").ComponentModule} ComponentModule */
 
@@ -17,7 +18,7 @@ export const Route = (routeProps) => {
     return;
   }
 
-  // If component isn't lazy, make it lazy
+  // If component isn't lazy, wrap it with preload/load
   if (!isLazyComponent(component)) {
     /** @type {() => Promise<ComponentModule>} */
     const wrappedComponent = lazy(() =>
@@ -26,11 +27,10 @@ export const Route = (routeProps) => {
         route: { preload, load },
       })
     );
-    routes.push({ ...rest, path, component: wrappedComponent });
+    routes.push({ ...rest, path, preload, load, component: wrappedComponent });
     return;
   }
 
-  // Otherwise keep original component
-  // @ts-expect-error - RouteProps and RouteEntry are now equivalent
-  routes.push(routeProps);
+  // Lazy component — same async function on server and client
+  routes.push({ ...rest, path, component, preload, load });
 };

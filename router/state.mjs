@@ -53,21 +53,27 @@ const defineProxy = (key, value, target) => {
   return stateObj;
 };
 
+/** @typedef  */
+
 /**
- * @param {T extends Record<string, unknown>} init
+ * @template {Record<string, unknown>} T
+ * @param {T} init
  * @returns {T}
  */
-export function miniStore(init) {
+export function microStore(init) {
+  /** @type {T} */
   const target = {};
   for (const [prop, value] of Object.entries(init)) {
-    if (
-      value && typeof value === "object" &&
-      Object.getPrototypeOf(value) === Object
-    ) {
+    const isPlainObject = value && typeof value === "object" &&
+      !Array.isArray(value) && Object.getPrototypeOf(value) === Object;
+
+    if (isPlainObject && Object.keys(value).length > 0) {
       for (const [sp, sv] of Object.entries(value)) {
         target[prop] = defineProxy(sp, sv, {});
       }
-    } else if (!Array.isArray(value)) {
+    } else if (isPlainObject) {
+      target[prop] = value;
+    } else if (!Array.isArray(value) && value != null) {
       defineProxy(prop, value, target);
     } else {
       console.warn(typeof value + " is not supported.");
@@ -79,25 +85,25 @@ export function miniStore(init) {
 /**
  * @type {typeof import("./types.d.ts").routerState}
  */
-// export const routerState = {
-//   pathname: van.state(initialPath),
-//   searchParams: van.state(new URLSearchParams(initialSearch)),
-//   params: van.state({}),
-// };
-export const routerState = miniStore({
+const initialStatus = isServer
+  ? "success"
+  : (globalThis.__DATA_CACHE ? "success" : "idle");
+
+export const routerState = microStore({
   pathname: initialPath,
   searchParams: new URLSearchParams(initialSearch),
   params: {},
+  status: initialStatus,
 });
 
 /**
  * @type {typeof import("./types.d.ts").setRouterState}
  */
-export const setRouterState = (path, search = undefined, params) => {
+export const setRouterState = (path, search = undefined, params = {}) => {
   const [pathname, searchParams] = fixRouteUrl(path).split("?");
   routerState.pathname = pathname;
   routerState.searchParams = new URLSearchParams(
     search || searchParams || "",
   );
-  Object.assign(routerState.params, params || {});
+  Object.assign(routerState.params, params);
 };

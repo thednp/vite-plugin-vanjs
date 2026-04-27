@@ -12,9 +12,8 @@ declare module "@vanjs/router" {
     PropValueOrDerived,
     State,
   } from "vanjs-core";
+  import type { LayoutFile } from "../plugin/types.d.ts";
 
-  // type VanElement = VElement | Exclude<Primitive, boolean | undefined>;
-  // type DOMElement = globalThis.Element;
   type PrimitiveChild = Primitive | State<Primitive | undefined | null>;
 
   type DOMElement<T extends keyof HTMLElementTagNameMap = "div"> =
@@ -27,13 +26,6 @@ declare module "@vanjs/router" {
     | DOMElement
     | VElement
     | PrimitiveChild;
-  // type VanElement =
-  //   | SVGElement
-  //   | HTMLElement
-  //   | DOMElement
-  //   | Node
-  //   | VElement
-  //   | PrimitiveChild;
   export type VanNode =
     | VanElement
     | VanElement[]
@@ -41,9 +33,7 @@ declare module "@vanjs/router" {
     | null
     | undefined;
 
-  type ComponentProps1<T> =
-    & Props
-    & PropsWithKnownKeys<T>;
+  type ComponentProps1<T> = Props & PropsWithKnownKeys<T>;
 
   type ComponentProps<K extends keyof HTMLElementTagNameMap> =
     & Props
@@ -69,7 +59,7 @@ declare module "@vanjs/router" {
    * import { Router } from '@vanjs/router';
    *
    * export const App = () => {
-   *   return Router(); // or <Router /> for JSX
+   * return Router(); // or <Router /> for JSX
    * }
    */
   export const Router:
@@ -89,12 +79,11 @@ declare module "@vanjs/router" {
    * import van from 'vanjs-core';
    *
    * export const Navigation = () => {
-   *   const { nav } = van.tags
-   *   return nav(
-   *     A({ href="/" }, "Home"), // or <A href="/">Home</A> with JSX
-   *     A({ href="/about" }, "About"), // or <A href="/about">About</A> with JSX
-   *     // ...other children
-   *   );
+   * const { nav } = van.tags
+   * return nav(
+   * A({ href="/" }, "Home"),
+   * A({ href="/about" }, "About"),
+   * );
    * }
    */
   export const A:
@@ -114,23 +103,41 @@ declare module "@vanjs/router" {
     options?: { replace?: boolean },
   ) => void;
 
-  /**
-   * A client only helper function that reloads the current page.
-   */
+  /** A client only helper function that reloads the current page. */
   export const reload: () => void;
 
   /**
    * A helper function that redirects the user to the specified href.
    * When called in the server, it will return a function that will redirect the user
    * to the specified href when called.
-   * @param {string | undefined} href the URL to redirect to
+   * @param href the URL to redirect to
    */
   export const redirect: (href?: string) => void | (() => void);
+
+  /**
+   * Returns the string value of a State or primitive
+   */
+  export const getValue: (v: unknown) => string;
+
+  /**
+   * Check if selected page is the current page
+   */
+  export const isCurrentPage: (pageName: string) => boolean;
+
+  /**
+   * Check if selected page is related to the current page
+   */
+  export const isCurrentLocation: (pageName: string) => boolean;
+
+  /**
+   * Check if component is a lazy component
+   */
+  export const isLazyComponent: (component: unknown) => boolean;
 
   // routes.mjs
   export type RouteEntry = {
     path: string;
-    component: Promise<ComponentModule>;
+    component: () => Promise<ComponentModule>;
     params?: Record<string, string>;
     preload?: (
       params?: Record<string, string>,
@@ -140,17 +147,16 @@ declare module "@vanjs/router" {
     ) => boolean | void | Promise<boolean | void>;
   };
 
+  export type ImportFn = () => LazyComponent;
+
   export type RouteProps = {
     path: string;
+    params?: Record<string, string>;
     component:
-      | (() =>
-        | HTMLElementTagNameMap[unknown]
-        | HTMLElementTagNameMap[unknown][])
+      | (() => DOMElement)
       | VanComponent
       | ComponentFn
-      | (() => Promise<DynamicModule>);
-    //   | ComponentModule["component"];
-    // component: ComponentFn | (() => Promise<ComponentModule>);
+      | (() => Promise<ComponentModule>);
     preload?: (
       params?: Record<string, string>,
     ) => boolean | void | Promise<boolean | void>;
@@ -158,6 +164,13 @@ declare module "@vanjs/router" {
       params?: Record<string, string>,
     ) => boolean | void | Promise<boolean | void>;
   };
+
+  export type RouteConfig = {
+    routePath: string;
+    path: string;
+    layouts?: LayoutFile[];
+  };
+
   export const routes: RouteEntry[];
 
   /**
@@ -180,20 +193,18 @@ declare module "@vanjs/router" {
     pathname: string;
     searchParams: URLSearchParams;
     params: Record<string, string>;
+    status: "idle" | "pending" | "success" | "error";
   };
+
   /**
    * A reactive object that holds the current router state.
    * This state is maintained by both server and client.
    */
-  // export const routerState: {
-  //   pathname:  State<RouterState.pathname>;
-  //   searchParams: State<RouterState.searchParams>;
-  //   params?: State<RouterState.params>;
-  // };
   export const routerState: {
     pathname: RouterState["pathname"];
     searchParams: RouterState["searchParams"];
     params?: RouterState["params"];
+    status: RouterState["status"];
   };
 
   /**
@@ -209,11 +220,23 @@ declare module "@vanjs/router" {
   ) => void;
 
   /**
-   * Merge the children of an Element or an array of elements with an optional array of children
-   * into the childen prperty of a simple object.
-   * @param source
-   * @param children
+   * Creates a reactive micro store from an initial object
    */
+  export const microStore: <T extends Record<string, unknown>>(init: T) => T;
+
+  /**
+   * Fixes the URL of a route.
+   * @param url
+   */
+  export const fixRouteUrl: (url: string) => string;
+
+  // unwrap.mjs
+  /**
+   * Merge the children of an Element or an array of elements with an optional array of children
+   * into the children property of a simple object.
+   */
+  export type UnwrapResult = { children: VanNode[] };
+
   export const unwrap: (
     source:
       | VanNode
@@ -228,8 +251,8 @@ declare module "@vanjs/router" {
         | ReturnType<IsoTagFunc>[]
         | VanNode
         | VanNode[]),
-    ...children: ChildDom[]
-  ) => { children: ChildDom[] };
+    ...children: VanNode[]
+  ) => UnwrapResult;
 
   export type JSXComponentFn = () => JSX.Element;
   export type FragmentFn = () => ChildDom | ChildDom[];
@@ -240,15 +263,11 @@ declare module "@vanjs/router" {
     route?: Pick<RouteEntry, "load" | "preload">;
   };
 
-  export type DynamicModule = {
-    Page: ComponentFn;
+  export type LazyComponent = Promise<{
     default?: ComponentFn;
+    Page?: ComponentFn;
     route?: Pick<RouteEntry, "load" | "preload">;
-  };
-
-  export type LazyComponent = Promise<DynamicModule>;
-
-  export type ImportFn = () => LazyComponent;
+  }>;
 
   /**
    * Registers a lazy component.
@@ -257,21 +276,57 @@ declare module "@vanjs/router" {
   export const lazy: (importFn: ImportFn) => () => Promise<ComponentModule>;
 
   /**
-   * Fixes the URL of a route.
-   * @param url
+   * Cache a route.
+   * @param key the cache route key
+   * @param value the cache route
    */
-  export const fixRouteUrl: (url: string) => string;
+  export const cacheRoute: (key: ImportFn, value: ComponentModule) => void;
+
+  /**
+   * Return a route cache.
+   * @param key the cache route key
+   */
+  export const getCachedRoute: (key: ImportFn) => ComponentModule | undefined;
 
   /**
    * Execute lifecycle methods preload and / or load
    */
   export const executeLifecycle: (
-    { route }: ComponentModule,
-    params?: Record<string, string> | undefined,
-  ) => Promise<boolean | void>;
+    route: RouteEntry | {
+      preload?: (params?: Record<string, string>) => unknown;
+      load?: (params?: Record<string, string>) => unknown;
+    } | null,
+    params: Record<string, string> | undefined,
+  ) => Promise<boolean>;
 
   /**
    * Find a registered route that matches the given path
    */
   export const matchRoute: (path: string) => RouteEntry | null;
+
+  /**
+   * Convenience hook to get the current route's cached data.
+   */
+  export const useRouteData: <T>() => T | undefined;
+
+  // dataCache.mjs
+  export type CacheEntry<T = unknown> = {
+    data: T;
+    error: Error | null;
+    timestamp: number;
+  };
+
+  export const dataCache: {
+    get<T>(pathname: string, key: string): CacheEntry<T> | undefined;
+    set<T>(pathname: string, key: string, entry: Partial<CacheEntry<T>>): void;
+    has(pathname: string, key?: string): boolean;
+    getRoute(pathname: string): Record<string, CacheEntry> | undefined;
+    del(pathname: string, key?: string): boolean;
+    clear(): void;
+    touch(pathname: string): void;
+    toJSON(): Record<string, Record<string, CacheEntry>>;
+    hydrateFromJSON(json: Record<string, Record<string, CacheEntry>>): void;
+    size(): number;
+    setMaxRoutes(n: number): void;
+  };
 }

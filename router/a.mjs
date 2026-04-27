@@ -1,7 +1,12 @@
 // router/a.mjs
 import van from "vanjs-core";
 import { matchRoute } from "./matchRoute.mjs";
-import { executeLifecycle, isCurrentPage, navigate } from "./helpers.mjs";
+import {
+  getValue,
+  isCurrentLocation,
+  isCurrentPage,
+  navigate,
+} from "./helpers.mjs";
 
 /** @typedef {typeof import("./types").A} A */
 
@@ -9,46 +14,53 @@ import { executeLifecycle, isCurrentPage, navigate } from "./helpers.mjs";
  * @type {A}
  */
 export const A = (
-  /* istanbul ignore next */ { href, children, ...rest } = {},
+  /* istanbul ignore next */
+  { href, children, ...rest } = {},
   ...otherChildren
 ) => {
   /* istanbul ignore next - try again later */
   const props = Object.fromEntries(
     Object.entries(rest || {}).filter(([_, val]) => val !== undefined),
   );
+
+  const preloaded = van.state(false);
+
   const newProps = {
     href,
     ...props,
     onclick: async (e) => {
+      const HREF = getValue(href);
       e.preventDefault();
       /* istanbul ignore next */
-      if (isCurrentPage(href)) return;
+      if (isCurrentPage(HREF)) return;
 
       // istanbul ignore else
-      if (props.onclick) {
+      if (typeof props.onclick === "function") {
         await props.onclick(e);
       }
 
-      const route = matchRoute(href);
-      const module = await route.component();
-      await executeLifecycle(module, route.params);
-
-      navigate(href);
+      navigate(HREF);
     },
-    onmouseenter: () => {
-      const route = matchRoute(href);
+    onmouseenter: async () => {
+      const HREF = getValue(href);
+      const route = matchRoute(HREF);
 
+      // istanbul ignore else
+      if (typeof props.onmouseenter === "function") {
+        await props.onmouseenter(e);
+      }
       /* istanbul ignore else */
-      if (route?.component) {
+      if (route?.component && !preloaded.val) {
         route.component();
+        preloaded.val = true;
       }
     },
   };
 
-  van.derive(() => {
-    if (isCurrentPage(href)) {
-      newProps["aria-current"] = "page";
-    }
+  newProps["aria-current"] = van.derive(() => {
+    const isPage = isCurrentPage(href);
+    const isLocation = isCurrentLocation(href);
+    return isPage ? "page" : isLocation ? "location" : null;
   });
 
   return van.tags.a(newProps, children || otherChildren);

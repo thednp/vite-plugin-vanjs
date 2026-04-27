@@ -7,9 +7,9 @@
 const routeCache = new Map();
 
 /** @type {GetCachedRoute} */
-export const getCached = (key) => routeCache.get(key);
+export const getCachedRoute = (key) => routeCache.get(key);
 
 /** @type {CacheRoute} */
-export const cache = (key, value) => {
+export const cacheRoute = (key, value) => {
   routeCache.set(key, value);
 };

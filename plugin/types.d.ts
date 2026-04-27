@@ -14,6 +14,6 @@ export type VanJSPluginOptions = {
 
 export declare const VitePluginVanJS: (
   config?: VanJSPluginOptions,
-) => Plugin<VanJSPluginOptions>;
+) => Plugin;
 
 export default VitePluginVanJS;

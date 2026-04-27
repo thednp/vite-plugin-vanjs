@@ -17,11 +17,13 @@ const styleUrl = PATH.resolve(process.cwd(), "tests", 'test-style.css');
 const scriptUrl = PATH.resolve(process.cwd(), "tests", 'test-script.js');
 const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
 
-describe(`Test client-side`, () => {
-  beforeEach(() => {
-    document.body.innerHTML = "";
-    document.head.innerHTML = "";
-  })
+ describe(`Test client-side`, () => {
+ beforeEach(() => {
+  document.body.innerHTML = "";
+  document.body.removeAttribute("data-root");
+  document.body.removeAttribute("data-h");
+  document.head.innerHTML = "";
+ })
 
   test(`Test meta tags`, () => {
     initializeHeadTags();
@@ -199,16 +201,17 @@ describe(`Test client-side`, () => {
     // console.log("\ninfo\n", docBody.outerHTML);
   })
 
-  test("Test router no route set", async () => {
-    // reset routes from file-system router
-    routes.length = 0;
-    van.add(document.body, Router() as HTMLElement);
+ test("Test router no route set", async () => {
+ // reset routes from file-system router
+ routes.length = 0;
+ const router = Router();
+ van.add(document.body, router);
 
-    // set router state
-    navigate('/nowhere', { replace: true });
+ // set router state
+ navigate('/nowhere', { replace: true });
 
-    expect(document.body.innerText).to.contain('No Route Found');
-  });
+ expect(document.body.innerText).to.contain('No Route Found');
+ });
 
   test("Test router", async () => {
     // reset routes from file-system router
@@ -253,10 +256,10 @@ describe(`Test client-side`, () => {
       component: lazy(() => import('./routes/(root)/index.ts'))
     });
 
-    setRouterState('/');
-    await new Promise(res => setTimeout(res, 17));
-    
-    van.add(document.body, () => Router())
+ setRouterState('/');
+ await new Promise(res => setTimeout(res, 17));
+
+ van.add(document.body, Router())
 
     await new Promise(res => setTimeout(res, 17));
     // console.log({ html: document.body.innerHTML });

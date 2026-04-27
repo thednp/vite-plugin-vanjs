@@ -87,6 +87,7 @@ export default function VitePluginVanJS(options = {}) {
           ],
         },
         ssr: {
+          // external: ["virtual:@vanjs/routes"],
           noExternal: ["vanjs-*", "*-vanjs", "@vanjs/*"],
         },
         resolve: {
@@ -235,8 +236,9 @@ routes.length = 0;
 // Register routes
 ${currentRoutes.map(generateRoute).join("\n")}
 ${
-          (ops && ops.ssr && currentRoutes.length) &&
-          `console.log(\`🍦 @vanjs/router registered ${currentRoutes.length} routes.\`)`
+          (ops?.ssr && currentRoutes.length)
+            ? `console.log(\`🍦 @vanjs/router registered ${currentRoutes.length} routes.\`)`
+            : /* istanbul ignore next */ ""
         }
 `;
 

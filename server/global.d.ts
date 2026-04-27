@@ -47,4 +47,26 @@ declare module "@vanjs/server" {
    * @returns HTML string
    */
   export const renderToString: (source: Source) => Promise<string>;
+
+  /**
+   * A function that generates a <script> for initial hydration data.
+   * Serializes the full path-keyed data cache into window.__DATA_CACHE
+   * @returns HTML string
+   */
+  export const getDataPreload: () => string;
+}
+
+interface Window {
+  __DATA_CACHE?: Record<
+    string,
+    Record<
+      string,
+      {
+        data: unknown;
+        status: string;
+        timestamp: number;
+        error: { message: string } | null;
+      }
+    >
+  >;
 }

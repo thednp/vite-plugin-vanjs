@@ -5,6 +5,7 @@ export * from "./a.mjs";
 export * from "./state.mjs";
 export * from "./lazy.mjs";
 export * from "./helpers.mjs";
-export * from "./cache.mjs";
+export * from "./routeCache.mjs";
+export * as dataCache from "./dataCache.mjs";
 export * from "./unwrap.mjs";
 export * from "./extractParams.mjs";

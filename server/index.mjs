@@ -1,4 +1,6 @@
 import { basename } from "node:path";
+// import { routerState } from "../router/index.mjs";
+import * as dataCache from "../router/dataCache.mjs";
 export * from "../plugin/helpers.mjs";
 
 /**
@@ -8,6 +10,7 @@ export const renderToString = async (inputSource) => {
   const source = typeof inputSource === "function"
     ? inputSource()
     : inputSource;
+
   if (typeof source === "number") {
     return String(source);
   }
@@ -31,8 +34,8 @@ export const renderToString = async (inputSource) => {
     }
     return elements.join("");
   }
-  // return String(source)
 
+  // return String(source)
   // no source provided
   // @ts-ignore - this is server side code
   console.warn("Render error! Source not recognized: " + source);
@@ -49,17 +52,17 @@ function renderPreloadLink(file) {
   } else if (file.endsWith(".css")) {
     return `<link rel="preload" href="${file}" as="style" crossorigin>`;
   } else if (file.endsWith(".woff")) {
-    return ` <link rel="preload" href="${file}" as="font" type="font/woff" crossorigin>`;
+    return `  <link rel="preload" href="${file}" as="font" type="font/woff" crossorigin>`;
   } else if (file.endsWith(".woff2")) {
-    return ` <link rel="preload" href="${file}" as="font" type="font/woff2" crossorigin>`;
+    return `  <link rel="preload" href="${file}" as="font" type="font/woff2" crossorigin>`;
   } else if (file.endsWith(".gif")) {
-    return ` <link rel="preload" href="${file}" as="image" type="image/gif">`;
+    return `<link rel="preload" href="${file}" as="image" type="image/gif">`;
   } else if (file.endsWith(".jpg") || file.endsWith(".jpeg")) {
-    return ` <link rel="preload" href="${file}" as="image" type="image/jpeg">`;
+    return `<link rel="preload" href="${file}" as="image" type="image/jpeg">`;
   } else if (file.endsWith(".png")) {
-    return ` <link rel="preload" href="${file}" as="image" type="image/png">`;
+    return `<link rel="preload" href="${file}" as="image" type="image/png">`;
   } else if (file.endsWith(".webp")) {
-    return ` <link rel="preload" href="${file}" as="image" type="image/webp">`;
+    return `<link rel="preload" href="${file}" as="image" type="image/webp">`;
   } else {
     // @ts-ignore - this is server side code
     console.warn("Render error! File format not recognized: " + file);
@@ -90,13 +93,11 @@ export function renderPreloadLinks(modules, manifest) {
   // Second pass: generate preload links
   modules.forEach((id) => {
     const files = manifest[id];
-
     // istanbul ignore else
     if (files?.length) {
       files.forEach((file) => {
         // Skip if we've seen this file or if it's an asset from an ignored path
         if (seen.has(file) || ignoredAssets.has(file)) return;
-
         seen.add(file);
         const filename = basename(file);
 
@@ -111,7 +112,6 @@ export function renderPreloadLinks(modules, manifest) {
             }
           }
         }
-
         links += renderPreloadLink(file);
       });
     }
@@ -119,3 +119,19 @@ export function renderPreloadLinks(modules, manifest) {
 
   return links;
 }
+
+/**
+ * Serialize route data for client hydration.
+ * Uses the new __DATA_CACHE format with path-keyed cache entries.
+ * @returns {string}
+ */
+export const getDataPreload = () => {
+  const cacheJSON = dataCache.toJSON();
+  const cacheEntries = Object.keys(cacheJSON);
+
+  if (cacheEntries.length > 0) {
+    const json = JSON.stringify(cacheJSON);
+    return `<script id="data-cache">window.__DATA_CACHE=${json}</script>`;
+  }
+  return "";
+};

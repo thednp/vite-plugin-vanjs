@@ -1,3 +1,4 @@
+import van from "vanjs-core";
 import { unwrap } from "../router/unwrap.mjs";
 import { getTagKey } from "../meta/helpers.mjs";
 
@@ -225,20 +226,16 @@ function createHydrationContext() {
 export const hydrate = (target, content) => {
   if (content instanceof Promise) {
     content.then((res) => {
-      if (!target.hasAttribute("data-h")) {
-        const { diffAndHydrate } = createHydrationContext();
-        diffAndHydrate(target, res);
-        target.setAttribute("data-h", "");
-      } else {
-        const wrapper = unwrap(res);
-        target.replaceChildren(
-          ...(Array.from(wrapper.children)),
-        );
-      }
+      hydrate(target, res);
     });
     return target;
   }
-
+  if (typeof content === "function") {
+    van.derive(() => {
+      hydrate(target, content());
+    });
+    return target;
+  }
   const wrapper = unwrap(content);
   const currentChildren = Array.from(target.children);
   const newChildren = Array.from(wrapper.children);
@@ -257,7 +254,9 @@ export const hydrate = (target, content) => {
         getTagKey(child) === key
       );
       if (existing) {
-        existing.replaceWith(newChild);
+        if (existing.outerHTML !== newChild.outerHTML) {
+          existing.replaceWith(newChild);
+        }
       } else {
         target.appendChild(newChild);
       }
@@ -268,9 +267,16 @@ export const hydrate = (target, content) => {
       diffAndHydrate(target, content);
       target.setAttribute("data-h", "");
     } else {
-      target.replaceChildren(...newChildren);
+      // target.replaceChildren(...newChildren);
+      const parsed = [];
+      for (const child of newChildren) {
+        parsed.push(
+          child instanceof Element
+            ? child
+            : /* istanbul ignore next */ String(child),
+        );
+      }
+      target.replaceChildren(...parsed);
     }
   }
-
-  return target;
 };

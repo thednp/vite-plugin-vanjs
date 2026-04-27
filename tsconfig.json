@@ -27,8 +27,6 @@
     "jsxImportSource": "@vanjs/jsx"
   },
   "include": [
-    "./tests/*.ts",
-    "./tests/*.tsx",
     "./plugin/*.ts",
     "./jsx/*.ts",
     "./setup/*.ts",
@@ -36,7 +34,6 @@
     "./meta/*.ts",
     "./server/*.ts",
     "./client/*.ts",
-    "./tests/vite-env.d.ts"
   ],
   "exclude": ["node_modules", "experiments", "coverage"],
 }

@@ -5,7 +5,7 @@ import { dirname, resolve, join } from "node:path";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const toAbsolute = (p:string) => resolve(__dirname, p);
+const toAbsolute = (p: string) => resolve(__dirname, p);
 
 import { expect, test, describe, vi, afterEach } from "vitest";
 import { Head, Title, Meta, Link, resetHeadTags } from "@vanjs/meta";
@@ -13,23 +13,23 @@ import van from "@vanjs/van";
 import vanX from "@vanjs/vanX";
 import { type Element as VanElement } from "mini-van-plate/van-plate";
 import vanjs from "../plugin/index.mjs";
-import { renderToString, renderPreloadLinks } from "@vanjs/server";
-import { Router, Route, lazy, setRouterState, routerState, fixRouteUrl, routes } from "@vanjs/router";
+import { renderToString, renderPreloadLinks, getDataPreload } from "@vanjs/server";
+import { Router, Route, lazy, setRouterState, routerState, fixRouteUrl, routes, dataCache, } from "@vanjs/router";
 import type { UserConfig } from "vite";
 import { mockPlugin7Context, mockPlugin8Context } from "./fixtures/mock.ts";
 
 // Mock Vite's internals
 vi.mock('vite', () => ({
-  transformWithOxc: vi.fn().mockImplementation((code) => 
-    Promise.resolve({ 
+  transformWithOxc: vi.fn().mockImplementation((code) =>
+    Promise.resolve({
       code,  // return the same code that was passed
       map: `[{"file": "./file.ts"}]`
     })
   ),
   transformWithEsbuild: vi.fn().mockImplementation(async (code) => {
-    return Promise.resolve({ 
+    return Promise.resolve({
       code,  // return the same code that was passed
-      map: [{"file": "./file.ts"}]
+      map: [{ "file": "./file.ts" }]
     })
   }),
 }));
@@ -106,15 +106,15 @@ describe(`Test SSR`, () => {
     const Anchor = a({ href: "/contact", onclick: () => console.log("clicked") }, "Click me") as unknown as VanElement;
     const Anchor1 = a({ href: "/contact", class: classString }, "Click me") as unknown as VanElement;
     const Icon = svg({
-        xmlns: "http://www.w3.org/2000/svg",
-        viewBox: "0 0 24 24",
-        fill: "none",
-        width: "32", height: "32",
-        stroke: "currentColor", "stroke-width": "1", "stroke-linecap": "round", "stroke-linejoin": "round",
-        class: "text-stone-500 mb-4"
-      },
-      path({"d": "M5 12h14"}),
-      path({"d": "m12 5 7 7-7 7"}),
+      xmlns: "http://www.w3.org/2000/svg",
+      viewBox: "0 0 24 24",
+      fill: "none",
+      width: "32", height: "32",
+      stroke: "currentColor", "stroke-width": "1", "stroke-linecap": "round", "stroke-linejoin": "round",
+      class: "text-stone-500 mb-4"
+    },
+      path({ "d": "M5 12h14" }),
+      path({ "d": "m12 5 7 7-7 7" }),
     ) as unknown as VanElement;
 
     expect(reactive(obj).a).to.equal(1);
@@ -149,43 +149,43 @@ describe(`Test SSR`, () => {
     }));
 
     // coverage
-    await (plugin.configResolved as any)({ mode: "test", root: toAbsolute("..") } );
+    await (plugin.configResolved as any)({ mode: "test", root: toAbsolute("..") });
     // virtual:module 
     expect(await (plugin.resolveId as any)('virtual:@vanjs/routes', undefined, { ssr: false })).toEqual('\0virtual:@vanjs/routes');
     // resolve modules development
     process.env.NODE_ENV = 'development';
-    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, {ssr: true})).toEqual(toAbsolute('../setup/index-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/index-ssr.mjs'));
     // expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/index-debug.mjs'));
     expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/van"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
     expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/van"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/van-debug.mjs'));
-    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: true } )).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
     expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
 
     // resolve modules production
     process.env.NODE_ENV = 'production';
     // plugin.configResolved({ mode: "production", root: toAbsolute("..") } as any);
-    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, {ssr: true})).toEqual(toAbsolute('../setup/index-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/index-ssr.mjs'));
     // expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/index.mjs'));
     expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/van"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
     expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/van"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
-    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: true } )).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
     expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
 
     // resolve modules test
     process.env.NODE_ENV = 'test';
     // plugin.configResolved({ mode: "test", root: toAbsolute("..") } as any);
-    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, {ssr: true})).toEqual(toAbsolute('../setup/index-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/index-ssr.mjs'));
     // expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/index.mjs'));
     expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/van"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/van-ssr.mjs'));
     expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/van"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
-    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: true } )).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
+    expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: true })).toEqual(toAbsolute('../setup/vanX-ssr.mjs'));
     expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/vanX"], undefined, { ssr: false })).toEqual(toAbsolute('../setup/vanX.mjs'));
 
     // edge cases
     expect((plugin.resolveId as any)("vanjs-core", "/vite-plugin-vanjs/jsx/jsx.mjs", { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
     expect((plugin.resolveId as any)("src/van.js", "/src/van.debug.js", { ssr: false })).toEqual(toAbsolute('../setup/van.mjs'));
     expect((plugin.resolveId as any)("src/some-plugin-dont-exist", "another-importer", { ssr: true })).toEqual(null);
-      
+
     // test aliases
     expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], "/setup/index", { ssr: true })).toEqual(toAbsolute('../setup/index-ssr.mjs'));
     expect((plugin.resolveId as any)((config.resolve?.alias as any)["@vanjs/setup"], toAbsolute("../setup/index"), { ssr: false })).toEqual(toAbsolute('../setup/index.mjs'));
@@ -230,7 +230,7 @@ describe(`Test SSR`, () => {
         },
       },
     });
-  });  
+  });
 
   test("Test plugin with vite 7 or older", async () => {
     const plugin = vanjs();
@@ -282,11 +282,11 @@ describe(`Test SSR`, () => {
     // @ts-expect-error
     plugin2.buildStart.call(mockPlugin8Context);
     (plugin2.configResolved as any)({ mode: "development", root: toAbsolute("..") } as any);
-    expect((await (plugin2.load as any)("\0virtual:@vanjs/routes", { ssr: false }))).toEqual({ code: "", map: null});
+    expect((await (plugin2.load as any)("\0virtual:@vanjs/routes", { ssr: false }))).toEqual({ code: "", map: null });
     expect(routes.length).toEqual(0);
     const plugin3 = vanjs({ routesDir: "tests/routes/empty" });
     (plugin3.configResolved as any)({ mode: "development", root: toAbsolute("..") } as any);
-    expect((await (plugin2.load as any)("\0virtual:@vanjs/routes", { ssr: false }))).toEqual({ code: "", map: null});
+    expect((await (plugin2.load as any)("\0virtual:@vanjs/routes", { ssr: false }))).toEqual({ code: "", map: null });
     const plugin4 = vanjs();
     expect((await (plugin4.load as any)("not-exist", { ssr: false }))).toBeNull();
   });
@@ -296,7 +296,7 @@ describe(`Test SSR`, () => {
     // @ts-expect-error
     plugin1.buildStart.call(mockPlugin7Context);
     (plugin1.configResolved as any)({ mode: "development", root: toAbsolute("..") } as any);
-    
+
     const result = await (plugin1.load as any)("\0virtual:@vanjs/routes", { ssr: true })
     console.log({ result })
 
@@ -306,10 +306,10 @@ describe(`Test SSR`, () => {
 
   test('Should set up file watchers correctly', () => {
     const plugin = vanjs();
-  
+
     // Store handlers in an object
     const handlers: Record<string, (file: string) => void> = {};
-    
+
     const mockServer = {
       watcher: {
         add: vi.fn(),
@@ -330,7 +330,7 @@ describe(`Test SSR`, () => {
     };
 
     // Initialize plugin with config
-    (plugin.configResolved as any)({ 
+    (plugin.configResolved as any)({
       root: '/mock/root',
       mode: 'development'
     } as any);
@@ -381,7 +381,7 @@ describe(`Test SSR`, () => {
       path: '/test',
       component: lazy(() => import('./routes/(root)/index.ts'))
     });
-  
+
     Route({
       path: '/test/:someParam',
       component: lazy(() => import('./routes/(root)/index.ts'))
@@ -426,4 +426,18 @@ describe(`Test SSR`, () => {
     expect(fixRouteUrl('')).toEqual("/")
     expect(fixRouteUrl('test')).toEqual("/test")
   });
+
+  test("testing dataCache and getDataPreload", async () => {
+    dataCache.clear();
+
+    expect(getDataPreload()).to.equal("");
+    dataCache.set("/", "", {
+      data: "This is data",
+      error: null,
+      timestamp: Date.now()
+    });
+
+    expect(getDataPreload()).to.contain(`<script id="data-cache">`);
+    expect(getDataPreload()).to.contain(`window.__DATA_CACHE={"/":{"":{"data":"This is data"`);
+  })
 });

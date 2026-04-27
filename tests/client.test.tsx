@@ -1,5 +1,5 @@
-/// <reference types="../" />
 // @vitest-environment happy-dom
+/// <reference types=".." />
 import van, { type ChildDom, type State } from 'vanjs-core'
 import { expect, test, describe } from "vitest";
 import { A } from "@vanjs/router"
@@ -21,7 +21,7 @@ describe(`Test client-side JSX`, () => {
         >
           Click Me
       </button>
-    ) as HTMLButtonElement;
+    )  as HTMLButtonElement;
 
     const myDiv = (
       <div
@@ -33,7 +33,7 @@ describe(`Test client-side JSX`, () => {
         >
           <span ref={spanRef} style={spanStyle}>Hi</span> VanJS
           <A href="/">Test Link</A>
-      </div>
+      </div> as any
     );
 
     const Component = () => {
@@ -56,10 +56,10 @@ describe(`Test client-side JSX`, () => {
   test(`Test SVG`, async () => {
     const svg = <svg width="100" height="100">
     <circle cx="50" cy="50" r="40" fill="blue" />
-  </svg>
+  </svg> as any;
     const svgWithSVGNS = <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg">
     <circle cx="50" cy="50" r="40" fill="blue" />
-  </svg>
+  </svg> as any
 
     expect((svg as SVGAElement).getAttribute("width")).toEqual("100");
     expect((svgWithSVGNS as SVGAElement).getAttribute("xmlns")).toEqual("http://www.w3.org/2000/svg");
@@ -69,6 +69,7 @@ describe(`Test client-side JSX`, () => {
   test(`Test fragment`, async () => {
     const Component = () => {
       return (
+        // @ts-expect-error - types don't come to tests
         <>
           <h1>Hi VanJS!</h1>
           <p>This is a paragraph</p>

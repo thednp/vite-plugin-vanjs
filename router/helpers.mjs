@@ -1,14 +1,23 @@
 import isServer from "../setup/isServer.mjs";
 import { routerState, setRouterState } from "./state.mjs";
 import { matchRoute } from "./matchRoute.mjs";
+import * as dataCache from "./dataCache.mjs";
 
 /** @typedef {typeof import("./types.d.ts").navigate} Navigate */
 /** @typedef {import("./types.d.ts").Route} Route */
 /** @typedef {import("./types.d.ts").VanNode} VanNode */
 /** @typedef {import("./types.d.ts").ComponentModule} ComponentModule */
-/** @typedef {import("./types.d.ts").DynamicModule} DynamicModule */
 /** @typedef {import("./types.d.ts").ComponentFn} ComponentFn */
 /** @typedef {import("./types.d.ts").LazyComponent} LazyComponent */
+
+/**
+ * Returns the HREF string value
+ * @param {unknown} v
+ * @returns {string}
+ */
+export const getValue = (v) => {
+  return typeof v === "function" ? v() : v.rawVal ? v.val : v;
+};
 
 /**
  * Check if selected page is the current page;
@@ -16,7 +25,17 @@ import { matchRoute } from "./matchRoute.mjs";
  * @returns {boolean}
  */
 export const isCurrentPage = (pageName) => {
-  return routerState.pathname === pageName;
+  return routerState.pathname === getValue(pageName);
+};
+
+/**
+ * Check if selected page is related to the current page;
+ * @param {string} pageName
+ * @returns {boolean}
+ */
+export const isCurrentLocation = (pageName) => {
+  const pathName = routerState.pathname;
+  return pathName !== "/" && pathName.includes(getValue(pageName));
 };
 
 /**
@@ -25,28 +44,46 @@ export const isCurrentPage = (pageName) => {
  * @returns {component is (() => LazyComponent)}
  */
 export const isLazyComponent = (component) => {
-  // Server: Check if it's an async function
-  if (isServer && typeof component === "function") {
-    return component.constructor.name.includes("AsyncFunction");
-  }
-
-  // Client: Check if it's designated as lazy
+  if (typeof component !== "function") return false;
   // @ts-expect-error - this property is optional and on purpose
-  return component?.isLazy === true;
+  return component?.isLazy === true ||
+    component.constructor.name.includes("AsyncFunction");
 };
 
 /**
  * Execute lifecycle methods preload and / or load
- * @param {ComponentModule} param0
+ * @param {import("./types.d.ts").RouteEntry} route
  * @param {Record<string, string> | undefined} params
  * @returns {Promise<boolean>}
  */
-export const executeLifecycle = async ({ route }, params) => {
+export const executeLifecycle = async (route, params) => {
   // istanbul ignore next
-  if (!route) return true;
   try {
-    if (route?.preload) await route.preload(params);
-    if (route?.load) await route.load(params);
+    if (!route) return true;
+
+    let data;
+    const preload = route.preload;
+    const load = route.load;
+
+    if (preload) await preload(params);
+    if (!data && load) data = await load(params);
+    if (data) {
+      // initialLoaded = true;
+      const pathname = routerState.pathname;
+      const cacheKey = Object.keys(params || {}).length === 0
+        ? ""
+        : JSON.stringify(params);
+      dataCache.set(pathname, cacheKey, {
+        data,
+        error: null,
+        status: "success",
+        timestamp: Date.now(),
+      });
+      if (!isServer) {
+        dataCache.touch(pathname);
+      }
+    }
+
     return true;
   } catch (error) {
     // istanbul ignore next
@@ -54,6 +91,16 @@ export const executeLifecycle = async ({ route }, params) => {
     // istanbul ignore next
     return false;
   }
+};
+
+/**
+ * Convenience hook to get the current route's cached data.
+ * @returns {any | undefined}
+ */
+export const useRouteData = () => {
+  const params = routerState.params;
+  const key = Object.keys(params).length === 0 ? "" : JSON.stringify(params);
+  return dataCache.get(routerState.pathname, key)?.data;
 };
 
 /**
