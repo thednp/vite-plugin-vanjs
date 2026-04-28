@@ -114,7 +114,7 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
       const module = await route.component();
 
       await executeLifecycle(module.route, route.params);
-      const children = resolveChildren(module)
+      const children = resolveChildren(module);
       updateHead();
       return van.add(wrapper, ...children);
     };

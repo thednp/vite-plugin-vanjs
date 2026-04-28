@@ -13,6 +13,7 @@ import { Page as IndexPage } from "./routes/(root)/index.ts";
 import { Page as ContactPage } from "./routes/contact.ts";
 import { Page as InfoPage } from "./routes/(root)/info.ts";
 import { jsx } from "@vanjs/jsx";
+import { ChildDom } from "vanjs-core";
 const styleUrl = PATH.resolve(process.cwd(), "tests", 'test-style.css');
 const scriptUrl = PATH.resolve(process.cwd(), "tests", 'test-script.js');
 const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
@@ -275,7 +276,7 @@ const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
     await new Promise(res => setTimeout(res, 17));
     expect(routerState.pathname).to.equal('/test/');
     expect(routerState.searchParams.toString()).to.equal('');
-    expect(routerState.params).to.deep.equal({ someParam: "1" });
+    expect(routerState.params).to.deep.equal({});
 
     // await new Promise(res => setTimeout(res, 17));
     // console.log({ html: document.body.innerHTML });
@@ -289,7 +290,7 @@ const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
     await new Promise(res => setTimeout(res, 17));
     expect(routerState.pathname).to.equal('/not-there');
     expect(routerState.searchParams.toString()).to.equal('');
-    expect(routerState.params).to.deep.equal({ someParam: '1' });
+    expect(routerState.params).to.deep.equal({});
 
     await new Promise(res => setTimeout(res, 17));
     // console.log({ html: document.body.innerHTML })
@@ -331,9 +332,9 @@ const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
     };
 
     // console.log(div( ...Array.from((unwrap(Page1())).children) ));
-    expect(div({}, ...Array.from((unwrap(Page1())).children)).innerHTML).to.contain('some div 1');
-    expect(div({}, ...Array.from((unwrap(Page2())).children)).innerHTML).to.contain('some div 2');
-    expect(div({}, ...Array.from((unwrap(Page3())).children)).innerHTML).to.contain('some div 3');
+    expect(div({}, ...Array.from((unwrap(Page1())).children) as ChildDom[]).innerHTML).to.contain('some div 1');
+    expect(div({}, ...Array.from((unwrap(Page2())).children) as ChildDom[]).innerHTML).to.contain('some div 2');
+    expect(div({}, ...Array.from((unwrap(Page3())).children) as ChildDom[]).innerHTML).to.contain('some div 3');
     // console.log(unwrap(Page3()))
     expect((unwrap(Page3()) ).children.length).toEqual(2);
     expect((unwrap([h1('Hello VanJS'), div('some div 5')])).children.length).toEqual(2);

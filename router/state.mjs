@@ -105,5 +105,8 @@ export const setRouterState = (path, search = undefined, params = {}) => {
   routerState.searchParams = new URLSearchParams(
     search || searchParams || "",
   );
+  Object.keys(routerState.params).forEach((key) =>
+    delete routerState.params[key]
+  );
   Object.assign(routerState.params, params);
 };
