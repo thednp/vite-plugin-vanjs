@@ -20,8 +20,10 @@ export const jsx = (jsxTag, { children, ref, style, ...rest }) => {
     Object.entries(rest).filter(([_, val]) => val !== undefined),
   );
 
+  // on client side manually call registerEnv({ van: vanServer.default }),
+  // then call vanServer.default.html([jsx component]) to render jsx as string
   if (!env.van) {
-    // on client side call registerEnv({ van: vanServer.default }) to render as string
+    // if no env.van created by user yet, then register automatically based on actual environment
     if (isServer) {
       registerEnv({ van: vanServer.default })
     } else {
