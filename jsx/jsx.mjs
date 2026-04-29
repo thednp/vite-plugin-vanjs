@@ -4,6 +4,8 @@ import van from "vanjs-core";
 import isServer from "../setup/isServer.mjs";
 import { setAttributeNS, styleToString } from "../client/index.mjs";
 import { namespaceElements } from "./ns.mjs";
+import { env, registerEnv } from "mini-van-plate/shared"
+import * as vanServer from 'mini-van-plate/van-plate';
 
 /**
  * Compiles JSX to VanJS elements with automatic namespace resolution.
@@ -18,16 +20,29 @@ export const jsx = (jsxTag, { children, ref, style, ...rest }) => {
     Object.entries(rest).filter(([_, val]) => val !== undefined),
   );
 
+  if (!env.van) {
+    // on client side call registerEnv({ van: vanServer.default }) to render as string
+    if (isServer) {
+      registerEnv({ van: vanServer.default })
+    } else {
+      registerEnv({ van })
+    }
+  }
+
+  // if registerEnv as vanServer (on client side), then it has "html" property
+  const renderAsString = isServer || env.van.html !== undefined;
+
   if (typeof jsxTag === "string") {
     const ns = namespaceElements[jsxTag];
-    const newElement = (ns ? van.tags(ns) : van.tags)[jsxTag](props, children);
+
+    const newElement = (ns ? env.van.tags(ns) : env.van.tags)[jsxTag](props, children);
 
     // Handle style reactively
-    van.derive(() => {
+    env.van.derive(() => {
       if (style) {
         const styleProp = typeof style === "function" ? style() : style;
         const styleValue = styleToString(styleProp);
-        if (isServer) {
+        if (renderAsString) {
           newElement.propsStr += ` style="${styleValue}"`;
         } else {
           newElement.style.cssText = styleValue;
@@ -36,7 +51,7 @@ export const jsx = (jsxTag, { children, ref, style, ...rest }) => {
     });
 
     // On server, apply props as string
-    if (isServer) {
+    if (renderAsString) {
       return newElement;
     }
 
@@ -46,7 +61,7 @@ export const jsx = (jsxTag, { children, ref, style, ...rest }) => {
       const attrNamespace = k === "xmlns" ? null : newElement.namespaceURI;
 
       if (typeof value === "function" && !k.startsWith("on")) {
-        van.derive(() => setAttributeNS(attrNamespace, newElement, k, value()));
+        env.van.derive(() => setAttributeNS(attrNamespace, newElement, k, value()));
         continue;
       }
 
@@ -56,7 +71,7 @@ export const jsx = (jsxTag, { children, ref, style, ...rest }) => {
       }
 
       if (typeof value === "object" && "val" in value) {
-        van.derive(() =>
+        env.van.derive(() =>
           setAttributeNS(attrNamespace, newElement, k, value.val)
         );
         continue;
