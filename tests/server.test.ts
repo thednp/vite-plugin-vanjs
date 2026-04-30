@@ -69,25 +69,19 @@ describe(`Test SSR`, () => {
       'src/app.css': ['/assets/app.css'],
       'src/app.ts': ['/src/app.js'],
       'fancy/src/app.ts': ['src/app.js'],
-      'src/assets/image.jpg': ['/assets/img.jpg'],
-      'src/assets/image-1.gif': ['/assets/img-1.gif'],
-      'src/assets/image-2.jpeg': ['/assets/img-2.jpeg'],
-      'src/assets/image-3.png': ['/assets/img-3.png'],
-      'src/assets/image-4.webp': ['/assets/img-4.webp'],
       'src/assets/Mona-sans.woff': ['/assets/mona-sans.woff'],
       'src/assets/Mona-sans-2.woff2': ['/assets/mona-sans-2.woff2'],
     };
     const markup = renderPreloadLinks(Object.keys(manifest), manifest);
-
-    expect(markup).to.contain('<link rel="preload" href="/src/van.js" as="script" crossorigin>');
-    expect(markup).to.contain('<link rel="preload" href="/src/setup/van.js" as="script" crossorigin>');
-    expect(markup).to.contain('<link rel="preload" href="/assets/app.css" as="style" crossorigin>');
-    expect(markup).to.contain('<link rel="preload" href="/src/app.js" as="script" crossorigin>');
-    expect(markup).to.contain('<link rel="preload" href="/assets/img.jpg" as="image" type="image/jpeg">');
-    expect(markup).to.contain('<link rel="preload" href="/assets/img-1.gif" as="image" type="image/gif">');
-    expect(markup).to.contain('<link rel="preload" href="/assets/img-2.jpeg" as="image" type="image/jpeg">');
-    expect(markup).to.contain('<link rel="preload" href="/assets/img-3.png" as="image" type="image/png">');
-    expect(markup).to.contain('<link rel="preload" href="/assets/img-4.webp" as="image" type="image/webp">');
+    // console.log({markup})
+    
+    expect(markup).to.contain('<link rel="stylesheet" href="/assets/app.css" crossorigin>');
+    expect(markup).to.contain('<link rel="modulepreload" href="/src/van.js" crossorigin>');
+    expect(markup).to.contain('<link rel="modulepreload" href="/src/setup/van.js" crossorigin>');
+    expect(markup).to.contain('<link rel="modulepreload" href="/src/app.js" crossorigin>');
+    // <link rel="preload" href="${file}" as="font" type="font/woff2" crossorigin>
+    expect(markup).to.contain('<link rel="preload" href="/assets/mona-sans.woff" as="font" type="font/woff" crossorigin>');
+    expect(markup).to.contain('<link rel="preload" href="/assets/mona-sans-2.woff2" as="font" type="font/woff2" crossorigin>');
 
     const mini = {
       'src/van.txt': ['/src/van.txt'],
@@ -298,10 +292,38 @@ describe(`Test SSR`, () => {
     (plugin1.configResolved as any)({ mode: "development", root: toAbsolute("..") } as any);
 
     const result = await (plugin1.load as any)("\0virtual:@vanjs/routes", { ssr: true })
-    console.log({ result })
+    // console.log({ result })
 
     expect(result?.code.length).toBeGreaterThan(0);
     expect(result?.map).toBeDefined();
+  });
+
+  test("Test filesystem router exclude routes", async () => {
+    const originalNodeEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = "production";
+    const plugin1 = vanjs({ routesDir: "tests/routes", excludeRoutes: ["/admin"] });
+    // @ts-expect-error
+    plugin1.buildStart.call(mockPlugin8Context);
+    (plugin1.configResolved as any)({ mode: "production", root: toAbsolute("..") } as any);
+
+    const result1 = await (plugin1.load as any)("\0virtual:@vanjs/routes", { ssr: true })
+    // console.log({ result })
+
+    expect(result1?.code.length).toBeGreaterThan(0);
+    expect(result1?.code).to.not.contain('/admin');
+
+    const plugin2 = vanjs({ routesDir: "tests/routes", excludeRoutesProd: ["/admin"] });
+    // @ts-expect-error
+    plugin2.buildStart.call(mockPlugin8Context);
+    (plugin2.configResolved as any)({ mode: "production", root: toAbsolute("..") } as any);
+
+    const result2 = await (plugin2.load as any)("\0virtual:@vanjs/routes", { ssr: true })
+    // console.log({ result })
+
+    expect(result2?.code.length).toBeGreaterThan(0);
+    expect(result2?.code).to.not.contain('/admin');
+    process.env.NODE_ENV = originalNodeEnv;
+
   });
 
   test('Should set up file watchers correctly', () => {

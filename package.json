@@ -1,9 +1,9 @@
 {
   "name": "vite-plugin-vanjs",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "author": "thednp",
   "license": "MIT",
-  "description": "A mini meta-framework for VanJS powered by Vite",
+  "description": "An async first mini meta-framework for VanJS powered by Vite",
   "repository": "https://github.com/thednp/vite-plugin-vanjs",
   "type": "module",
   "sideEffects": false,

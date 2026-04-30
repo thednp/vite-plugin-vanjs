@@ -5,7 +5,7 @@
 [![NPM Version](https://img.shields.io/npm/v/vite-plugin-vanjs.svg)](https://www.npmjs.com/package/vite-plugin-vanjs)
 [![NPM Downloads](https://img.shields.io/npm/dm/vite-plugin-vanjs.svg)](http://npm-stat.com/charts.html?package=vite-plugin-vanjs)
 
-A mini meta-framework for [VanJS](https://vanjs.org/) developed around the awesome [vite](https://vite.dev) and tested with [vitest](https://vitest.dev). The plugin comes with a set of modules to streamline your workflow:
+An async first mini meta-framework for [VanJS](https://vanjs.org/) developed around the awesome [vite](https://vite.dev) and tested with [vitest](https://vitest.dev). The plugin comes with a set of modules to streamline your workflow:
 * ***@vanjs/router*** - one of the most important part of an application which allows you to split code and lazy load page like components with ease, handles both Client Side Rendering (SSR) and Server Side Rendering (CSR) and makes it really easy to work with;
 * ***@vanjs/meta*** - allows you to create metadata for your pages as well as load additional assets with ease;
 * ***@vanjs/jsx*** - enables JSX transformation with automatic namespace resolution;

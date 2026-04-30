@@ -10,6 +10,8 @@ import type { Plugin } from "vite";
 export type VanJSPluginOptions = {
   routesDir?: string;
   extensions?: string[];
+  excludeRoutes?: string[]; // NEW — excluded in all envs
+  excludeRoutesProd?: string[]; // NEW — excluded in production only
 };
 
 export declare const VitePluginVanJS: (

@@ -7,6 +7,7 @@
 import { dirname, join, posix, win32 } from "node:path";
 import { existsSync } from "node:fs";
 import { readdir } from "node:fs/promises";
+import process from "node:process";
 
 /**
  * Get the file most probable route path for a given potential route.
@@ -194,10 +195,21 @@ export const processLayoutRoutes = (routes, config, pluginConfig) => {
  * Scan and process routes and return them
  * @type {typeof import("./types").getRoutes}
  */
-// export const scanRoutes = async (config, pluginConfig) => {}
 export const getRoutes = async (config, pluginConfig) => {
   const routes = await scanRoutes(config, pluginConfig);
-  return processLayoutRoutes(routes, config, pluginConfig);
+  const processed = processLayoutRoutes(routes, config, pluginConfig);
+  // istanbul ignore next - defaults can't be checked
+  const { excludeRoutes = [], excludeRoutesProd = [] } = pluginConfig;
+  const isProd = process.env.NODE_ENV === "production";
+  const allExcludes = [...excludeRoutes, ...(isProd ? excludeRoutesProd : [])];
+  if (allExcludes.length) {
+    return processed.filter((r) =>
+      !allExcludes.some((p) =>
+        r.routePath === p || r.routePath.startsWith(p + "/")
+      )
+    );
+  }
+  return processed;
 };
 
 /** @type {(route: RouteFile) => string} */

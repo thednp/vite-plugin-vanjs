@@ -22,6 +22,8 @@ const toAbsolute = (p) => resolve(__dirname, p);
 const pluginDefaults = {
   routesDir: "src/routes",
   extensions: [".tsx", ".jsx", ".ts", ".js"],
+  excludeRoutes: [],
+  excludeRoutesProd: [],
 };
 
 // Define module mapping configuration

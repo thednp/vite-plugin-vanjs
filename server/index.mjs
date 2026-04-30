@@ -46,25 +46,17 @@ export const renderToString = async (inputSource) => {
  * @param {string} file
  * @returns {string}
  */
+// return `<link rel="preload" href="${file}" as="style" crossorigin>`;
 function renderPreloadLink(file) {
   if (file.endsWith(".js")) {
-    return `<link rel="preload" href="${file}" as="script" crossorigin>`;
+    return `<link rel="modulepreload" href="${file}" crossorigin>`;
   } else if (file.endsWith(".css")) {
-    return `<link rel="preload" href="${file}" as="style" crossorigin>`;
+    return `<link rel="stylesheet" href="${file}" crossorigin>`;
   } else if (file.endsWith(".woff")) {
-    return `  <link rel="preload" href="${file}" as="font" type="font/woff" crossorigin>`;
+    return `<link rel="preload" href="${file}" as="font" type="font/woff" crossorigin>`;
   } else if (file.endsWith(".woff2")) {
-    return `  <link rel="preload" href="${file}" as="font" type="font/woff2" crossorigin>`;
-  } else if (file.endsWith(".gif")) {
-    return `<link rel="preload" href="${file}" as="image" type="image/gif">`;
-  } else if (file.endsWith(".jpg") || file.endsWith(".jpeg")) {
-    return `<link rel="preload" href="${file}" as="image" type="image/jpeg">`;
-  } else if (file.endsWith(".png")) {
-    return `<link rel="preload" href="${file}" as="image" type="image/png">`;
-  } else if (file.endsWith(".webp")) {
-    return `<link rel="preload" href="${file}" as="image" type="image/webp">`;
+    return `<link rel="preload" href="${file}" as="font" type="font/woff2" crossorigin>`;
   } else {
-    // @ts-ignore - this is server side code
     console.warn("Render error! File format not recognized: " + file);
     return "";
   }
@@ -131,7 +123,7 @@ export const getDataPreload = () => {
 
   if (cacheEntries.length > 0) {
     const json = JSON.stringify(cacheJSON);
-    return `<script id="data-cache">window.__DATA_CACHE=${json}</script>`;
+    return `<script id="data-cache">window.__DATA_CACHE=${json};</script>`;
   }
   return "";
 };
