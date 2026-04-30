@@ -6,7 +6,7 @@ import van from '@vanjs/van';
 import * as vanX from 'vanjs-ext';
 import vanXDefault from "@vanjs/vanX";
 import { hydrate, setAttribute, setAttributeNS } from "@vanjs/client";
-import { Head, Title, Meta, Link, addMeta, resetHeadTags, initializeHeadTags, SupportedTags } from "@vanjs/meta";
+import { Head, Title, Meta, Link, Script, addMeta, resetHeadTags, initializeHeadTags, SupportedTags } from "@vanjs/meta";
 import { Router, Route, lazy, A, setRouterState, routerState, navigate, routes, unwrap } from "@vanjs/router";
 import { Layout } from "./routes/(root).ts";
 import { Page as IndexPage } from "./routes/(root)/index.ts";
@@ -34,18 +34,24 @@ const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
       Link({ href: "/some-url.css" }),
       // coverage
       Link({ rel: "stylesheet", href: "/some-url.css" }),
+      Link({ rel: "preload", href: "/some-url.css" }),
+      Script({ type: "not-supported", src: "/some-url.js" }),
+      Script({ src: "/some-url.js" }),
+      Script({ type: "application/ld+json", src: "/some-url.js" }, "{}"),
     ]
     defaultHead();
     const headTags = Head() as unknown as (() => SupportedTags[]);
     const allTags = headTags() as SupportedTags[];
 
-    expect(allTags).to.have.length(3);
+    expect(allTags).to.have.length(5);
     expect(allTags[0].tagName).to.equal("TITLE");
     expect(allTags[0].innerText).to.equal("Sample title");
     expect(allTags[1].tagName).to.equal("META");
     expect(allTags[1].getAttribute('content')).to.equal("Sample description");
     expect(allTags[2].tagName).to.equal("LINK");
     expect(allTags[2].getAttribute('href')).to.equal("/some-url.css");
+    expect(allTags[3].tagName).to.equal("LINK");
+    expect(allTags[3].getAttribute('rel')).to.equal("preload");
 
     // override title
     const Page = () => {
@@ -203,15 +209,15 @@ const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
   })
 
  test("Test router no route set", async () => {
- // reset routes from file-system router
- routes.length = 0;
- const router = Router();
- van.add(document.body, router);
+  // reset routes from file-system router
+  routes.length = 0;
+  const router = Router();
+  van.add(document.body, router);
 
- // set router state
- navigate('/nowhere', { replace: true });
+  // set router state
+  navigate('/nowhere', { replace: true });
 
- expect(document.body.innerText).to.contain('No Route Found');
+  expect(document.body.innerText).to.contain('No Route Found');
  });
 
   test("Test router", async () => {
@@ -257,10 +263,10 @@ const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
       component: lazy(() => import('./routes/(root)/index.ts'))
     });
 
- setRouterState('/');
- await new Promise(res => setTimeout(res, 17));
+    setRouterState('/');
+    await new Promise(res => setTimeout(res, 17));
 
- van.add(document.body, Router())
+    van.add(document.body, Router())
 
     await new Promise(res => setTimeout(res, 17));
     // console.log({ html: document.body.innerHTML });

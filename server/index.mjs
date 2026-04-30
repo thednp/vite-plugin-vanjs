@@ -1,5 +1,4 @@
 import { basename } from "node:path";
-// import { routerState } from "../router/index.mjs";
 import * as dataCache from "../router/dataCache.mjs";
 export * from "../plugin/helpers.mjs";
 
@@ -20,7 +19,10 @@ export const renderToString = async (inputSource) => {
   if (typeof source === "boolean") {
     return String(source);
   }
-  if (typeof source === "object" && "render" in source) {
+  if (
+    source && typeof source === "object" && "render" in source &&
+    typeof source.render === "function"
+  ) {
     return source.render();
   }
   if (source instanceof Promise) {

@@ -15,6 +15,7 @@ export const initializeHeadTags: () => void | (() => Promise<void>);
 export type SupportedTags =
   | HTMLTitleElement
   | HTMLLinkElement
+  | HTMLScriptElement
   | HTMLMetaElement;
 
 export type AllHeadTags =
