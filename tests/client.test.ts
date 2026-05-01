@@ -37,7 +37,7 @@ const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
       Link({ rel: "preload", href: "/some-url.css" }),
       Script({ type: "not-supported", src: "/some-url.js" }),
       Script({ src: "/some-url.js" }),
-      Script({ type: "application/ld+json", src: "/some-url.js" }, "{}"),
+      Script({ type: "application/ld+json" }, "{}"),
     ]
     defaultHead();
     const headTags = Head() as unknown as (() => SupportedTags[]);
@@ -52,6 +52,9 @@ const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
     expect(allTags[2].getAttribute('href')).to.equal("/some-url.css");
     expect(allTags[3].tagName).to.equal("LINK");
     expect(allTags[3].getAttribute('rel')).to.equal("preload");
+    expect(allTags[4].tagName).to.equal("SCRIPT");
+    expect(allTags[4].getAttribute('type')).to.equal("application/ld+json");
+    expect(allTags[4].innerText).to.equal("{}");
 
     // override title
     const Page = () => {

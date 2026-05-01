@@ -68,6 +68,11 @@ describe(`Test SSR`, () => {
       'setup/van.mjs': ['/src/setup/van.js'],
       'src/app.css': ['/assets/app.css'],
       'src/app.ts': ['/src/app.js'],
+      'assets/img.gif': ['/assets/img.gif'],
+      'assets/img.png': ['/assets/img.png'],
+      'assets/img.jpg': ['/assets/img.jpg'],
+      'assets/img.jpeg': ['/assets/img.jpeg'],
+      'assets/webp.webp': ['/assets/webp.webp'],
       'fancy/src/app.ts': ['src/app.js'],
       'src/assets/Mona-sans.woff': ['/assets/mona-sans.woff'],
       'src/assets/Mona-sans-2.woff2': ['/assets/mona-sans-2.woff2'],
@@ -79,7 +84,11 @@ describe(`Test SSR`, () => {
     expect(markup).to.contain('<link rel="modulepreload" href="/src/van.js" crossorigin>');
     expect(markup).to.contain('<link rel="modulepreload" href="/src/setup/van.js" crossorigin>');
     expect(markup).to.contain('<link rel="modulepreload" href="/src/app.js" crossorigin>');
-    // <link rel="preload" href="${file}" as="font" type="font/woff2" crossorigin>
+    expect(markup).to.contain('<link rel="preload" href="/assets/img.gif" as="image" type="image/gif" crossorigin>');
+    expect(markup).to.contain('<link rel="preload" href="/assets/img.png" as="image" type="image/png" crossorigin>');
+    expect(markup).to.contain('<link rel="preload" href="/assets/img.jpg" as="image" type="image/jpeg" crossorigin>');
+    expect(markup).to.contain('<link rel="preload" href="/assets/img.jpeg" as="image" type="image/jpeg" crossorigin>');
+    expect(markup).to.contain('<link rel="preload" href="/assets/webp.webp" as="image" type="image/webp" crossorigin>');
     expect(markup).to.contain('<link rel="preload" href="/assets/mona-sans.woff" as="font" type="font/woff" crossorigin>');
     expect(markup).to.contain('<link rel="preload" href="/assets/mona-sans-2.woff2" as="font" type="font/woff2" crossorigin>');
 

@@ -65,14 +65,18 @@ export const executeLifecycle = async (route, params) => {
     const preload = route.preload;
     const load = route.load;
 
+    const pathname = routerState.pathname;
+    const cacheKey = Object.keys(params || {}).length === 0
+      ? ""
+      : JSON.stringify(params);
+
     if (preload) await preload(params);
-    if (!data && load) data = await load(params);
+    if (!data && load && !dataCache.has(pathname, cacheKey)) {
+      data = await load(params);
+    } else if (load && dataCache.has(pathname, cacheKey)) {
+      dataCache.touch(pathname);
+    }
     if (data) {
-      // initialLoaded = true;
-      const pathname = routerState.pathname;
-      const cacheKey = Object.keys(params || {}).length === 0
-        ? ""
-        : JSON.stringify(params);
       dataCache.set(pathname, cacheKey, {
         data,
         error: null,

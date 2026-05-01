@@ -43,14 +43,14 @@ export const Link = (props) => {
  * Add a new `<script>` tag, not to be used for .js files
  * Only to be used as `<script type="application/ld+json">`
  * for SEO purposes.
- * @type {(props: PropsWithKnownKeys<HTMLScriptElement>) => null}
+ * @type {(props: PropsWithKnownKeys<HTMLScriptElement>, content: string) => null}
  */
-export const Script = (props) => {
+export const Script = (props, content) => {
   const { script } = van.tags;
   if (!props.type || props.type !== "application/ld+json") {
     console.warn("Script doesn't support this type, check the Wiki.");
   } else {
-    addMeta(script(props));
+    addMeta(script(props, content));
   }
   return null;
 };
