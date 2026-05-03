@@ -1,14 +1,31 @@
 import isServer from "../setup/isServer.mjs";
 import { routerState, setRouterState } from "./state.mjs";
 import { matchRoute } from "./matchRoute.mjs";
+import { unwrap } from "./unwrap.mjs";
 import * as dataCache from "./dataCache.mjs";
 
 /** @typedef {typeof import("./types.d.ts").navigate} Navigate */
+/** @typedef {import("./types.d.ts").SearchParamDef} SearchParamDef */
 /** @typedef {import("./types.d.ts").Route} Route */
 /** @typedef {import("./types.d.ts").VanNode} VanNode */
 /** @typedef {import("./types.d.ts").ComponentModule} ComponentModule */
 /** @typedef {import("./types.d.ts").ComponentFn} ComponentFn */
 /** @typedef {import("./types.d.ts").LazyComponent} LazyComponent */
+
+/**
+ * Resolve component children from a module
+ * @param {ComponentModule | Element | Element[] | any} module
+ * @returns {VanNode[]}
+ */
+export const resolveChildren = (module) => {
+  const isElement = typeof Element !== "undefined" && module instanceof Element;
+  const cp = (Array.isArray(module) || isElement)
+    ? module
+    : typeof module.component === "function"
+    ? module.component()
+    : module.component;
+  return cp ? Array.from(unwrap(cp).children) : /* istanbul ignore next */ [];
+};
 
 /**
  * Returns the HREF string value
@@ -19,13 +36,25 @@ export const getValue = (v) => {
   return typeof v === "function" ? v() : v.rawVal ? v.val : v;
 };
 
+export const getCacheKey = () => {
+  const params = routerState.params;
+  const search = routerState.searchParams;
+  return Object.keys(params).length === 0
+    ? search || ""
+    : JSON.stringify(params) + (search ? `&${search}` : "");
+};
+
 /**
  * Check if selected page is the current page;
  * @param {string} pageName
  * @returns {boolean}
  */
 export const isCurrentPage = (pageName) => {
-  return routerState.pathname === getValue(pageName);
+  const href = getValue(pageName);
+  if (isServer) return routerState.pathname === href;
+  const url = new URL(href, globalThis.location.origin);
+  return routerState.pathname === url.pathname &&
+    routerState.searchParams === url.searchParams.toString();
 };
 
 /**
@@ -53,10 +82,9 @@ export const isLazyComponent = (component) => {
 /**
  * Execute lifecycle methods preload and / or load
  * @param {import("./types.d.ts").RouteEntry} route
- * @param {Record<string, string> | undefined} params
  * @returns {Promise<boolean>}
  */
-export const executeLifecycle = async (route, params) => {
+export const executeLifecycle = async (route) => {
   // istanbul ignore next
   try {
     if (!route) return true;
@@ -66,13 +94,11 @@ export const executeLifecycle = async (route, params) => {
     const load = route.load;
 
     const pathname = routerState.pathname;
-    const cacheKey = Object.keys(params || {}).length === 0
-      ? ""
-      : JSON.stringify(params);
+    const cacheKey = getCacheKey();
 
-    if (preload) await preload(params);
+    if (preload) await preload();
     if (!data && load && !dataCache.has(pathname, cacheKey)) {
-      data = await load(params);
+      data = await load();
     } else if (load && dataCache.has(pathname, cacheKey)) {
       dataCache.touch(pathname);
     }
@@ -102,8 +128,7 @@ export const executeLifecycle = async (route, params) => {
  * @returns {any | undefined}
  */
 export const useRouteData = () => {
-  const params = routerState.params;
-  const key = Object.keys(params).length === 0 ? "" : JSON.stringify(params);
+  const key = getCacheKey();
   return dataCache.get(routerState.pathname, key)?.data;
 };
 

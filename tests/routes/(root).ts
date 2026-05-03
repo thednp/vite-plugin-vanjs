@@ -1,15 +1,12 @@
-import { RouterState } from "@vanjs/router";
+import { routerState } from "@vanjs/router";
 import van, { ChildDom } from "vanjs-core";
 
 export const route = {
-  preload: async (params: RouterState["params"]) => {
-    // in most cases you may want to enforce user access control
-    console.log('Main Layout preload triggered', params);
+  preload: async () => {
+    console.log('Main Layout preload triggered', routerState.params);
   },
-  load: async (params: RouterState["params"]) => {
-    // Load data if needed
-    // you might want to cache this data
-    console.log('Main Layout load triggered', params);
+  load: async () => {
+    console.log('Main Layout load triggered', routerState.params);
   }
 }
 

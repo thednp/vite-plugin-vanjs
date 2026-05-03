@@ -139,12 +139,8 @@ declare module "@vanjs/router" {
     path: string;
     component: () => Promise<ComponentModule>;
     params?: Record<string, string>;
-    preload?: (
-      params?: Record<string, string>,
-    ) => boolean | void | Promise<boolean | void>;
-    load?: (
-      params?: Record<string, string>,
-    ) => boolean | void | Promise<boolean | void>;
+    preload?: () => boolean | void | Promise<boolean | void>;
+    load?: () => boolean | void | Promise<boolean | void>;
   };
 
   export type ImportFn = () => LazyComponent;
@@ -157,12 +153,8 @@ declare module "@vanjs/router" {
       | VanComponent
       | ComponentFn
       | (() => Promise<ComponentModule>);
-    preload?: (
-      params?: Record<string, string>,
-    ) => boolean | void | Promise<boolean | void>;
-    load?: (
-      params?: Record<string, string>,
-    ) => boolean | void | Promise<boolean | void>;
+    preload?: () => boolean | void | Promise<boolean | void>;
+    load?: () => boolean | void | Promise<boolean | void>;
   };
 
   export type RouteConfig = {
@@ -191,7 +183,7 @@ declare module "@vanjs/router" {
   // state.mjs
   export type RouterState = {
     pathname: string;
-    searchParams: URLSearchParams;
+    searchParams: string;
     params: Record<string, string>;
     status: "idle" | "pending" | "success" | "error";
   };
@@ -293,10 +285,9 @@ declare module "@vanjs/router" {
    */
   export const executeLifecycle: (
     route: RouteEntry | {
-      preload?: (params?: Record<string, string>) => unknown;
-      load?: (params?: Record<string, string>) => unknown;
+      preload?: () => unknown;
+      load?: () => unknown;
     } | null,
-    params: Record<string, string> | undefined,
   ) => Promise<boolean>;
 
   /**
@@ -304,8 +295,7 @@ declare module "@vanjs/router" {
    */
   export const matchRoute: (path: string) => RouteEntry | null;
 
-  /**
-   * Convenience hook to get the current route's cached data.
+  /**  * Convenience hook to get the current route's cached data.
    */
   export const useRouteData: <T>() => T | undefined;
 

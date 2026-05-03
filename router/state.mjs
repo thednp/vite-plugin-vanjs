@@ -18,6 +18,16 @@ export const fixRouteUrl = (url) => {
 const initialPath = !isServer ? globalThis.location.pathname : "/";
 const initialSearch = !isServer ? globalThis.location.search : "";
 
+/**
+ * Normalize a search string to a plain string (strip leading "?")
+ * @param {string} search
+ * @returns {string}
+ */
+const normalizeSearch = (search) => {
+  if (!search) return "";
+  return search.startsWith("?") ? search.slice(1) : search;
+};
+
 const STATE_PROXY = "_proxy";
 const proxyProps = {
   value: 1,
@@ -72,7 +82,7 @@ export function microStore(init) {
         target[prop] = defineProxy(sp, sv, {});
       }
     } else if (isPlainObject) {
-      target[prop] = value;
+      defineProxy(prop, value, target);
     } else if (!Array.isArray(value) && value != null) {
       defineProxy(prop, value, target);
     } else {
@@ -91,7 +101,7 @@ const initialStatus = isServer
 
 export const routerState = microStore({
   pathname: initialPath,
-  searchParams: new URLSearchParams(initialSearch),
+  searchParams: normalizeSearch(initialSearch),
   params: {},
   status: initialStatus,
 });
@@ -100,11 +110,9 @@ export const routerState = microStore({
  * @type {typeof import("./types.d.ts").setRouterState}
  */
 export const setRouterState = (path, search = undefined, params = {}) => {
-  const [pathname, searchParams] = fixRouteUrl(path).split("?");
+  const [pathname, searchPart] = fixRouteUrl(path).split("?");
   routerState.pathname = pathname;
-  routerState.searchParams = new URLSearchParams(
-    search || searchParams || "",
-  );
+  routerState.searchParams = normalizeSearch(search || searchPart || "");
   Object.keys(routerState.params).forEach((key) =>
     delete routerState.params[key]
   );
