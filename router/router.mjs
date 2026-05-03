@@ -101,6 +101,7 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
 
   // Init client here
   initClient();
+  let initialized = false;
 
   // Client-side: hydrate data cache from SSR output
   // This must happen BEFORE any component renders so useRouteData() works
@@ -114,13 +115,14 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
   if (root) {
     van.derive(() => {
       _searchParams = routerState.searchParams;
-      if (!_initialized) return;
+      if (!initialized) return;
       const matchedRoute = matchRoute(routerState.pathname);
       if (!matchedRoute) {
         wrapper.replaceChildren(div("No Route Found"));
         return;
       }
       (async () => {
+        initialized = true;
         await executeModule(matchedRoute, wrapper);
       })();
     });
