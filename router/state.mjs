@@ -92,18 +92,11 @@ export function microStore(init) {
   return target;
 }
 
-/**
- * @type {typeof import("./types.d.ts").routerState}
- */
-const initialStatus = isServer
-  ? "success"
-  : (globalThis.__DATA_CACHE ? "success" : "idle");
-
 export const routerState = microStore({
   pathname: initialPath,
   searchParams: normalizeSearch(initialSearch),
   params: {},
-  status: initialStatus,
+  loading: false,
 });
 
 /**

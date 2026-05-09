@@ -29,8 +29,8 @@ export const A = (
     href,
     ...props,
     onclick: async (e) => {
-      const HREF = getValue(href);
       e.preventDefault();
+      const HREF = getValue(href);
       /* istanbul ignore next */
       if (isCurrentPage(HREF)) return;
 
@@ -60,7 +60,7 @@ export const A = (
   newProps["aria-current"] = van.derive(() => {
     const isPage = isCurrentPage(href);
     const isLocation = isCurrentLocation(href);
-    return isPage ? "page" : isLocation ? "location" : null;
+    return isPage ? "page" : isLocation ? "location" : "";
   });
 
   return van.tags.a(newProps, children || otherChildren);

@@ -29,7 +29,8 @@ export type TagProps = SupportedTags | PropsWithKnownKeys<SupportedTags>;
 
 export type HeadTags = AllHeadTags[] | TagFunc[];
 
-export const addMeta = (_tag: string | TagProps) => null;
+export const addMeta = (_tag: string | Partial<SupportedTags>) => null;
+export const removeMeta = (_tag: string | Partial<SupportedTags>) => null;
 
 export const Head: () => HeadTags;
 

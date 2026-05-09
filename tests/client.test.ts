@@ -6,7 +6,7 @@ import van from '@vanjs/van';
 import * as vanX from 'vanjs-ext';
 import vanXDefault from "@vanjs/vanX";
 import { hydrate, setAttribute, setAttributeNS } from "@vanjs/client";
-import { Head, Title, Meta, Link, Script, addMeta, resetHeadTags, initializeHeadTags, SupportedTags } from "@vanjs/meta";
+import { Head, Title, Meta, Link, Script, addMeta, removeMeta, resetHeadTags, initializeHeadTags, type SupportedTags } from "@vanjs/meta";
 import { Router, Route, lazy, A, setRouterState, routerState, navigate, routes, unwrap } from "@vanjs/router";
 import { Layout } from "./routes/(root).ts";
 import { Page as IndexPage } from "./routes/(root)/index.ts";
@@ -38,12 +38,14 @@ const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
       Script({ type: "not-supported", src: "/some-url.js" }),
       Script({ src: "/some-url.js" }),
       Script({ type: "application/ld+json" }, "{}"),
+      Meta({ id: "og-title", name: "og:title", content: 'Sample title' }),
+      Meta({ id: "og-desc", name: "og:description", content: 'Sample description' }),
     ]
     defaultHead();
     const headTags = Head() as unknown as (() => SupportedTags[]);
     const allTags = headTags() as SupportedTags[];
 
-    expect(allTags).to.have.length(5);
+    expect(allTags).to.have.length(7);
     expect(allTags[0].tagName).to.equal("TITLE");
     expect(allTags[0].innerText).to.equal("Sample title");
     expect(allTags[1].tagName).to.equal("META");
@@ -56,11 +58,17 @@ const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
     expect(allTags[4].getAttribute('type')).to.equal("application/ld+json");
     expect(allTags[4].innerText).to.equal("{}");
 
+    removeMeta(van.tags.meta({ id: "og-title"}));
+    removeMeta("META.og-desc");
+    expect(headTags().find(t => t.id === "og-title")).toBeUndefined();
+    expect(headTags().find(t => t.id === "og-desc")).toBeUndefined();
+
     // override title
     const Page = () => {
       // initialize again
-      resetHeadTags();
 
+      resetHeadTags();
+      
       // add some dummy tags for testing purpose    
       document.head.append(van.tags.meta({ name: "viewport", content: 'width=device-width, initial-scale=1' }));
 
@@ -73,6 +81,8 @@ const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
     expect((updatedTags[1] as HTMLElement).innerText).to.equal("Sample title updated");
     // cover undefined case
     addMeta();
+    // @ts-expect-error - testing page
+    removeMeta();
   });
 
   test("Test setup", async () => {

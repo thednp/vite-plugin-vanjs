@@ -218,26 +218,26 @@ export const generateRouteProloaders = (route) => {
   const layoutName = "Module";
 
   return `{
-preload: async () => {
+preload: async (params) => {
   ${
     route.layouts.map((layout) =>
       `if (${layout.id + layoutName}?.route?.preload) await ${
         layout.id + layoutName
-      }?.route?.preload();`
+      }?.route?.preload(params);`
     ).join("\n ")
   }
-  if (${moduleName}?.route?.preload) await ${moduleName}?.route?.preload();
+  if (${moduleName}?.route?.preload) await ${moduleName}?.route?.preload(params);
 },
-load: async () => {
+load: async (params) => {
   let _data;
   ${
     route.layouts.map((layout) =>
       `if (${layout.id + layoutName}?.route?.load) await ${
         layout.id + layoutName
-      }?.route?.load();`
+      }?.route?.load(params);`
     ).join("\n ")
   }
-  if (${moduleName}?.route?.load) _data = await ${moduleName}?.route?.load();
+  if (${moduleName}?.route?.load) _data = await ${moduleName}?.route?.load(params);
   return _data;
 }
 }`;

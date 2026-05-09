@@ -19,6 +19,7 @@ export const parseAttributes = (attributeString) => {
 /** @type {typeof import('./types.d.ts').getTagAttribute} */
 const getTagAttribute = (tag) => {
   const attributes = [
+    "id",
     "name",
     "property",
     "charset",
@@ -28,7 +29,6 @@ const getTagAttribute = (tag) => {
     "rel",
     "src",
     "href",
-    "id",
   ];
 
   for (const attr of attributes) {

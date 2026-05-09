@@ -1,7 +1,11 @@
+import van from "vanjs-core";
 import isServer from "../setup/isServer.mjs";
 import { routerState, setRouterState } from "./state.mjs";
 import { matchRoute } from "./matchRoute.mjs";
 import { unwrap } from "./unwrap.mjs";
+import { hydrate } from "../client/index.mjs";
+import { Head } from "../meta/index.mjs";
+
 import * as dataCache from "./dataCache.mjs";
 
 /** @typedef {typeof import("./types.d.ts").navigate} Navigate */
@@ -11,6 +15,16 @@ import * as dataCache from "./dataCache.mjs";
 /** @typedef {import("./types.d.ts").ComponentModule} ComponentModule */
 /** @typedef {import("./types.d.ts").ComponentFn} ComponentFn */
 /** @typedef {import("./types.d.ts").LazyComponent} LazyComponent */
+
+/**
+ * Update head tags
+ */
+const updateHead = () => {
+  // istanbul ignore else
+  if (document.head) {
+    hydrate(document.head, Head());
+  }
+};
 
 /**
  * Resolve component children from a module
@@ -51,8 +65,8 @@ export const getCacheKey = () => {
  */
 export const isCurrentPage = (pageName) => {
   const href = getValue(pageName);
-  if (isServer) return routerState.pathname === href;
-  const url = new URL(href, globalThis.location.origin);
+  const url = new URL(href, "http://localhost:5173");
+  // console.log({ href }, routerState.searchParams, url.searchParams.toString())
   return routerState.pathname === url.pathname &&
     routerState.searchParams === url.searchParams.toString();
 };
@@ -63,8 +77,12 @@ export const isCurrentPage = (pageName) => {
  * @returns {boolean}
  */
 export const isCurrentLocation = (pageName) => {
-  const pathName = routerState.pathname;
-  return pathName !== "/" && pathName.includes(getValue(pageName));
+  const href = getValue(pageName);
+  const searchParams = new URLSearchParams(routerState.searchParams);
+  const pathname = routerState.pathname;
+  const url = new URL(href, "http://localhost:5173");
+  return url.pathname !== "/" && pathname.includes(url.pathname) ||
+    pathname === url.pathname && searchParams.size > 0;
 };
 
 /**
@@ -96,9 +114,9 @@ export const executeLifecycle = async (route) => {
     const pathname = routerState.pathname;
     const cacheKey = getCacheKey();
 
-    if (preload) await preload();
+    if (preload) await preload(route.params);
     if (!data && load && !dataCache.has(pathname, cacheKey)) {
-      data = await load();
+      data = await load(route.params);
     } else if (load && dataCache.has(pathname, cacheKey)) {
       dataCache.touch(pathname);
     }
@@ -121,6 +139,31 @@ export const executeLifecycle = async (route) => {
     // istanbul ignore next
     return false;
   }
+};
+
+/**
+ * @param {RouteEntry} route
+ * @param {HTMLElement} wrapper
+ * @param {boolean} ssr
+ * @returns
+ */
+export const executeModule = async (route, wrapper, ssr) => {
+  if (routerState.loading === true) return;
+  // 0. Set Loading State
+  routerState.loading = true;
+  // 1. Resolve the module first (to get route lifecycle hooks)
+  const module = await route.component();
+  // 2. Execute lifecycle (a complete route includes all props)
+  await executeLifecycle(Object.assign(route, module.route));
+  // 3. Resolve children
+  const children = resolveChildren(module);
+  // 4. Update <head> in the client
+  if (!isServer) updateHead();
+  // 5. Set Loading State
+  routerState.loading = false;
+  // 6. Update / replace children in wrapper
+  if (ssr) return van.add(wrapper, ...children);
+  else wrapper.replaceChildren(...children);
 };
 
 /**

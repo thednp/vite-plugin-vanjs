@@ -139,8 +139,8 @@ declare module "@vanjs/router" {
     path: string;
     component: () => Promise<ComponentModule>;
     params?: Record<string, string>;
-    preload?: () => boolean | void | Promise<boolean | void>;
-    load?: () => boolean | void | Promise<boolean | void>;
+    preload?: (params?: Record<string, string>) => unknown;
+    load?: (params?: Record<string, string>) => Promise<unknown>;
   };
 
   export type ImportFn = () => LazyComponent;
@@ -153,8 +153,8 @@ declare module "@vanjs/router" {
       | VanComponent
       | ComponentFn
       | (() => Promise<ComponentModule>);
-    preload?: () => boolean | void | Promise<boolean | void>;
-    load?: () => boolean | void | Promise<boolean | void>;
+    preload?: (params?: Record<string, string>) => unknown;
+    load?: (params?: Record<string, string>) => Promise<unknown>;
   };
 
   export type RouteConfig = {
@@ -185,7 +185,7 @@ declare module "@vanjs/router" {
     pathname: string;
     searchParams: string;
     params: Record<string, string>;
-    status: "idle" | "pending" | "success" | "error";
+    loading: boolean;
   };
 
   /**
@@ -196,7 +196,7 @@ declare module "@vanjs/router" {
     pathname: RouterState["pathname"];
     searchParams: RouterState["searchParams"];
     params?: RouterState["params"];
-    status: RouterState["status"];
+    loading: RouterState["loading"];
   };
 
   /**
@@ -285,8 +285,8 @@ declare module "@vanjs/router" {
    */
   export const executeLifecycle: (
     route: RouteEntry | {
-      preload?: () => unknown;
-      load?: () => unknown;
+      preload?: (params?: Record<string, string>) => unknown;
+      load?: (params?: Record<string, string>) => Promise<unknown>;
     } | null,
   ) => Promise<boolean>;
 

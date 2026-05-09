@@ -3,9 +3,8 @@ import isServer from "../setup/isServer.mjs";
 import { MODE } from "../plugin/const.mjs";
 import { routerState, setRouterState } from "./state.mjs";
 import { matchRoute } from "./matchRoute.mjs";
-import { executeLifecycle, resolveChildren } from "./helpers.mjs";
-import { hydrate } from "../client/index.mjs";
-import { Head, initializeHeadTags } from "../meta/index.mjs";
+import { executeModule } from "./helpers.mjs";
+import { initializeHeadTags } from "../meta/index.mjs";
 import * as dataCache from "./dataCache.mjs";
 import "virtual:@vanjs/routes";
 
@@ -14,36 +13,6 @@ const isDev = MODE === "development";
 /** @typedef {import("./types.d.ts").ComponentModule} ComponentModule */
 /** @typedef {import("./types.d.ts").RouteEntry} RouteEntry */
 /** @typedef {import("./types.d.ts").VanNode} VanNode */
-
-/**
- * Update head tags
- */
-const updateHead = () => {
-  // istanbul ignore else
-  if (document.head) {
-    hydrate(document.head, Head());
-  }
-};
-
-/**
- * @param {RouteEntry} route
- * @param {HTMLElement} wrapper
- * @param {boolean} ssr
- * @returns
- */
-const executeModule = async (route, wrapper, ssr) => {
-  // 1. Resolve the module first (to get route lifecycle hooks)
-  const module = await route.component();
-  // 2. Execute lifecycle
-  await executeLifecycle(module.route);
-  // 3. Resolve children
-  const children = resolveChildren(module);
-  // 4. Update <head> in the client
-  if (!isServer) updateHead();
-  // 5. Update / replace children in wrapper
-  if (ssr) return van.add(wrapper, ...children);
-  else wrapper.replaceChildren(...children);
-};
 
 /**
  * Initialize client-side router (Head + popstate listener)
@@ -83,7 +52,7 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
   /* istanbul ignore else */
   if (!route) return van.add(wrapper, div("No Route Found"));
   // It's important to READ the params
-  Object.assign(routerState.params, route.params || {});
+  Object.assign(routerState.params, route.params);
 
   // Server-side rendering
   if (isServer) {
@@ -105,6 +74,7 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
 
   // Client-side: hydrate data cache from SSR output
   // This must happen BEFORE any component renders so useRouteData() works
+  // Skip in dev mode: we manually clear dataCache on mutations for instant updates
   if (globalThis.__DATA_CACHE && !isDev) {
     dataCache.hydrateFromJSON(globalThis.__DATA_CACHE);
   }
@@ -114,7 +84,6 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
 
   if (root) {
     van.derive(() => {
-      _searchParams = routerState.searchParams;
       if (!initialized) return;
       const matchedRoute = matchRoute(routerState.pathname);
       if (!matchedRoute) {
@@ -122,26 +91,27 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
         return;
       }
       (async () => {
-        initialized = true;
+        _searchParams = routerState.searchParams;
         await executeModule(matchedRoute, wrapper);
       })();
     });
     return async () => {
-      return await executeModule(route, wrapper, true);
+      const result = await executeModule(route, wrapper, true);
+      initialized = true;
+      return result;
     };
   }
 
   // Pure SPA path - reactive routing
   van.derive(() => {
     const matchedRoute = matchRoute(routerState.pathname);
-    _searchParams = routerState.searchParams;
-    // routerState.searchParams;
     if (!matchedRoute) {
       wrapper.replaceChildren(div("No Route Found"));
       return;
     }
 
     (async () => {
+      _searchParams = routerState.searchParams;
       await executeModule(matchedRoute, wrapper);
     })();
   });

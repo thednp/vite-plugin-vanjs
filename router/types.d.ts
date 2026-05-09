@@ -83,8 +83,8 @@ export const isLazyComponent: (component: unknown) => boolean;
 
 export const executeLifecycle: (
   route: RouteEntry | {
-    preload?: () => unknown;
-    load?: () => unknown;
+    preload?: (params?: Record<string, unknown>) => unknown;
+    load?: (params?: Record<string, string>) => Promise<unknown>;
   } | null,
 ) => Promise<boolean>;
 
@@ -103,8 +103,8 @@ export type RouteEntry = {
   path: string;
   component: () => Promise<ComponentModule>;
   params?: Record<string, string>;
-  preload?: () => boolean | void | Promise<boolean | void>;
-  load?: () => boolean | void | Promise<boolean | void>;
+  preload?: (params?: Record<string, string>) => unknown;
+  load?: (params?: Record<string, string>) => Promise<unknown>;
 };
 
 export type ImportFn = () => LazyComponent;
@@ -119,8 +119,8 @@ export type RouteProps = {
     | VanComponent
     | ComponentFn
     | (() => Promise<ComponentModule>);
-  preload?: () => boolean | void | Promise<boolean | void>;
-  load?: () => boolean | void | Promise<boolean | void>;
+  preload?: (params?: Record<string, string>) => unknown;
+  load?: (params?: Record<string, string>) => Promise<unknown>;
 };
 
 export type RouteConfig = {
@@ -138,14 +138,14 @@ export type RouterState = {
   pathname: string;
   searchParams: string;
   params: Record<string, string>;
-  status: "idle" | "pending" | "success" | "error";
+  loading: boolean;
 };
 
 export const routerState: {
   pathname: RouterState["pathname"];
   searchParams: RouterState["searchParams"];
   params?: RouterState["params"];
-  status: RouterState["status"];
+  loading: RouterState["loading"];
 };
 
 export const setRouterState: (

@@ -29,7 +29,8 @@ declare module "@vanjs/meta" {
 
   export type HeadTags = SupportedTags[] | TagFunc[];
 
-  export const addMeta: (tag?: TagProps) => void;
+  export const addMeta: (tag?: Partial<SupportedTags>) => void;
+  export const removeMeta = (_tag: string | Partial<SupportedTags>) => null;
 
   export const Head: () => HeadTags;
 

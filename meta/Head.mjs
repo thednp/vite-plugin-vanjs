@@ -6,6 +6,7 @@ import { getTagKey } from "./helpers.mjs";
 /** @typedef {typeof import("./types.d.ts").resetHeadTags} ResetTags */
 /** @typedef {typeof import("./types.d.ts").initializeHeadTags} InitializeTags */
 /** @typedef {typeof import("./types.d.ts").addMeta} AddMeta */
+/** @typedef {typeof import("./types.d.ts").removeMeta} RemoveMeta */
 /** @typedef {typeof import("./types.d.ts").Head} HeadComp */
 
 /**
@@ -67,6 +68,25 @@ export const addMeta = (tag) => {
   const tags = getHeadTags();
   const key = getTagKey(tag);
   tags.set(key, tag);
+};
+
+/**
+ * Remove a new meta tag `van.tags.script({ id })`
+ * or TAGNAME.id key.
+ * Only client side.
+ * @type {RemoveMeta}
+ */
+export const removeMeta = (tagOrId) => {
+  if (!tagOrId || isServer) return;
+  const tags = getHeadTags();
+  const tagIsString = typeof tagOrId === "string";
+  const key = tagIsString ? tagOrId : getTagKey(tagOrId);
+  const id = tagIsString ? tagOrId.split(".")[1] : tagOrId.id;
+  // istanbul ignore else
+  if (id) {
+    document.getElementById(id)?.remove();
+    tags.delete(key);
+  }
 };
 
 /**
