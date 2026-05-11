@@ -14,8 +14,8 @@ export type VanJSPluginOptions = {
   excludeRoutesProd?: string[]; // NEW — excluded in production only
 };
 
-export declare const VitePluginVanJS: (
+const VitePluginVanJS: (
   config?: VanJSPluginOptions,
-) => Plugin;
+) => Plugin<VanJSPluginOptions>;
 
 export default VitePluginVanJS;
