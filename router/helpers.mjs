@@ -151,19 +151,22 @@ export const executeModule = async (route, wrapper, ssr) => {
   if (routerState.loading === true) return;
   // 0. Set Loading State
   routerState.loading = true;
-  // 1. Resolve the module first (to get route lifecycle hooks)
-  const module = await route.component();
-  // 2. Execute lifecycle (a complete route includes all props)
-  await executeLifecycle(Object.assign(route, module.route));
-  // 3. Resolve children
-  const children = resolveChildren(module);
-  // 4. Update <head> in the client
-  if (!isServer) updateHead();
-  // 5. Set Loading State
-  routerState.loading = false;
-  // 6. Update / replace children in wrapper
-  if (ssr) return van.add(wrapper, ...children);
-  else wrapper.replaceChildren(...children);
+  try {
+    // 1. Resolve the module first (to get route lifecycle hooks)
+    const module = await route.component();
+    // 2. Execute lifecycle (a complete route includes all props)
+    await executeLifecycle(Object.assign(route, module.route));
+    // 3. Resolve children
+    const children = resolveChildren(module);
+    // 4. Update <head> in the client
+    if (!isServer) updateHead();
+    // 6. Update / replace children in wrapper
+    if (ssr) return van.add(wrapper, ...children);
+    else wrapper.replaceChildren(...children);
+  } finally {
+    // 5. Set Loading State
+    routerState.loading = false;
+  }
 };
 
 /**

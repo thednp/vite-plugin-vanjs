@@ -108,18 +108,24 @@ export function elementsMatch(el1, el2, deep) {
     return false;
   }
 
-  const childNodes1 = Array.from(el1.childNodes);
-  const childNodes2 = Array.from(el2.childNodes);
+  // Filter empty text nodes — SSR omits them, client creates Text("")
+  // from function children returning ""
+  const cn1 = Array.from(el1.childNodes).filter((n) =>
+    n.nodeType !== 3 || /* istanbul ignore next */ n.textContent !== ""
+  );
+  const cn2 = Array.from(el2.childNodes).filter((n) =>
+    n.nodeType !== 3 || /* istanbul ignore next */ n.textContent !== ""
+  );
 
   // istanbul ignore else
-  if (childNodes1.length !== childNodes2.length) {
+  if (cn1.length !== cn2.length) {
     return false;
   }
 
   // Only recurse if necessary (has childNodes with data-hk)
-  const hasHydratedChildren = childNodes1.some((child) =>
-    child instanceof HTMLElement && (child.hasAttribute("data-hk") ||
-      child.querySelector("[data-hk]"))
+  const hasHydratedChildren = cn1.some((child) =>
+    child instanceof HTMLElement &&
+    (child.hasAttribute("data-hk") || child.querySelector("[data-hk]"))
   );
 
   // istanbul ignore next
@@ -130,7 +136,7 @@ export function elementsMatch(el1, el2, deep) {
   // Only recurse if opted in
   // istanbul ignore next
   return deep
-    ? childNodes1.every((child, idx) => elementsMatch(child, childNodes2[idx]))
+    ? cn1.every((child, idx) => elementsMatch(child, cn2[idx]))
     : true;
 }
 
@@ -279,4 +285,5 @@ export const hydrate = (target, content) => {
       target.replaceChildren(...parsed);
     }
   }
+  return target;
 };

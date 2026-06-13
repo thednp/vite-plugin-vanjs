@@ -115,26 +115,29 @@ const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
   })
 
   test("Test hydrate", async () => {
-    const { head, body, div, h1, style, script, link, title } = van.tags;
+    const { head, body, div, h1, style, script, link, title, main, span } = van.tags;
     const docHead = head({ "data-h": "" });
     const docBody = body({ class: "main", id: "main", "data-root": ""});
 
     // document.head.replaceChildren();
     const Page = () => {
       return div(
-        h1('Hello VanJS')
+        h1('Hello VanJS'),
+        span("")
       );
     };
     const PageAsync = async () => {
       return [
         h1('Hello VanJS'),
-        div('some div 4')
+        div('some div 4'),
+        span("")
       ];
     };
     const PageAsync1 = async () => {
       return [
         h1('Hello VanJS 1'),
-        div('some div 5')
+        div('some div 5'),
+        span("")
       ];
     };
     const Head = () => {
@@ -219,6 +222,11 @@ const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
     van.hydrate(oldBody as HTMLElement, body => hydrate(body, null));
     expect(oldBody.innerText).to.contain('Info');
     // console.log("\ninfo\n", docBody.outerHTML);
+
+    const content = div("Label: ", span("Value"), "!", span(""), "");
+    const target = div({}, ...Array.from(content.childNodes).map(n => n.cloneNode(true)));
+    hydrate(target, content);
+    expect(target.innerText).toContain("Label:");
   })
 
  test("Test router no route set", async () => {

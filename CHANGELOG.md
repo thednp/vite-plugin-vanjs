@@ -1,5 +1,43 @@
 # Changelog
 
+## [0.1.25] - 2026-06-13
+
+### Meta
+
+- **`removeMeta()`** — new function to remove meta tags by id or `TAGNAME.id` selector.
+- **`Meta` type** — now includes `property` attribute.
+- **`id` attribute priority** — moved to front of attribute list for `getTagAttribute()`.
+
+### Router
+
+- **`routerState.status` → `routerState.loading`** — simplified to a boolean (`true` during navigation, `false` otherwise). Removed `"idle" | "pending" | "success" | "error"` enum.
+- **`preload(params)` / `load(params)`** — lifecycle hooks now receive route params as argument.
+- **`aria-current`** — returns `""` instead of `null` for non-matching links.
+- **`isCurrentLocation()`** — now accounts for searchParams when checking partial path matches.
+
+### Plugin
+
+- **`generateRouteProloaders()`** — passes `params` to `preload`/`load` lifecycle hooks in generated route proloaders.
+- **Plugin return type** — simplified from `Plugin` to `Plugin<VanJSPluginOptions>`.
+
+### Client
+
+- **`elementsMatch()` text node filtering** — filters out empty text nodes before comparing child node lists, fixing SSR/client mismatch where SSR omits empty text nodes.
+- **`hydrate()`** — now always returns `target` element.
+- **100% branch coverage** — client/index.mjs now has 100% statement, branch, function, and line coverage.
+
+### Server
+
+- **`helpers.mjs` refactor** — `updateHead()` and `executeModule()` moved from `router.mjs` to `helpers.mjs`. `executeModule` now wraps work in `try/finally` to guarantee `loading = false` is always reset.
+
+### Testing
+
+- **Coverage improvements** — added tests for `removeMeta`, empty text node handling in hydration, and `elementsMatch` with text node children.
+
+### Dependencies
+
+- Updated `@types/node` to `^25.9.3`, `vite` to `^8.0.16`, `vitest` to `^4.1.8`, `happy-dom` to `^20.10.3`.
+
 ## [0.1.17] - 2026-04-27
 
 ### Router
