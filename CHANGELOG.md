@@ -11,6 +11,17 @@
 
 - **Layout chain rendering** — plugin now generates `{ route, component, layouts, leaf }` for routes with layouts. Client router builds layout chains inside-out (leaf → innermost layout → outermost layout) with prefix-diff detection to reuse shared layouts across sibling pages.
 - **`RouteLayout` type** — new type for `{ path, component }` layout entries in the generated route modules.
+- **`routerState._oldVal` non-reactive reads** — `microStore()` now exposes `_oldVal` getters backed by `rawVal`, which never create reactive subscriptions (`van.state().rawVal` stays in sync with `.val` on `vanjs-core`, with a `.val` fallback on `mini-van-plate`). Everything except navigation signals is read through it.
+- **Single Router instance with `hydrate(main, App)`** — `Router()` setup reads (`pathname`, `searchParams`) are non-reactive, so the template pattern of passing `App` as a function no longer re-creates the whole Router (and its derive, layout state and outlet) on every navigation. Fixes layout DOM being rebuilt and lifecycle executions accumulating by one per navigation.
+- **Search-aware routing** — client derives (hydration and SPA) now subscribe to both `pathname` and `searchParams`, so same-path query changes (search input, pagination) trigger navigation. VanJS batches the synchronous writes from `setRouterState()` into a single run and ignores same-value writes, so each navigation still executes its lifecycle exactly once.
+- **Stale navigation guard** — the `navToken` is re-checked after `executeLifecycle()`, before any DOM mutation, on both client paths. A slow load from a superseded navigation (e.g. rapid search typing) resolves but never renders over fresh results.
+- **Live-target hydration** — after the initial render, client navigations mutate the adopted SSR root instead of the detached render wrapper. Shared layouts swap only the outlet's children, preserving layout DOM and component state; `outlet` is cleared when leaving layout routes.
+- **Server one-shot render** — the server branch inlines resolve → lifecycle → render with no shared `loading` flag. Overlapping SSR requests share the `routerState` singleton, so the client-side loading guard could wrongly bail out with `undefined` ("Render error! Source not recognized").
+- **`lazy()` component resolution** — also resolves `module.component` (layout-chain modules), not just `default`/`Page`.
+
+### Testing
+
+- **100% coverage** — 880/880 statements, 500/500 branches, 162/162 functions, 829/829 lines. New suites: template-pattern hydration (single Router instance, layout DOM preservation, array leaves), search-only navigations with overlapping slow/fast loads on hydration and SPA paths, concurrent SSR renders. Hydration tests now assert on the live DOM like real templates do.
 
 ### Dependencies
 
