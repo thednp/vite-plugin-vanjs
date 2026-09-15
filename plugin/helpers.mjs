@@ -19,7 +19,7 @@ export const fileToRoute = (file, routesDir) => {
     .replace(/\\/g, "/") // normalize Windows backslashes to forward slashes
     .replace(/\.(jsx|tsx|ts|js)$/, "")
     .replace(/index$/, "")
-    .replace(/\(.*\)$/, "") // Remove (file_name) from path
+    .replace(/\([^()]*\)$/, "") // Remove (file_name) from path
     .replace(/\([^()]+\)\/?/g, "") // Remove (folder_name) from path
     .replace(/\[\.\.\.[^\]]+\]/g, "*")
     .replace(/\[([^\]]+)\]/g, ":$1");
