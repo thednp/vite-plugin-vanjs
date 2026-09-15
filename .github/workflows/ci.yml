@@ -22,12 +22,12 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 2
 
       - name: PNPM setup
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v5
 
       - name: Deno Setup
         uses: denoland/setup-deno@v2
@@ -35,7 +35,7 @@ jobs:
           deno-version: v2.x
 
       - name: Node Setup
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 24
           cache: pnpm
