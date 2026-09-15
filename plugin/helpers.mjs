@@ -20,7 +20,7 @@ export const fileToRoute = (file, routesDir) => {
     .replace(/\.(jsx|tsx|ts|js)$/, "")
     .replace(/index$/, "")
     .replace(/\(.*\)$/, "") // Remove (file_name) from path
-    .replace(/\([^)]+\)\/?/g, "") // Remove (folder_name) from path
+    .replace(/\([^()]+\)\/?/g, "") // Remove (folder_name) from path
     .replace(/\[\.\.\.[^\]]+\]/g, "*")
     .replace(/\[([^\]]+)\]/g, ":$1");
   const slashPath = cleanPath.endsWith("/")
