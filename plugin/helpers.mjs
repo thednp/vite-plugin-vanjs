@@ -16,6 +16,7 @@ import process from "node:process";
 export const fileToRoute = (file, routesDir) => {
   const cleanPath = file
     .slice(routesDir.length + 1) // also remove initial slash
+    .replace(/\\/g, "/") // normalize Windows backslashes to forward slashes
     .replace(/\.(jsx|tsx|ts|js)$/, "")
     .replace(/index$/, "")
     .replace(/\(.*\)$/, "") // Remove (file_name) from path
@@ -136,7 +137,7 @@ export const findLayouts = (routePath, config, pluginConfig) => {
   const { routesDir, extensions } = pluginConfig;
   const layouts = [];
   let dir = dirname(routePath);
-  const routesPath = join(config.root, routesDir);
+  const routesPath = normalizePath(join(config.root, routesDir));
 
   // Walk up the directory tree looking for layout files
   while (dir.startsWith(routesPath) && dir !== routesPath) { // Stop at routes dir
@@ -148,8 +149,13 @@ export const findLayouts = (routePath, config, pluginConfig) => {
       // Look for a layout file in the current directory
       for (const ext of extensions) {
         const layoutPaths = [
-          join(dirname(dir), `${dirName}${ext}`),
-          join(dirname(dir), `(${dirName.replace(/^\((.*)\)$/, "$1")})${ext}`),
+          normalizePath(join(dirname(dir), `${dirName}${ext}`)),
+          normalizePath(
+            join(
+              dirname(dir),
+              `(${dirName.replace(/^\((.*)\)$/, "$1")})${ext}`,
+            ),
+          ),
         ];
 
         for (const path of layoutPaths) {
@@ -162,10 +168,10 @@ export const findLayouts = (routePath, config, pluginConfig) => {
     }
 
     // istanbul ignore else
-    if (layoutFile && layoutFile !== routePath) {
+    if (layoutFile && normalizePath(layoutFile) !== routePath) {
       layouts.unshift({
         id: `Layout${layouts.length}`,
-        path: layoutFile,
+        path: normalizePath(layoutFile),
       });
     }
 

@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.1.26] - 2026-09-15
+
+### Plugin
+
+- **Windows path fix** — `fileToRoute()` now normalizes backslashes to forward slashes, preventing `PARSE_ERROR` from OXC parser when route paths contain Windows separators.
+- **Layout resolution fix** — `findLayouts()` now normalizes all `path.join()` output with `normalizePath()`, fixing layout detection and import paths on Windows.
+
+### Dependencies
+
+- Updated `vanjs-core` to `^1.6.1`, `@types/node` to `^26.5.1`, `@vitest/browser` to `^5.0.1`, `@vitest/coverage-istanbul` to `^5.0.1`, `@vitest/ui` to `^5.0.1`, `happy-dom` to `^20.14.5`, `typescript` to `7.0.2`, `vite` to `^8.3.0`, `vitest` to `^5.0.1`.
+
 ## [0.1.25] - 2026-06-13
 
 ### Meta

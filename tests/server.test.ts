@@ -237,7 +237,6 @@ describe(`Test SSR`, () => {
 
   test("Test plugin with vite 7 or older", async () => {
     const plugin = vanjs();
-    // @ts-expect-error - testing
     plugin.buildStart.call(mockPlugin7Context);
     const config = await (plugin?.config as any)() as UserConfig;
 
@@ -275,14 +274,12 @@ describe(`Test SSR`, () => {
 
   test("Test filesystem router vite 8", async () => {
     const plugin1 = vanjs({ routesDir: "tests/routes" });
-    // @ts-expect-error
     plugin1.buildStart.call(mockPlugin8Context);
     (plugin1.configResolved as any)({ mode: "development", root: toAbsolute("..") } as any);
     expect((await (plugin1.load as any)("\0virtual:@vanjs/routes", { ssr: true }))?.code.length).toBeGreaterThan(0);
     expect(routes.length).toEqual(7);
     routes.length = 0;
     const plugin2 = vanjs({ routesDir: "tests/not-exist" });
-    // @ts-expect-error
     plugin2.buildStart.call(mockPlugin8Context);
     (plugin2.configResolved as any)({ mode: "development", root: toAbsolute("..") } as any);
     expect((await (plugin2.load as any)("\0virtual:@vanjs/routes", { ssr: false }))).toEqual({ code: "", map: null });
@@ -296,7 +293,6 @@ describe(`Test SSR`, () => {
 
   test("Test filesystem router vite 7", async () => {
     const plugin1 = vanjs({ routesDir: "tests/routes" });
-    // @ts-expect-error
     plugin1.buildStart.call(mockPlugin7Context);
     (plugin1.configResolved as any)({ mode: "development", root: toAbsolute("..") } as any);
 
@@ -311,9 +307,8 @@ describe(`Test SSR`, () => {
     const originalNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = "production";
     const plugin1 = vanjs({ routesDir: "tests/routes", excludeRoutes: ["/admin"] });
-    // @ts-expect-error
     plugin1.buildStart.call(mockPlugin8Context);
-    (plugin1.configResolved as any)({ mode: "production", root: toAbsolute("..") } as any);
+    (plugin1.configResolved)({ mode: "production", root: toAbsolute("..") } as any);
 
     const result1 = await (plugin1.load as any)("\0virtual:@vanjs/routes", { ssr: true })
     // console.log({ result })
@@ -322,7 +317,6 @@ describe(`Test SSR`, () => {
     expect(result1?.code).to.not.contain('/admin');
 
     const plugin2 = vanjs({ routesDir: "tests/routes", excludeRoutesProd: ["/admin"] });
-    // @ts-expect-error
     plugin2.buildStart.call(mockPlugin8Context);
     (plugin2.configResolved as any)({ mode: "production", root: toAbsolute("..") } as any);
 

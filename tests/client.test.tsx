@@ -1,5 +1,4 @@
 // @vitest-environment happy-dom
-/// <reference types=".." />
 import van, { type ChildDom, type State } from 'vanjs-core'
 import { expect, test, describe } from "vitest";
 import { A } from "@vanjs/router"
@@ -20,8 +19,8 @@ describe(`Test client-side JSX`, () => {
         class={className}
         >
           Click Me
-      </button>
-    )  as HTMLButtonElement;
+      </button> as HTMLButtonElement
+    ); 
 
     const myDiv = (
       <div
