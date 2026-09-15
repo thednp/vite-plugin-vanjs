@@ -42,7 +42,7 @@ const proxyProps = {
  * @param {Record<string, string | number>} target
  * @returns {T}
  */
-const defineProxy = (key, value, target) => {
+const defineProxy = (key, value, target, oldVal) => {
   const stateObj = van.state(value);
 
   const getter = () => stateObj.val;
@@ -50,6 +50,9 @@ const defineProxy = (key, value, target) => {
     stateObj.val = newVal;
   };
   stateObj.val = value;
+
+  const hasOwnRawVal = Object.getOwnPropertyDescriptor(stateObj, "rawVal")
+    ?.writable;
 
   Object.defineProperties(target, {
     [STATE_PROXY]: proxyProps,
@@ -60,7 +63,14 @@ const defineProxy = (key, value, target) => {
     },
   });
 
-  return stateObj;
+  Object.defineProperty(oldVal, key, {
+    get: () => stateObj.rawVal,
+    set: (v) => {
+      if (hasOwnRawVal) stateObj.rawVal = v;
+      else stateObj.val = v;
+    },
+    enumerable: true,
+  });
 };
 
 /** @typedef  */
@@ -73,6 +83,8 @@ const defineProxy = (key, value, target) => {
 export function microStore(init) {
   /** @type {T} */
   const target = {};
+  /** @type {Record<string, unknown>} */
+  const oldVal = {};
   for (const [prop, value] of Object.entries(init)) {
     const isPlainObject = value && typeof value === "object" &&
       !Array.isArray(value) &&
@@ -82,17 +94,23 @@ export function microStore(init) {
       /** @type {Record<string, string | number>} */
       const nested = {};
       for (const [sp, sv] of Object.entries(value)) {
-        defineProxy(sp, sv, nested);
+        defineProxy(sp, sv, nested, oldVal);
       }
-      defineProxy(prop, nested, target);
+      defineProxy(prop, nested, target, oldVal);
     } else if (isPlainObject) {
-      defineProxy(prop, value, target);
+      defineProxy(prop, value, target, oldVal);
     } else if (!Array.isArray(value) && value != null) {
-      defineProxy(prop, value, target);
+      defineProxy(prop, value, target, oldVal);
     } else {
       console.warn(typeof value + " is not supported.");
     }
   }
+
+  Object.defineProperty(target, "_oldVal", {
+    get: () => oldVal,
+    enumerable: false,
+  });
+
   return target;
 }
 

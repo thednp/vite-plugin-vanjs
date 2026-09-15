@@ -9,6 +9,7 @@ import {
   resolveChildren,
   routerState,
   setRouterState,
+  lazy,
 } from "@vanjs/router";
 
 describe(`Test router helpers`, () => {
@@ -86,5 +87,23 @@ describe(`Test router helpers`, () => {
 
     expect(routerState.loading).to.equal(false);
     expect(wrapper.innerHTML).to.contain("loaded");
+  });
+
+  test(`Test lazy resolves module.component when no default or Page`, async () => {
+    const { div, h1 } = van.tags;
+    const leafFn = () => div(h1("Leaf"));
+    const layoutFn = (props: any) => div(props?.children);
+
+    const importFn = lazy(async () => ({
+      component: () => layoutFn({ children: leafFn() }),
+      layouts: [{ path: "/layout/test", component: layoutFn }],
+      leaf: leafFn,
+      route: {},
+    }));
+
+    const mod = await importFn();
+    expect(mod.component).to.be.a("function");
+    expect(mod.layouts).to.have.length(1);
+    expect(mod.leaf).to.equal(leafFn);
   });
 });

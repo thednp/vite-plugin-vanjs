@@ -21,7 +21,7 @@ export const lazy = (importFn) => {
 
     const module = await importFn();
     /** @type {ComponentFn} */
-    const component = module?.default || module.Page;
+    const component = module?.default || module.Page || module.component;
     /** @type {ComponentModule} */
     const result = {
       component,

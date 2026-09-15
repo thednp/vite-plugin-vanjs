@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { expect, test, describe, beforeEach } from "vitest";
 import van from "@vanjs/van";
+import { hydrate } from "@vanjs/client";
 import {
   lazy,
   Route,
@@ -82,17 +83,21 @@ describe(`Test hydration router`, () => {
     expect(wrapper.tagName).to.equal("MAIN");
     expect(wrapper.getAttribute("id")).to.equal("app-root");
     expect(wrapper.hasAttribute("data-attr")).to.equal(false);
-    expect(await waitForText(wrapper, "Hydrated Home!")).to.contain(
+    // Diff the initial render into the live root like hydrate(main, App)
+    // does in real templates; navigations mutate the live DOM afterwards.
+    const live = document.querySelector("main[data-root]") as HTMLElement;
+    hydrate(live, wrapper);
+    expect(await waitForText(live, "Hydrated Home!")).to.contain(
       "Hydrated Home!",
     );
 
     // the hydrated root reacts to route changes
     setRouterState("/info");
-    expect(await waitForText(wrapper, "Info")).to.contain("Info");
+    expect(await waitForText(live, "Info")).to.contain("Info");
 
     // no matching route and no catch-all
     setRouterState("/nowhere");
-    expect(await waitForText(wrapper, "No Route Found")).to.contain(
+    expect(await waitForText(live, "No Route Found")).to.contain(
       "No Route Found",
     );
 
@@ -102,7 +107,7 @@ describe(`Test hydration router`, () => {
     expect(routerState.pathname).to.equal("/info");
     expect(routerState.searchParams).to.equal("query=1");
 
-    expect(await waitForText(wrapper, "Info")).to.contain("Info");
+    expect(await waitForText(live, "Info")).to.contain("Info");
 
     delete (globalThis as any).__DATA_CACHE;
   });
@@ -149,11 +154,13 @@ describe(`Test hydration router`, () => {
 
     const App = Router();
     const wrapper = await (App as any)() as HTMLElement;
-    expect(await waitForText(wrapper, "Root Nav")).to.contain("Root Nav");
-    expect(await waitForText(wrapper, "Home Page")).to.contain("Home Page");
+    const live = document.querySelector("main[data-root]") as HTMLElement;
+    hydrate(live, wrapper);
+    expect(await waitForText(live, "Root Nav")).to.contain("Root Nav");
+    expect(await waitForText(live, "Home Page")).to.contain("Home Page");
 
     setRouterState("/about");
-    expect(await waitForText(wrapper, "About Page")).to.contain("About Page");
-    expect(await waitForText(wrapper, "Root Nav")).to.contain("Root Nav");
+    expect(await waitForText(live, "About Page")).to.contain("About Page");
+    expect(await waitForText(live, "Root Nav")).to.contain("Root Nav");
   });
 });

@@ -50,9 +50,10 @@ const initClient = () => {
 /**
  * Build the layout chain + leaf into DOM nodes.
  * @param {{ layouts?: RouteLayout[], leaf?: () => any }} mod
- * @returns {any[]}
+ * @param {HTMLElement} outlet
+ * @returns {import("@vanjs/router").DOMElement[]}
  */
-const buildChain = (mod) => {
+const buildChain = (mod, outlet) => {
   const chain = mod.layouts ?? /* istanbul ignore next */ [];
   const leafFn = mod.leaf;
 
@@ -62,11 +63,17 @@ const buildChain = (mod) => {
     return Array.isArray(nodes) ? nodes : [nodes];
   }
 
-  // Build inside-out: leaf → innermost layout → ... → outermost layout
-  let content = leafFn ? leafFn() : /* istanbul ignore next */ [];
+  // Fill the outlet with the leaf content
+  const leafContent = leafFn ? leafFn() : /* istanbul ignore next */ [];
   /* istanbul ignore else */
-  if (!Array.isArray(content)) content = [content];
+  if (Array.isArray(leafContent)) {
+    outlet.replaceChildren(...leafContent);
+  } else {
+    outlet.replaceChildren(leafContent);
+  }
 
+  // Build outside-in: outermost layout wraps innermost → ... → leaf outlet
+  let content = [outlet];
   for (let k = chain.length - 1; k >= 0; k--) {
     content = chain[k].component({ children: content });
     /* istanbul ignore else */
@@ -82,26 +89,37 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
     Object.entries(initialProps).filter(([_, val]) => val !== undefined),
   );
   const wrapper = main({ ...props, "data-root": "" });
-  const route = matchRoute(routerState.pathname);
-  let _searchParams = routerState.searchParams;
+  // Read the initial route without subscribing: Router() is typically
+  // invoked inside a reactive context (e.g. hydrate(main, App)), and a
+  // reactive read here would re-create the whole Router on every
+  // navigation. Only the internal derive below subscribes, to pathname
+  // and searchParams.
+  const route = matchRoute(routerState._oldVal.pathname);
+  let _searchParams = routerState._oldVal.searchParams;
 
   /* istanbul ignore else */
   if (!route) return van.add(wrapper, div("No Route Found"));
   // It's important to READ the params
   Object.assign(routerState.params, route.params);
 
-  // Server-side rendering — unchanged, single-pass full render
+  // Server-side rendering — single-pass full render in one shot.
+  // No reactivity and no shared loading flag: concurrent requests share
+  // the routerState singleton, so the client-side loading guard would
+  // wrongly bail out with `undefined` on overlapping requests.
   if (isServer) {
-    return async () => {
+    return (async () => {
       try {
-        return await executeModule(route, wrapper, true);
+        const module = await route.component();
+        await executeLifecycle(Object.assign(route, module.route));
+        const children = resolveChildren(module);
+        return van.add(wrapper, ...children);
       } catch (error) {
         /* istanbul ignore next */
         console.error("Router error:", error);
         /* istanbul ignore next */
         return van.add(wrapper, div("Error loading page"));
       }
-    };
+    })();
   }
 
   // Init client here
@@ -118,7 +136,15 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
   // Persistent layout chain keys for prefix-diff tracking (client only)
   /** @type {string[]} */
   let layoutKeys = [];
+  /** @type {HTMLElement | null} */
+  let outlet = null;
   let navToken = 0;
+  // Live DOM target for client-side navigations. On the hydration path this
+  // starts as the detached wrapper (used for the initial render that hydrate()
+  // diffs into the SSR root) and is adopted to the real root once the initial
+  // render completes. On the SPA path it stays the wrapper, which is live.
+  /** @type {any} */
+  let liveTarget = wrapper;
 
   /**
    * Navigate to a new route, rendering the layout chain.
@@ -141,18 +167,23 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
 
     layoutKeys = newKeys;
 
-    if (keepCount === 0 || keepCount < newKeys.length) {
-      // Full rebuild (diverged layout chain)
-      const children = buildChain(mod);
-      wrapper.replaceChildren(...children);
-    } else {
+    if (keepCount > 0 && keepCount === layoutKeys.length && outlet) {
       // All layouts shared — only the leaf changed.
-      // Rebuild from the leaf up through the shared layouts.
-      // We still need to rebuild the DOM because VanJS layout components
-      // create new DOM nodes each call, but the shared layout _functions_
-      // are reused (cached by routeCache), avoiding re-import overhead.
-      const children = buildChain(mod);
-      wrapper.replaceChildren(...children);
+      // Directly swap the outlet's children; layout DOM is untouched.
+      const leafFn = mod.leaf;
+      const leafContent = leafFn ? leafFn() : /* istanbul ignore next */ [];
+      /* istanbul ignore else */
+      if (Array.isArray(leafContent)) {
+        outlet.replaceChildren(...leafContent);
+      } else {
+        outlet.replaceChildren(leafContent);
+      }
+    } else {
+      // Diverged layout chain — full rebuild with a fresh outlet.
+      const div = van.tags.div;
+      outlet = div();
+      const children = buildChain(mod, outlet);
+      liveTarget.replaceChildren(...children);
     }
   };
 
@@ -161,46 +192,60 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
 
   if (root) {
     van.derive(() => {
-      // It's important to READ the pathname to keep the derive subscribed
+      // Subscribe to pathname AND searchParams: either one triggers a
+      // navigation (e.g. search-only changes keep the same pathname).
+      // VanJS batches the synchronous writes from setRouterState into a
+      // single run, and same-value writes don't re-trigger at all.
+      // Everything else is read via _oldVal to avoid extra runs.
       const pathname = routerState.pathname;
+      _searchParams = routerState.searchParams;
       if (!initialized) return;
       const matchedRoute = matchRoute(pathname);
       if (!matchedRoute) {
-        wrapper.replaceChildren(div("No Route Found"));
+        liveTarget.replaceChildren(div("No Route Found"));
         return;
       }
       (async () => {
         const token = ++navToken;
-        routerState.loading = true;
+        routerState._oldVal.loading = true;
         try {
-          _searchParams = routerState.searchParams;
           const module = await matchedRoute.component();
           /* istanbul ignore next */
           if (token !== navToken) return;
           await executeLifecycle(Object.assign(matchedRoute, module.route));
+          // A newer navigation may have started during the (possibly slow)
+          // lifecycle: never render stale results over fresh ones.
+          if (token !== navToken) return;
           /* istanbul ignore else */
           if (document.head) hydrate(document.head, Head());
           if (module.layouts) {
             navigateToModule(module);
           } else {
             layoutKeys = [];
+            outlet = null;
             const children = resolveChildren(module);
-            wrapper.replaceChildren(...children);
+            liveTarget.replaceChildren(...children);
           }
         } finally {
-          routerState.loading = false;
+          routerState._oldVal.loading = false;
         }
       })();
     });
     return async () => {
       const result = await executeModule(route, wrapper, true);
+      // Adopt the live SSR root: subsequent navigations mutate the real DOM,
+      // not the detached wrapper used for the initial render.
+      liveTarget = root;
       initialized = true;
       return result;
     };
   }
 
-  // Pure SPA path - reactive routing
+  // Pure SPA path - reactive routing.
+  // Subscribed to pathname and searchParams (batched into a single run);
+  // everything else goes through _oldVal.
   van.derive(() => {
+    _searchParams = routerState.searchParams;
     const matchedRoute = matchRoute(routerState.pathname);
     if (!matchedRoute) {
       wrapper.replaceChildren(div("No Route Found"));
@@ -209,22 +254,28 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
 
     (async () => {
       const token = ++navToken;
+      // routerState._oldVal.loading = true;
       routerState.loading = true;
       try {
         _searchParams = routerState.searchParams;
         const module = await matchedRoute.component();
         if (token !== navToken) return;
         await executeLifecycle(Object.assign(matchedRoute, module.route));
+        // A newer navigation may have started during the (possibly slow)
+        // lifecycle: never render stale results over fresh ones.
+        if (token !== navToken) return;
         /* istanbul ignore else */
         if (document.head) hydrate(document.head, Head());
         if (module.layouts) {
           navigateToModule(module);
         } else {
           layoutKeys = [];
+          outlet = null;
           const children = resolveChildren(module);
           wrapper.replaceChildren(...children);
         }
       } finally {
+        // routerState._oldVal.loading = false;
         routerState.loading = false;
       }
     })();

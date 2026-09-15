@@ -14,7 +14,7 @@ import vanX from "@vanjs/vanX";
 import { type Element as VanElement } from "mini-van-plate/van-plate";
 import vanjs from "../plugin/index.mjs";
 import { renderToString, renderPreloadLinks, getDataPreload } from "@vanjs/server";
-import { Router, Route, lazy, setRouterState, routerState, fixRouteUrl, routes, dataCache, } from "@vanjs/router";
+import { Router, Route, lazy, setRouterState, routerState, fixRouteUrl, routes, dataCache, executeModule, } from "@vanjs/router";
 import type { UserConfig } from "vite";
 import { mockPlugin7Context, mockPlugin8Context } from "./fixtures/mock.ts";
 
@@ -450,6 +450,59 @@ describe(`Test SSR`, () => {
 
     expect(fixRouteUrl('')).toEqual("/")
     expect(fixRouteUrl('test')).toEqual("/test")
+  });
+
+  test("Test concurrent server renders", async () => {
+    routes.length = 0;
+    Route({
+      path: "/slow",
+      component: lazy(async () => {
+        await new Promise((res) => setTimeout(res, 20));
+        return {
+          Page: () => {
+            const { div } = van.tags;
+            return div("Slow page");
+          },
+        };
+      }),
+    });
+
+    setRouterState("/slow");
+    await new Promise((res) => setTimeout(res, 17));
+
+    // Overlapping renders share the routerState singleton; the second
+    // one must still render instead of bailing out with `undefined`.
+    const [html1, html2] = await Promise.all([
+      renderToString(Router()),
+      renderToString(Router()),
+    ]);
+    expect(html1).to.contain("Slow page");
+    expect(html2).to.contain("Slow page");
+  });
+
+  test("Test routerState _oldVal read and write on server", async () => {
+    routerState._oldVal.loading = true;
+    expect(routerState._oldVal.loading).to.equal(true);
+    routerState._oldVal.loading = false;
+    expect(routerState._oldVal.loading).to.equal(false);
+    expect(routerState._oldVal.pathname).to.equal(routerState.pathname);
+  });
+
+  test("Test executeModule directly on server", async () => {
+    routes.length = 0;
+    Route({
+      path: "/srv-mod",
+      component: lazy(() => import("./routes/(root)/index.ts")),
+    });
+
+    setRouterState("/srv-mod");
+    await new Promise((res) => setTimeout(res, 17));
+
+    const route = routes.find((r) => r.path === "/srv-mod");
+    const wrapper = van.tags.main({});
+    const result = await executeModule(route, wrapper, true);
+    const html = await renderToString(result);
+    expect(html).to.contain("Hello VanJS!");
   });
 
   test("testing dataCache and getDataPreload", async () => {

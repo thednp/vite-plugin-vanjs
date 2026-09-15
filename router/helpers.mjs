@@ -148,9 +148,9 @@ export const executeLifecycle = async (route) => {
  * @returns
  */
 export const executeModule = async (route, wrapper, ssr) => {
-  if (routerState.loading === true) return;
+  if (routerState._oldVal.loading === true) return;
   // 0. Set Loading State
-  routerState.loading = true;
+  routerState._oldVal.loading = true;
   try {
     // 1. Resolve the module first (to get route lifecycle hooks)
     const module = await route.component();
@@ -165,7 +165,7 @@ export const executeModule = async (route, wrapper, ssr) => {
     else wrapper.replaceChildren(...children);
   } finally {
     // 5. Set Loading State
-    routerState.loading = false;
+    routerState._oldVal.loading = false;
   }
 };
 
