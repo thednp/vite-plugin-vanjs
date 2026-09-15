@@ -41,7 +41,7 @@ export const A = (
 
       navigate(HREF);
     },
-    onmouseenter: async () => {
+    onmouseenter: async (e) => {
       const HREF = getValue(href);
       const route = matchRoute(HREF);
 

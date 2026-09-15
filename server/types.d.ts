@@ -38,6 +38,13 @@ export type Source =
  */
 export const renderToString: (source: Source) => Promise<string>;
 
+/**
+ * A function that generates a <script> for initial hydration data.
+ * Serializes the full path-keyed data cache into window.__DATA_CACHE.
+ * @returns HTML string
+ */
+export const getDataPreload: () => string;
+
 // FILE SYSTEM ROUTER
 /**
  * Get the file most probable route path for a given potential route.
@@ -47,7 +54,14 @@ export const fileToRoute: (file: string, routesDir: string) => string;
 export type PageFile = { path: string; routePath: string };
 export type LayoutFile = { id: string; path: string };
 export type RouteFile = PageFile & { layouts: Array<LayoutFile> };
-export type PluginConfig = { routesDir: string; extensions: string[] };
+export type PluginConfig = {
+  routesDir: string;
+  extensions: string[];
+  /** route paths excluded in all environments */
+  excludeRoutes?: string[];
+  /** route paths excluded in production only */
+  excludeRoutesProd?: string[];
+};
 /**
  * Find all layout files for a given route.
  */

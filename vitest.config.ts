@@ -14,14 +14,17 @@ export default defineConfig({
       reporter: ["html", "text", "lcov"],
       enabled: true,
       include: [
-        "plugin/*.[mjs|ts]",
-        "meta/*.[mjs|ts]",
-        "router/.[mjs|ts]*",
-        "setup/*.[mjs|ts]",
-        "client/*.[mjs|ts]",
-        "server/*.[mjs|ts]",
-        "jsx/*.[mjs|ts]",
+        "plugin/*.mjs",
+        "meta/*.mjs",
+        "router/*.mjs",
+        "setup/*.mjs",
+        "client/*.mjs",
+        "server/*.mjs",
+        "jsx/*.mjs",
       ],
+      // exclude: [
+      //   "*.d.ts"
+      // ]
     },
   },
 });

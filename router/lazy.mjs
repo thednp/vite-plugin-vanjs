@@ -23,7 +23,12 @@ export const lazy = (importFn) => {
     /** @type {ComponentFn} */
     const component = module?.default || module.Page;
     /** @type {ComponentModule} */
-    const result = { component, route: module.route };
+    const result = {
+      component,
+      route: module.route,
+      layouts: module.layouts,
+      leaf: module.leaf,
+    };
 
     cacheRoute(importFn, result);
     return result;

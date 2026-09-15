@@ -35,5 +35,5 @@
     "./server/*.ts",
     "./client/*.ts",
   ],
-  "exclude": ["node_modules", "experiments", "coverage"],
+  "exclude": ["node_modules", "experiments", "coverage", "tests"],
 }

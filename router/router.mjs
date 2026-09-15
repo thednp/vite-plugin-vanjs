@@ -3,8 +3,14 @@ import isServer from "../setup/isServer.mjs";
 import { MODE } from "../plugin/const.mjs";
 import { routerState, setRouterState } from "./state.mjs";
 import { matchRoute } from "./matchRoute.mjs";
-import { executeModule } from "./helpers.mjs";
+import {
+  executeLifecycle,
+  executeModule,
+  resolveChildren,
+} from "./helpers.mjs";
 import { initializeHeadTags } from "../meta/index.mjs";
+import { hydrate } from "../client/index.mjs";
+import { Head } from "../meta/index.mjs";
 import * as dataCache from "./dataCache.mjs";
 import "virtual:@vanjs/routes";
 
@@ -13,6 +19,7 @@ const isDev = MODE === "development";
 /** @typedef {import("./types.d.ts").ComponentModule} ComponentModule */
 /** @typedef {import("./types.d.ts").RouteEntry} RouteEntry */
 /** @typedef {import("./types.d.ts").VanNode} VanNode */
+/** @typedef {import("./types.d.ts").RouteLayout} RouteLayout */
 
 /**
  * Initialize client-side router (Head + popstate listener)
@@ -40,6 +47,35 @@ const initClient = () => {
   _initialized = true;
 };
 
+/**
+ * Build the layout chain + leaf into DOM nodes.
+ * @param {{ layouts?: RouteLayout[], leaf?: () => any }} mod
+ * @returns {any[]}
+ */
+const buildChain = (mod) => {
+  const chain = mod.layouts ?? /* istanbul ignore next */ [];
+  const leafFn = mod.leaf;
+
+  if (chain.length === 0) {
+    const nodes = leafFn ? leafFn() : /* istanbul ignore next */ [];
+    /* istanbul ignore next */
+    return Array.isArray(nodes) ? nodes : [nodes];
+  }
+
+  // Build inside-out: leaf → innermost layout → ... → outermost layout
+  let content = leafFn ? leafFn() : /* istanbul ignore next */ [];
+  /* istanbul ignore else */
+  if (!Array.isArray(content)) content = [content];
+
+  for (let k = chain.length - 1; k >= 0; k--) {
+    content = chain[k].component({ children: content });
+    /* istanbul ignore else */
+    if (!Array.isArray(content)) content = [content];
+  }
+
+  return content;
+};
+
 export const Router = (initialProps = /* istanbul ignore next */ {}) => {
   const { div, main } = van.tags;
   const props = Object.fromEntries(
@@ -54,7 +90,7 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
   // It's important to READ the params
   Object.assign(routerState.params, route.params);
 
-  // Server-side rendering
+  // Server-side rendering — unchanged, single-pass full render
   if (isServer) {
     return async () => {
       try {
@@ -79,20 +115,81 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
     dataCache.hydrateFromJSON(globalThis.__DATA_CACHE);
   }
 
+  // Persistent layout chain keys for prefix-diff tracking (client only)
+  /** @type {string[]} */
+  let layoutKeys = [];
+  let navToken = 0;
+
+  /**
+   * Navigate to a new route, rendering the layout chain.
+   * Uses prefix-diff to detect shared layouts and only rebuilds the diverged suffix.
+   * @param {{ layouts?: RouteLayout[], leaf?: () => any }} mod
+   */
+  const navigateToModule = (mod) => {
+    const newKeys = (mod.layouts ?? /* istanbul ignore next */ []).map((l) =>
+      l.path
+    );
+
+    // Find shared prefix length
+    let keepCount = 0;
+    while (
+      keepCount < layoutKeys.length && keepCount < newKeys.length &&
+      layoutKeys[keepCount] === newKeys[keepCount]
+    ) {
+      keepCount++;
+    }
+
+    layoutKeys = newKeys;
+
+    if (keepCount === 0 || keepCount < newKeys.length) {
+      // Full rebuild (diverged layout chain)
+      const children = buildChain(mod);
+      wrapper.replaceChildren(...children);
+    } else {
+      // All layouts shared — only the leaf changed.
+      // Rebuild from the leaf up through the shared layouts.
+      // We still need to rebuild the DOM because VanJS layout components
+      // create new DOM nodes each call, but the shared layout _functions_
+      // are reused (cached by routeCache), avoiding re-import overhead.
+      const children = buildChain(mod);
+      wrapper.replaceChildren(...children);
+    }
+  };
+
   // Client-side: check if hydrating SSR content or pure SPA
   const root = document.querySelector("[data-root]");
 
   if (root) {
     van.derive(() => {
+      // It's important to READ the pathname to keep the derive subscribed
+      const pathname = routerState.pathname;
       if (!initialized) return;
-      const matchedRoute = matchRoute(routerState.pathname);
+      const matchedRoute = matchRoute(pathname);
       if (!matchedRoute) {
         wrapper.replaceChildren(div("No Route Found"));
         return;
       }
       (async () => {
-        _searchParams = routerState.searchParams;
-        await executeModule(matchedRoute, wrapper);
+        const token = ++navToken;
+        routerState.loading = true;
+        try {
+          _searchParams = routerState.searchParams;
+          const module = await matchedRoute.component();
+          /* istanbul ignore next */
+          if (token !== navToken) return;
+          await executeLifecycle(Object.assign(matchedRoute, module.route));
+          /* istanbul ignore else */
+          if (document.head) hydrate(document.head, Head());
+          if (module.layouts) {
+            navigateToModule(module);
+          } else {
+            layoutKeys = [];
+            const children = resolveChildren(module);
+            wrapper.replaceChildren(...children);
+          }
+        } finally {
+          routerState.loading = false;
+        }
       })();
     });
     return async () => {
@@ -111,8 +208,25 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
     }
 
     (async () => {
-      _searchParams = routerState.searchParams;
-      await executeModule(matchedRoute, wrapper);
+      const token = ++navToken;
+      routerState.loading = true;
+      try {
+        _searchParams = routerState.searchParams;
+        const module = await matchedRoute.component();
+        if (token !== navToken) return;
+        await executeLifecycle(Object.assign(matchedRoute, module.route));
+        /* istanbul ignore else */
+        if (document.head) hydrate(document.head, Head());
+        if (module.layouts) {
+          navigateToModule(module);
+        } else {
+          layoutKeys = [];
+          const children = resolveChildren(module);
+          wrapper.replaceChildren(...children);
+        }
+      } finally {
+        routerState.loading = false;
+      }
     })();
   });
 

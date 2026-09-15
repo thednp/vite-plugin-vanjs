@@ -120,6 +120,12 @@ declare module "@vanjs/router" {
   export const getValue: (v: unknown) => string;
 
   /**
+   * Build the data cache key for the current route, based on the
+   * current route params and the current search params.
+   */
+  export const getCacheKey: () => string;
+
+  /**
    * Check if selected page is the current page
    */
   export const isCurrentPage: (pageName: string) => boolean;
@@ -253,13 +259,22 @@ declare module "@vanjs/router" {
   export type ComponentModule = {
     component: ComponentFn;
     route?: Pick<RouteEntry, "load" | "preload">;
+    layouts?: RouteLayout[];
+    leaf?: ComponentFn;
   };
 
   export type LazyComponent = Promise<{
     default?: ComponentFn;
     Page?: ComponentFn;
     route?: Pick<RouteEntry, "load" | "preload">;
+    layouts?: RouteLayout[];
+    leaf?: ComponentFn;
   }>;
+
+  export type RouteLayout = {
+    path: string;
+    component: ComponentFn;
+  };
 
   /**
    * Registers a lazy component.
@@ -289,6 +304,30 @@ declare module "@vanjs/router" {
       load?: (params?: Record<string, string>) => Promise<unknown>;
     } | null,
   ) => Promise<boolean>;
+
+  /**
+   * Resolve a route component, execute its lifecycle methods and render
+   * the resulting children into the given wrapper.
+   * @param route the matched route
+   * @param wrapper the element that hosts the route children
+   * @param ssr when true the children are appended instead of replaced
+   */
+  export const executeModule: (
+    route: RouteEntry,
+    wrapper: HTMLElement,
+    ssr?: boolean,
+  ) => Promise<HTMLElement | void>;
+
+  /**
+   * Resolve the children of a component module, an element or an array of elements.
+   */
+  export const resolveChildren: (
+    module:
+      | ComponentModule
+      | VanElement
+      | VanElement[]
+      | { component?: ComponentFn | VanElement },
+  ) => VanNode[];
 
   /**
    * Find a registered route that matches the given path

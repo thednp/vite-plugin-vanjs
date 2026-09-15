@@ -75,6 +75,12 @@ export const redirect: (href?: string) => void | (() => void);
 
 export const getValue: (v: unknown) => string;
 
+/**
+ * Build the data cache key for the current route, based on the
+ * current route params and the current search params.
+ */
+export const getCacheKey: () => string;
+
 export const isCurrentPage: (pageName: string) => boolean;
 
 export const isCurrentLocation: (pageName: string) => boolean;
@@ -87,6 +93,30 @@ export const executeLifecycle: (
     load?: (params?: Record<string, string>) => Promise<unknown>;
   } | null,
 ) => Promise<boolean>;
+
+/**
+ * Resolve a route component, execute its lifecycle methods and render
+ * the resulting children into the given wrapper.
+ * @param route the matched route
+ * @param wrapper the element that hosts the route children
+ * @param ssr when true the children are appended instead of replaced
+ */
+export const executeModule: (
+  route: RouteEntry,
+  wrapper: HTMLElement,
+  ssr?: boolean,
+) => Promise<HTMLElement | void>;
+
+/**
+ * Resolve the children of a component module, an element or an array of elements.
+ */
+export const resolveChildren: (
+  module:
+    | ComponentModule
+    | VanElement
+    | VanElement[]
+    | { component?: ComponentFn | VanElement },
+) => VanNode[];
 
 export const useRouteData: <T>() => T | undefined;
 
@@ -190,13 +220,22 @@ export type ComponentFn = FragmentFn | VanComponent | JSXComponentFn;
 export type ComponentModule = {
   component: ComponentFn;
   route?: Pick<RouteEntry, "load" | "preload">;
+  layouts?: RouteLayout[];
+  leaf?: ComponentFn;
 };
 
 export type LazyComponent = Promise<{
   default?: ComponentFn;
   Page?: ComponentFn;
   route?: Pick<RouteEntry, "load" | "preload">;
+  layouts?: RouteLayout[];
+  leaf?: ComponentFn;
 }>;
+
+export type RouteLayout = {
+  path: string;
+  component: ComponentFn;
+};
 
 // dataCache.mjs
 export type CacheEntry<T = unknown> = {

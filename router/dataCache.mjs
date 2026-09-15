@@ -27,6 +27,7 @@ const evictIfNeeded = () => {
   if (maxRoutes <= 0) return;
   while (dataCacheMap.size > maxRoutes) {
     const firstKey = dataCacheMap.keys().next().value;
+    /* istanbul ignore else - the map is guaranteed to have entries here */
     if (firstKey !== undefined) {
       dataCacheMap.delete(firstKey);
     }

@@ -42,7 +42,8 @@ pnpm check:ts      # tsc -noEmit only
 - **Environments**: `client.test.ts` uses `happy-dom`, `server.test.ts` uses `@vitest-environment node`
 - **Config**: `vitest.config.ts` — routes dir is `tests/routes`
 - **Coverage**: Istanbul, enabled by default, covers `plugin/`, `router/`, `setup/`, `client/`, `server/`, `meta/`, `jsx/`
-- **Test files**: `tests/client.test.ts`, `tests/client.test.tsx`, `tests/server.test.ts`, `tests/server.test.tsx`
+- **Test files**: `tests/client.test.ts`, `tests/client.test.tsx`, `tests/server.test.ts`, `tests/server.test.tsx`, `tests/dataCache.test.ts`, `tests/state.test.ts`, `tests/router.helpers.test.ts`, `tests/router.hydration.test.ts`, `tests/router.spa.test.ts`
+- **Coverage**: 100% statements / branches / functions / lines for all covered directories
 
 ## Code Style
 

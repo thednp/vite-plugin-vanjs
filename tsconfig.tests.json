@@ -1,0 +1,14 @@
+{
+  // temporary config used to type-check the test files
+  "extends": "./tsconfig.json",
+  "include": [
+    "tests",
+    "plugin/*.ts",
+    "router/*.ts",
+    "server/*.ts",
+    "meta/*.ts",
+    "client/*.ts",
+    "jsx/*.ts",
+    "setup/*.ts"
+  ]
+}

@@ -1,11 +1,16 @@
 # Changelog
 
-## [0.1.26] - 2026-09-15
+## [0.2.0] - 2026-09-15
 
 ### Plugin
 
 - **Windows path fix** — `fileToRoute()` now normalizes backslashes to forward slashes, preventing `PARSE_ERROR` from OXC parser when route paths contain Windows separators.
 - **Layout resolution fix** — `findLayouts()` now normalizes all `path.join()` output with `normalizePath()`, fixing layout detection and import paths on Windows.
+
+### Router
+
+- **Layout chain rendering** — plugin now generates `{ route, component, layouts, leaf }` for routes with layouts. Client router builds layout chains inside-out (leaf → innermost layout → outermost layout) with prefix-diff detection to reuse shared layouts across sibling pages.
+- **`RouteLayout` type** — new type for `{ path, component }` layout entries in the generated route modules.
 
 ### Dependencies
 

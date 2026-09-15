@@ -252,17 +252,24 @@ load: async (params) => {
 /** @type {(route: RouteFile) => string} */
 export const generateComponentRoute = (route) => {
   if (route.layouts?.length > 0) {
-    // Only generate imports for unique layouts
     const layoutImports = route.layouts.map(
       (layout) =>
         `const ${layout.id}Module = await import('${layout.path}');\n` +
         `const ${layout.id}Page = ${layout.id}Module.Layout || ${layout.id}Module.Page || ${layout.id}Module.default;`,
     ).join("\n");
 
-    // Use both shared and unique layouts for the component chain
-    const pageComponent = route.layouts.reduce(
+    const layoutsArray = `[${
+      route.layouts.map(
+        (layout) =>
+          `{ path: ${
+            JSON.stringify(layout.path)
+          }, component: ${layout.id}Page }`,
+      ).join(", ")
+    }]`;
+
+    const chainBuild = route.layouts.reduceRight(
       (acc, layout) => `${layout.id}Page({ children: ${acc} })`,
-      "Page()",
+      "leaf()",
     );
 
     return `lazy(() => {
@@ -270,10 +277,15 @@ export const generateComponentRoute = (route) => {
         ${layoutImports}
         const PageModule = await import('${route.path}');
         const Page = PageModule?.Page || PageModule?.default;
+        const layouts = ${layoutsArray};
+        const leaf = () => Page();
+        const component = () => ${chainBuild};
   
         return Promise.resolve({
           route: ${generateRouteProloaders(route)},
-          Page: () => ${pageComponent},
+          component,
+          layouts,
+          leaf,
         });
       };
       return importFn();

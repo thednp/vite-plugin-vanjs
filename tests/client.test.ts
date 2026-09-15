@@ -387,4 +387,41 @@ const script1Url = PATH.resolve(process.cwd(), "tests", 'test-script-1.js');
     setAttributeNS("http://www.w3.org/1999/xlink", svg, "xmlns:xlink", null);
     expect(svg.getAttributeNS("http://www.w3.org/1999/xlink", "xmlns:xlink")).toBeNull();
   })
+
+  test("Test anchor link", async () => {
+    let clicked = false;
+    let hovered = false;
+    const Anchor = A({
+      href: "/test-anchor",
+      onclick: () => { clicked = true; },
+      onmouseenter: (e: Event) => { hovered = e instanceof Event; },
+    }, "Hover me");
+    van.add(document.body, Anchor);
+
+    expect(Anchor.innerText).to.contain("Hover me");
+    expect(Anchor.getAttribute("aria-current")).to.equal("");
+
+    Anchor.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
+    await new Promise(res => setTimeout(res, 17));
+    expect(hovered).to.equal(true);
+
+    Anchor.click();
+    await new Promise(res => setTimeout(res, 17));
+    expect(clicked).to.equal(true);
+    expect(Anchor.getAttribute("aria-current")).to.equal("page");
+
+    // related location instead of the current page
+    setRouterState("/test-anchor/child");
+    await new Promise(res => setTimeout(res, 17));
+    expect(Anchor.getAttribute("aria-current")).to.equal("location");
+
+    // falsy children fallback to the rest arguments
+    const Empty = A({ href: "/empty-anchor" }, "");
+    expect(Empty.innerText).to.equal("");
+    expect(Empty.getAttribute("href")).to.equal("/empty-anchor");
+
+    const Multiple = A({ href: "/multi-anchor" }, "one", "two");
+    expect(Multiple.innerText).to.contain("one");
+    expect(Multiple.innerText).to.contain("two");
+  });
 })

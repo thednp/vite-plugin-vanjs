@@ -75,12 +75,16 @@ export function microStore(init) {
   const target = {};
   for (const [prop, value] of Object.entries(init)) {
     const isPlainObject = value && typeof value === "object" &&
-      !Array.isArray(value) && Object.getPrototypeOf(value) === Object;
+      !Array.isArray(value) &&
+      Object.getPrototypeOf(value) === Object.prototype;
 
     if (isPlainObject && Object.keys(value).length > 0) {
+      /** @type {Record<string, string | number>} */
+      const nested = {};
       for (const [sp, sv] of Object.entries(value)) {
-        target[prop] = defineProxy(sp, sv, {});
+        defineProxy(sp, sv, nested);
       }
+      defineProxy(prop, nested, target);
     } else if (isPlainObject) {
       defineProxy(prop, value, target);
     } else if (!Array.isArray(value) && value != null) {
