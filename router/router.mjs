@@ -60,12 +60,13 @@ const buildChain = (mod, outlet) => {
   if (chain.length === 0) {
     const nodes = leafFn ? leafFn() : /* istanbul ignore next */ [];
     /* istanbul ignore next */
-    return Array.isArray(nodes) ? nodes : [nodes];
+    return Array.isArray(nodes) ? nodes.flat() : [nodes];
   }
 
   // Fill the outlet with the leaf content
-  const leafContent = leafFn ? leafFn() : /* istanbul ignore next */ [];
+  const raw = leafFn ? leafFn() : /* istanbul ignore next */ [];
   /* istanbul ignore else */
+  const leafContent = Array.isArray(raw) ? raw.flat() : raw;
   if (Array.isArray(leafContent)) {
     outlet.replaceChildren(...leafContent);
   } else {
@@ -76,8 +77,12 @@ const buildChain = (mod, outlet) => {
   let content = [outlet];
   for (let k = chain.length - 1; k >= 0; k--) {
     content = chain[k].component({ children: content });
-    /* istanbul ignore else */
+    /* istanbul ignore next */
     if (!Array.isArray(content)) content = [content];
+    // JSX Fragments return their children array directly, so a layout
+    // returning [<>...</>] produces [[...]] (nested). flatten() ensures
+    // replaceChildren always receives a flat list of DOM nodes.
+    content = content.flat();
   }
 
   return content;
@@ -171,8 +176,9 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
       // All layouts shared — only the leaf changed.
       // Directly swap the outlet's children; layout DOM is untouched.
       const leafFn = mod.leaf;
-      const leafContent = leafFn ? leafFn() : /* istanbul ignore next */ [];
+      const raw = leafFn ? leafFn() : /* istanbul ignore next */ [];
       /* istanbul ignore else */
+      const leafContent = Array.isArray(raw) ? raw.flat() : raw;
       if (Array.isArray(leafContent)) {
         outlet.replaceChildren(...leafContent);
       } else {

@@ -149,4 +149,67 @@ describe(`Template pattern (hydrate with App function)`, () => {
     expect(main.innerHTML).to.not.contain("undefined");
     expect(loadCount).to.equal(4);
   });
+
+  test(`JSX-style Fragment layouts render correctly on navigation`, async () => {
+    routes.length = 0;
+
+    // Simulate JSX Fragment: layout returns [Fragment(...)] where
+    // Fragment({ children }) returns children (an array), producing
+    // a nested [[div1, div2]]. buildChain must flatten this.
+    const Fragment = ({ children }: { children: any }) => children;
+    const FragLayout = (props: { children?: any }) => {
+      return [
+        Fragment({
+          children: [
+            van.tags.div({ class: "frag-nav" }, "Frag Sidebar"),
+            van.tags.div({ class: "frag-main" }, props.children),
+          ],
+        }),
+      ];
+    };
+
+    const FragPageA = () =>
+      van.tags.div({ class: "frag-page-a" }, "Frag Page A");
+    const FragPageB = () =>
+      van.tags.div({ class: "frag-page-b" }, "Frag Page B");
+
+    Route({
+      path: "/frag-a",
+      component: lazyWithLayouts(
+        [{ path: "/frag-layout", component: FragLayout }],
+        FragPageA,
+      ),
+    });
+    Route({
+      path: "/frag-b",
+      component: lazyWithLayouts(
+        [{ path: "/frag-layout", component: FragLayout }],
+        FragPageB,
+      ),
+    });
+
+    setRouterState("/frag-a");
+    document.body.innerHTML = `<main id="frag-main" data-root=""></main>`;
+    const main = document.getElementById("frag-main") as HTMLElement;
+
+    const App = () => Router({ id: "frag-main" });
+    hydrate(main, App);
+
+    expect(await waitForText(main, "Frag Page A")).to.contain("Frag Page A");
+    expect(main.querySelector(".frag-nav")).toBeTruthy();
+    expect(main.innerHTML).to.not.contain("[object");
+    expect(main.innerHTML).to.not.contain("undefined");
+
+    // Navigate to sibling — all layouts shared, only leaf swaps
+    setRouterState("/frag-b");
+    expect(await waitForText(main, "Frag Page B")).to.contain("Frag Page B");
+    expect(main.querySelector(".frag-nav")).toBeTruthy();
+    expect(main.innerHTML).to.not.contain("[object");
+    expect(main.innerHTML).to.not.contain("undefined");
+
+    // Back to A — shared layout, leaf swap
+    setRouterState("/frag-a");
+    expect(await waitForText(main, "Frag Page A")).to.contain("Frag Page A");
+    expect(main.innerHTML).to.not.contain("[object");
+  });
 });

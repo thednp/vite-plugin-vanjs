@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.2] - 2026-09-16
+
+### Router
+
+- **JSX Fragment layout fix** — `buildChain()`, `navigateToModule()` leaf swap, and `resolveChildren()` now flatten nested arrays. JSX Fragments (`<>...</>`) return their children array directly, so a layout returning `[<>...</>]` produced `[[div1, div2]]` (nested). `replaceChildren` stringified this to `[object HTMLDivElement],[object HTMLDivElement]` on client-side navigation. Non-JSX templates returned flat arrays and were unaffected.
+
 ## [0.2.0] - 2026-09-15
 
 ### Plugin

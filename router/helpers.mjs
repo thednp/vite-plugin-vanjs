@@ -38,7 +38,11 @@ export const resolveChildren = (module) => {
     : typeof module.component === "function"
     ? module.component()
     : module.component;
-  return cp ? Array.from(unwrap(cp).children) : /* istanbul ignore next */ [];
+  // JSX Fragments return their children array directly, so a component
+  // returning [<>...</>] produces [[...]] (nested). flatten() ensures
+  // callers always receive a flat list of DOM nodes.
+  const raw = cp ? Array.from(unwrap(cp).children) : /* istanbul ignore next */ [];
+  return raw.flat();
 };
 
 /**
