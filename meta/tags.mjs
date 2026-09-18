@@ -2,7 +2,10 @@ import van from "vanjs-core";
 import { addMeta } from "./Head.mjs";
 
 /** @typedef {import("./types.d.ts").SupportedTags} SupportedTags */
-/** @typedef {import("vanjs-core").PropsWithKnownKeys<T = SupportedTags>} PropsWithKnownKeys<T> */
+/**
+ * @template T
+ * @typedef {import("vanjs-core").PropsWithKnownKeys<T>} PropsWithKnownKeys
+ */
 /** @typedef {import("./types.d.ts").TagProps} TagProps */
 
 /**

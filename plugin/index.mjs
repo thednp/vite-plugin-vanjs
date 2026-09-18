@@ -1,12 +1,11 @@
-/** @typedef {typeof import("./types").VitePluginVanJS} VitePluginVanJS */
-/** @typedef {import("./types").VanJSPluginOptions} VanJSPluginOptions */
 /** @typedef {import("vite").ResolvedConfig} ResolvedConfig */
-/** @typedef {import("./types").PageFile} PageFile */
-/** @typedef {import("./types").RouteFile} RouteFile */
 /** @typedef {import("vite").BuildAppHook} BuildAppHook */
 /** @typedef {import("vite").TransformResult} TransformResult */
 /** @typedef {import("vite").Plugin} Plugin */
-/** @typedef {ThisParameterType<BuildAppHook>} PluginContext */
+/** @typedef {import("./types.d.ts").VitePluginVan} VitePluginVan */
+/** @typedef {import("./types.d.ts").VanJSPluginOptions} VanJSPluginOptions */
+/** @typedef {import("./types.d.ts").PageFile} PageFile */
+/** @typedef {import("./types.d.ts").RouteFile} RouteFile */
 
 import { fileURLToPath } from "node:url";
 import { dirname, join, resolve } from "node:path";
@@ -56,7 +55,7 @@ const debugModuleAliases = {
   "@vanjs/setup": "../setup/index-debug",
 };
 
-/** @type {VitePluginVanJS} */
+/** @type {VitePluginVan} */
 export default function VitePluginVanJS(options = {}) {
   const pluginConfig = { ...pluginDefaults, ...options };
   const { routesDir } = pluginConfig;

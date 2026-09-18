@@ -10,6 +10,7 @@ import {
 } from "./helpers.mjs";
 import { initializeHeadTags } from "../meta/index.mjs";
 import { hydrate } from "../client/index.mjs";
+import { markHydrationComplete } from "../setup/helpers.mjs";
 import { Head } from "../meta/index.mjs";
 import * as dataCache from "./dataCache.mjs";
 import "virtual:@vanjs/routes";
@@ -132,9 +133,16 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
   let initialized = false;
 
   // Client-side: hydrate data cache from SSR output
-  // This must happen BEFORE any component renders so useRouteData() works
-  // Skip in dev mode: we manually clear dataCache on mutations for instant updates
-  if (globalThis.__DATA_CACHE && !isDev) {
+  // This must happen BEFORE any component renders so useRouteData() works.
+  // Skip in dev mode for /admin pages: we manually clear dataCache on
+  // mutations for instant updates. Public pages reuse SSR data like prod.
+  // NOTE: read via _oldVal — subscribing here would re-create the whole
+  // Router on every navigation.
+  if (
+    globalThis.__DATA_CACHE &&
+    /* istanbul ignore next -- build-time constant, isDev is false in vitest */
+    (!isDev || !routerState._oldVal.pathname.startsWith("/admin"))
+  ) {
     dataCache.hydrateFromJSON(globalThis.__DATA_CACHE);
   }
 
@@ -243,6 +251,9 @@ export const Router = (initialProps = /* istanbul ignore next */ {}) => {
       // not the detached wrapper used for the initial render.
       liveTarget = root;
       initialized = true;
+      // Initial hydration is done: freshly rendered client nodes are born
+      // into live DOM and need no hydration keys from here on.
+      markHydrationComplete();
       return result;
     };
   }

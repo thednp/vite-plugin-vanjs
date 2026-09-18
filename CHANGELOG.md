@@ -1,5 +1,47 @@
 # Changelog
 
+## [0.2.3] - 2026-09-18
+
+### Client
+
+- **Hydration rewrite** — `createHydrationContext()` replaced with structural diffing: `significantChildren` filters empty text nodes (SSR omits them, client creates `Text("")`), `nodesPairable` compares by node type + tag + id + className + text, `adoptNode` walks static subtrees recursively replacing only text and keyed nodes. Replaces the old `parentCache`/`getParent` + `querySelectorAll("[data-hk]")` approach.
+- **`stripHydrationKeys()`** — new function strips `data-hk` from root and all descendants after each hydration pass. Server bundles keep their own module instance so this stays a no-op.
+- **`elementsMatch()` exported** — new public export for shallow (or `deep`) comparison of two elements, used by hydration diffing and available to user code.
+
+### Router
+
+- **Data cache hydration scoped for dev** — in dev mode, only `/admin` pages skip SSR data cache hydration (public pages reuse SSR data like prod). Reads `routerState._oldVal.pathname` to avoid creating a reactive subscription.
+- **`markHydrationComplete()`** — called after initial hydration render. Prevents `needsHydration()` from firing on freshly rendered client nodes that are born into live DOM.
+- **`extractParams()` exported** — added to `router/global.d.ts` and `router/types.d.ts`.
+- **`component` on `LazyComponent`** — added `component?: ComponentFn` to the `LazyComponent` type (layout-chain modules).
+
+### Plugin
+
+- **Type import paths** — all `@typedef` imports now point to `.d.ts` files (previously `.ts`).
+- **`VitePluginVan` type** — renamed from `VitePluginVanJS`, decoupled from `Plugin<VanJSPluginOptions>` generic.
+- **`VitePluginContext` type** — new exported type for `this` context members (`meta.viteVersion`).
+
+### Server
+
+- **Preload CSS stays render-blocking** — route/layout JS is skipped for preloading, but their `.css` files are now kept for first-paint. Prevents FOUC on SSR pages with layout styles.
+
+### Setup
+
+- **`needsHydration()`** — now checks nested reactive state objects (`style: { color: state }`) via `Object.values(v)`. Also returns `false` once `hydrationComplete` is set.
+- **`markHydrationComplete()` / `resetHydrationState()`** — new exported lifecycle functions for the hydration flag.
+
+### Meta
+
+- **JSDoc `@template` syntax fix** — corrected `@typedef` for `PropsWithKnownKeys` in `tags.mjs`.
+
+### Types
+
+- **`server/types.d.ts`** — fixed `processLayoutRoutes` return type from `PRouteFile` to `RouteFile`.
+
+### Testing
+
+- **76 tests, 100% coverage** — 911/911 statements, 557/557 branches, 171/171 functions, 858/858 lines. New suites: hydration diffing edge cases (SSR divergence, keyed adoption, comment pairing, stripHydrationKeys, elementsMatch deep recursion, empty text node filtering), setup helpers (needsHydration, markHydrationComplete, resetHydrationState), template pattern regression, search race conditions.
+
 ## [0.2.2] - 2026-09-16
 
 ### Router

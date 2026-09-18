@@ -266,6 +266,7 @@ declare module "@vanjs/router" {
   export type LazyComponent = Promise<{
     default?: ComponentFn;
     Page?: ComponentFn;
+    component?: ComponentFn;
     route?: Pick<RouteEntry, "load" | "preload">;
     layouts?: RouteLayout[];
     leaf?: ComponentFn;
@@ -333,6 +334,14 @@ declare module "@vanjs/router" {
    * Find a registered route that matches the given path
    */
   export const matchRoute: (path: string) => RouteEntry | null;
+
+  /**
+   * Extract the route params from a route pattern and a path
+   */
+  export const extractParams: (
+    pattern: string,
+    path: string,
+  ) => Record<string, string> | null;
 
   /**  * Convenience hook to get the current route's cached data.
    */

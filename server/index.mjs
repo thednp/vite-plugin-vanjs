@@ -80,7 +80,9 @@ export function renderPreloadLinks(modules, manifest) {
   const seen = new Set();
   const ignoredAssets = new Set();
 
-  // First pass: collect all assets from ignored paths
+  // First pass: collect all assets from ignored paths.
+  // Route/layout JS stays on-demand, but their CSS is render-blocking for
+  // first paint, so it is never ignored.
   Object.entries(manifest).forEach(([id, files]) => {
     // istanbul ignore else - don't pre-render routes, layouts and JSX stuff
     if (
@@ -88,7 +90,10 @@ export function renderPreloadLinks(modules, manifest) {
         id.includes(l)
       )
     ) {
-      files.forEach((asset) => ignoredAssets.add(asset));
+      files.forEach((asset) => {
+        // istanbul ignore else
+        if (!asset.endsWith(".css")) ignoredAssets.add(asset);
+      });
     }
   });
 

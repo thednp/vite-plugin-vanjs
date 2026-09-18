@@ -7,6 +7,7 @@ import { renderToString } from "@vanjs/server";
 describe(`Test server-side JSX`, () => {
   test(`Test regular tags`, async () => {
     const Component = () => {
+      // @ts-expect-error - testing
       return (<div style={{ margin: 0 }}>Hi</div> as any)
     }
     const html = await renderToString(<Component /> as never);

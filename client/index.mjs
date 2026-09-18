@@ -141,37 +141,99 @@ export function elementsMatch(el1, el2, deep) {
 }
 
 function createHydrationContext() {
-  /** @type {WeakMap<Element, Element>} */
-  const parentCache = new WeakMap();
+  /**
+   * Significant child nodes: elements + non-empty text.
+   * SSR omits empty text nodes while the client creates Text("") for
+   * empty bindings, so those are filtered out on both sides.
+   * @param {Element} el
+   * @returns {ChildNode[]}
+   */
+  const significantChildren = (el) =>
+    Array.from(el.childNodes).filter((n) =>
+      n.nodeType !== 3 || n.textContent !== ""
+    );
 
-  /** @type {(element: HTMLElement, root: HTMLElement) => HTMLElement | null} */
-  function getParent(element, root) {
-    const cacheKey = element;
-    // istanbul ignore if - must be connected to a read DOM
-    if (parentCache.has(cacheKey)) {
-      const cached = parentCache.get(cacheKey);
-      // Verify the cached parent is still valid for this root
-      if (cached && cached.isConnected && root.contains(cached)) {
-        return cached;
+  /**
+   * Whether an element carries a hydration key
+   * @param {Node} el
+   * @returns {el is Element}
+   */
+  const isKeyed = (el) => el instanceof Element && el.hasAttribute("data-hk");
+
+  /**
+   * Consume hydration keys under a freshly hydrated root: adoption is done,
+   * subsequent renders are born keyless, so keys must not linger.
+   * @param {Element} root
+   */
+  function stripHydrationKeys(root) {
+    // istanbul ignore if - the diffed root is always an Element
+    if (!(root instanceof Element)) return;
+    if (root.hasAttribute("data-hk")) root.removeAttribute("data-hk");
+    root.querySelectorAll("[data-hk]").forEach((el) =>
+      el.removeAttribute("data-hk")
+    );
+  }
+
+  /**
+   * Whether two nodes can pair up: same kind, same tag/id/class, same text.
+   * className is coerced to String so SVG (SVGAnimatedString) pairs by tag+id.
+   * @param {ChildNode} oldN
+   * @param {ChildNode} newN
+   * @returns {boolean}
+   */
+  function nodesPairable(oldN, newN) {
+    if (oldN.nodeType === 3 || newN.nodeType === 3) {
+      return oldN.nodeType === newN.nodeType &&
+        oldN.textContent === newN.textContent;
+    }
+    if (oldN.nodeType === 8 || newN.nodeType === 8) {
+      return oldN.nodeType === newN.nodeType &&
+        oldN.textContent === newN.textContent;
+    }
+    if (!(oldN instanceof Element) || !(newN instanceof Element)) {
+      return false;
+    }
+    return oldN.tagName === newN.tagName &&
+      (oldN.id || "") === (newN.id || "") &&
+      String(oldN.className || "") === String(newN.className || "");
+  }
+
+  /**
+   * Adopt a node pair. Keyed SSR elements are replaced with their fresh
+   * client render (keys follow the client gate); static subtrees are walked
+   * so untouched nodes (e.g. images) are never re-instantiated. Text nodes
+   * are swapped for identical client ones so van bindings stay live.
+   * @param {ChildNode} oldNode
+   * @param {ChildNode} newNode
+   */
+  function adoptNode(oldNode, newNode) {
+    if (isKeyed(oldNode)) {
+      // istanbul ignore else - pairable nodes always share the same tag
+      if (newNode instanceof Element && oldNode.tagName === newNode.tagName) {
+        oldNode.replaceWith(newNode);
       }
-      // If not valid, remove from cache
-      parentCache.delete(cacheKey);
+      // else: no trustworthy counterpart — leave the SSR node in place
+      return;
     }
-
-    const chain = [];
-    let current = element;
-
-    while (current !== root && current) {
-      chain.push(current);
-      current = current.parentElement;
+    if (!(oldNode instanceof Element) || !(newNode instanceof Element)) return;
+    const oldSiblings = significantChildren(oldNode);
+    const newSiblings = significantChildren(newNode);
+    if (
+      oldSiblings.length !== newSiblings.length ||
+      !oldSiblings.every((ok, i) => nodesPairable(ok, newSiblings[i]))
+    ) {
+      // structural divergence — swap the whole subtree with the fresh client render
+      oldNode.replaceWith(newNode);
+      return;
     }
-
-    const parent = chain.slice(-1)[0];
-    // istanbul ignore else
-    if (parent) {
-      parentCache.set(cacheKey, parent);
-    }
-    return parent;
+    oldSiblings.forEach((os, i) => {
+      const ns = newSiblings[i];
+      if (os.nodeType === 3) {
+        os.replaceWith(ns);
+      } else {
+        adoptNode(os, ns);
+      }
+    });
   }
 
   /** @type {(oldDom: HTMLElement, newDom: HTMLElement | HTMLElement[]) => HTMLElement} */
@@ -180,47 +242,38 @@ function createHydrationContext() {
     // SPA mode
     // istanbul ignore else
     if (!oldDom.children.length && !elementsMatch(oldDom, newDom)) {
-      return oldDom.replaceChildren(...unwrap(newDom).children);
+      oldDom.replaceChildren(...unwrap(newDom).children);
+      stripHydrationKeys(oldDom);
+      return;
     }
     // istanbul ignore else
     if (newDom instanceof Array) {
       oldDom.replaceChildren(...unwrap(newDom).children);
+      stripHydrationKeys(oldDom);
       return;
     }
 
-    // SSR Mode
-    /** @type {Set<HTMLElement>} */
-    const oldSet = new Set();
-    /** @type {Set<HTMLElement>} */
-    const newSet = new Set();
-
-    const processElements = (root, set) => {
-      const elements = root.querySelectorAll("[data-hk]");
-      let lastParent = null;
-
-      elements.forEach((el) => {
-        const parent = getParent(el, root);
-        if (parent && parent !== lastParent) {
-          set.add(parent);
-          lastParent = parent;
-        }
-      });
-    };
-
-    processElements(oldDom, oldSet);
-    processElements(newDom, newSet);
-
-    // istanbul ignore else
-    if (newSet.size > 0) {
-      const newArray = Array.from(newSet);
-      oldSet.forEach((el) => {
-        const match = newArray.find((m) => elementsMatch(m, el));
-        // istanbul ignore else
-        if (match) {
-          el.replaceWith(match);
-        }
-      });
+    // SSR mode: adopt keyed elements 1:1 with fresh client renders,
+    // leave static subtrees untouched
+    const oldSiblings = significantChildren(oldDom);
+    const newSiblings = significantChildren(newDom);
+    if (
+      oldSiblings.length !== newSiblings.length ||
+      !oldSiblings.every((ok, i) => nodesPairable(ok, newSiblings[i]))
+    ) {
+      oldDom.replaceChildren(...newSiblings);
+      stripHydrationKeys(oldDom);
+      return;
     }
+    oldSiblings.forEach((ok, i) => {
+      const nk = newSiblings[i];
+      if (ok.nodeType === 3) {
+        ok.replaceWith(nk);
+      } else {
+        adoptNode(ok, nk);
+      }
+    });
+    stripHydrationKeys(oldDom);
   }
 
   return { diffAndHydrate };

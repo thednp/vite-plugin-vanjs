@@ -58,4 +58,17 @@ declare module "@vanjs/client" {
       | JSX.Element
       | Promise<ChildElement | ChildElement[] | JSX.Element>,
   ) => T;
+
+  /**
+   * Shallow compare two elements, optionally recursing into keyed children.
+   *
+   * @param el1 the server rendered element
+   * @param el2 the client rendered element or elements
+   * @param deep when true, compares the hydrated children of both elements
+   */
+  export const elementsMatch = (
+    el1: HTMLElement,
+    el2: HTMLElement | HTMLElement[],
+    deep?: boolean,
+  ) => boolean;
 }

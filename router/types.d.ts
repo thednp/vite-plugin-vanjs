@@ -227,6 +227,7 @@ export type ComponentModule = {
 export type LazyComponent = Promise<{
   default?: ComponentFn;
   Page?: ComponentFn;
+  component?: ComponentFn;
   route?: Pick<RouteEntry, "load" | "preload">;
   layouts?: RouteLayout[];
   leaf?: ComponentFn;

@@ -2,7 +2,6 @@
 import { cacheRoute, getCachedRoute } from "./routeCache.mjs";
 
 /** @typedef {import('./types').VanNode} VanNode */
-/** @typedef {import('./types').DynamicModule} DynamicModule */
 /** @typedef {import('./types').ComponentModule} ComponentModule */
 /** @typedef {import('./types').ComponentFn} ComponentFn */
 

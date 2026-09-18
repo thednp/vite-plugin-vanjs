@@ -1,0 +1,55 @@
+# vite-plugin-vanjs
+
+An async-first mini meta-framework for VanJS powered by Vite. Provides file-system routing, SSR/SSG, JSX support, metadata management, and a data caching layer — all as a Vite plugin.
+
+## Packages
+
+- `vite-plugin-vanjs` — Core Vite plugin: route scanning, virtual modules, build/dev config
+- `@vanjs/router` — Router, Route, lazy, A, navigate, routerState, dataCache, matchRoute, extractParams
+- `@vanjs/client` — Hydration: `hydrate()` for SSR-to-client DOM reconciliation
+- `@vanjs/server` — `renderToString()`, preload link generation, data cache serialization
+- `@vanjs/meta` — Head/Title/Meta/Link: SSR-safe document metadata
+- `@vanjs/setup` — Isomorphic VanJS setup, `needsHydration`, `markHydrationComplete`
+- `@vanjs/jsx` — JSX runtime (jsx, jsxs, jsxDev) with automatic namespace resolution
+
+## Key Concepts
+
+- ESM only — all source `.mjs`, types `.d.ts`
+- Isomorphic — `isServer` gates SSR vs SPA paths
+- Reactive state — `microStore()` creates reactive proxy objects via `van.state()`
+- `routerState._oldVal` — non-reactive reads via `rawVal` to avoid re-triggering derivations
+- Single Router instance — only internal `van.derive()` subscribes to pathname + searchParams
+- Stale navigation guard — `navToken` counter re-checked after lifecycle before DOM mutation
+- Layout chain diffing — prefix-diff on layout paths to reuse shared layouts across sibling pages
+- JSX Fragment flattening — `.flat()` on layout/leaf results because Fragments return nested arrays
+- Live-target hydration — navigations mutate the adopted SSR root, not the detached render wrapper
+- Server one-shot render — no shared loading flag, concurrent requests don't interfere
+
+## Commands
+
+```
+pnpm test -- --run   # Run vitest once
+pnpm lint            # deno lint + tsc -noEmit
+pnpm format          # deno fmt
+pnpm check:ts        # tsc -noEmit only
+```
+
+## Code Style
+
+- No comments unless explicitly requested
+- No semicolons (deno fmt)
+- JSDoc on public APIs only
+- deno fmt + deno lint
+
+## Source Layout
+
+```
+plugin/         Core Vite plugin
+router/         Router, state, helpers, lazy, dataCache, matchRoute, unwrap
+client/         Hydration (hydrate, elementsMatch, setAttribute)
+server/         renderToString, data cache serialization
+meta/           Head/Title/Meta/Link
+setup/          Isomorphic VanJS setup (van.mjs, van-ssr.mjs, helpers.mjs)
+jsx/            JSX runtime (jsx, Fragment, ns)
+tests/          Vitest tests (76 tests, 100% coverage)
+```

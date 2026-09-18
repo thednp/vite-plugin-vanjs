@@ -97,7 +97,7 @@ export const processLayoutRoutes: (
   routes: Array<PageFile>,
   config: ResolvedConfig,
   pluginConfig: PluginConfig,
-) => Array<PRouteFile>;
+) => Array<RouteFile>;
 
 /**
  * Scan and process layouts and return them.

@@ -9,8 +9,7 @@ import { Head } from "../meta/index.mjs";
 import * as dataCache from "./dataCache.mjs";
 
 /** @typedef {typeof import("./types.d.ts").navigate} Navigate */
-/** @typedef {import("./types.d.ts").SearchParamDef} SearchParamDef */
-/** @typedef {import("./types.d.ts").Route} Route */
+/** @typedef {import("./types.d.ts").RouteEntry} RouteEntry */
 /** @typedef {import("./types.d.ts").VanNode} VanNode */
 /** @typedef {import("./types.d.ts").ComponentModule} ComponentModule */
 /** @typedef {import("./types.d.ts").ComponentFn} ComponentFn */
@@ -41,7 +40,9 @@ export const resolveChildren = (module) => {
   // JSX Fragments return their children array directly, so a component
   // returning [<>...</>] produces [[...]] (nested). flatten() ensures
   // callers always receive a flat list of DOM nodes.
-  const raw = cp ? Array.from(unwrap(cp).children) : /* istanbul ignore next */ [];
+  const raw = cp
+    ? Array.from(unwrap(cp).children)
+    : /* istanbul ignore next */ [];
   return raw.flat();
 };
 

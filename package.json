@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-vanjs",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "author": "thednp",
   "license": "MIT",
   "description": "An async first mini meta-framework for VanJS powered by Vite",
@@ -24,6 +24,8 @@
     "jsx-runtime.d.ts",
     "jsx-dev-runtime.d.ts",
     "README.md",
+    "AGENTS.md",
+    "llms.txt",
     "LICENSE"
   ],
   "keywords": [
@@ -99,7 +101,7 @@
     "vanjs-ext": "^0.6.3"
   },
   "devDependencies": {
-    "@types/node": "^26.5.1",
+    "@types/node": "^26.6.1",
     "@vitest/browser": "^5.0.1",
     "@vitest/coverage-istanbul": "^5.0.1",
     "@vitest/ui": "^5.0.1",

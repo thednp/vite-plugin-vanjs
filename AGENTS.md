@@ -25,6 +25,12 @@
 - **Data flow** — `route.load()` returns data → cached by `executeLifecycle()` in `dataCache` → read via `useRouteData()`
 - **Cache key** — `""` for empty params, `JSON.stringify(params)` otherwise
 - **No `DynamicModule`** — replaced by `LazyComponent = Promise<{ default?, Page?, route? }>`
+- **`routerState._oldVal`** — non-reactive reads via `rawVal` property (cross-env: writable on client, getter fallback on server). Used to avoid re-triggering derivations
+- **Single Router instance** — `Router()` setup reads via `_oldVal`; only internal `van.derive()` subscribes to `pathname` + `searchParams`
+- **Stale navigation guard** — `navToken` counter re-checked after `executeLifecycle()` before any DOM mutation
+- **Layout chain diffing** — `buildChain()` uses prefix-diff on layout paths to reuse shared layouts across sibling pages; `outlet` swapped on leaf-only changes
+- **JSX Fragment flattening** — `buildChain()` and `resolveChildren()` call `.flat()` on results because JSX Fragments return nested arrays
+- **Live-target hydration** — real DOM adopted after initial render; navigations mutate the live root, not the detached render wrapper
 
 ## Commands
 
@@ -42,7 +48,7 @@ pnpm check:ts      # tsc -noEmit only
 - **Environments**: `client.test.ts` uses `happy-dom`, `server.test.ts` uses `@vitest-environment node`
 - **Config**: `vitest.config.ts` — routes dir is `tests/routes`
 - **Coverage**: Istanbul, enabled by default, covers `plugin/`, `router/`, `setup/`, `client/`, `server/`, `meta/`, `jsx/`
-- **Test files**: `tests/client.test.ts`, `tests/client.test.tsx`, `tests/server.test.ts`, `tests/server.test.tsx`, `tests/dataCache.test.ts`, `tests/state.test.ts`, `tests/router.helpers.test.ts`, `tests/router.hydration.test.ts`, `tests/router.spa.test.ts`
+- **Test files**: `tests/client.test.ts`, `tests/client.test.tsx`, `tests/server.test.ts`, `tests/server.test.tsx`, `tests/dataCache.test.ts`, `tests/state.test.ts`, `tests/router.helpers.test.ts`, `tests/router.hydration.test.ts`, `tests/router.spa.test.ts`, `tests/router.search.test.ts`, `tests/router.template-pattern.test.ts`, `tests/hydration-diff.test.ts`, `tests/setup.test.ts`
 - **Coverage**: 100% statements / branches / functions / lines for all covered directories
 
 ## Code Style
