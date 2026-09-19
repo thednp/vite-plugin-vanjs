@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.4] - 2026-09-19
+
+### Server
+
+- **Preload asset exclusion** — route/layout assets (both JS and CSS) are now excluded from preload links. CSS is no longer treated as render-blocking for first paint — styles are loaded on demand like JS.
+
 ## [0.2.3] - 2026-09-18
 
 ### Client
@@ -40,7 +46,7 @@
 
 ### Testing
 
-- **76 tests, 100% coverage** — 911/911 statements, 557/557 branches, 171/171 functions, 858/858 lines. New suites: hydration diffing edge cases (SSR divergence, keyed adoption, comment pairing, stripHydrationKeys, elementsMatch deep recursion, empty text node filtering), setup helpers (needsHydration, markHydrationComplete, resetHydrationState), template pattern regression, search race conditions.
+- **76 tests, 100% coverage** — 910/910 statements, 556/556 branches, 171/171 functions, 857/857 lines. New suites: hydration diffing edge cases (SSR divergence, keyed adoption, comment pairing, stripHydrationKeys, elementsMatch deep recursion, empty text node filtering), setup helpers (needsHydration, markHydrationComplete, resetHydrationState), template pattern regression, search race conditions.
 
 ## [0.2.2] - 2026-09-16
 
